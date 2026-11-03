@@ -2859,3 +2859,11 @@ Bus I²C del robot cortado desde las 19:39: reconectar SDA, SCL, 5 V y GND antes
 - graficas_recompensa_perdida.py: recompensa por episodio (cruda + tendencia) y 8 paneles de pérdidas por marcha, más recompensa de las 5 marchas. Copiadas a Documento_TESIS/Figures/Resultados (ppo_recompensa_<marcha>_episodios.png, ppo_perdidas_<marcha>.png); aún no están en el texto de la tesis.
 - Presentación resumida en línea de tiempo, 29 diapositivas, ecuaciones sin explicar y una sola tabla de resultados: https://claude.ai/artifact/HfRaeqjedTApv4aB1gmPgd (copia en Documentacion/presentacion_charla_20261029/).
 - El documento de tesis (PDF del 22-oct) sigue sin los resultados del 26 al 29-oct. Pendiente: actualizarlo; probar gateo y galope en el robot; caminatas en el piso; exportar las políticas nuevas a NumPy para la Raspberry.
+
+### 3-nov-2026 — videos de las caminatas movidos al disco externo
+
+Para liberar espacio se comprimieron a H.264 los videos MJPEG (comprimir_videos.py: 199 comprimidos; 4 de extra_general conservados en MJPEG por un desfase de ≈0,15 s en el primer fotograma) y las 217 caminatas con video se copiaron a `Vidios tesis` en el disco externo USB2 (rsync, verificación por suma de comprobación sin diferencias). Los 407 `video.mkv` se borraron del PC; los datos (csv, json, análisis) siguen también en `Experimentos/camaras/grabaciones`. Disco del PC: de 28 a 96 GB libres. Para reanalizar un video hay que conectar el disco; las caminatas nuevas se siguen grabando en el PC.
+
+### 3-nov-2026 — convergencia por marcha en el informe
+
+Campaña v31 (cola_v31.sh): las 5 marchas desde cero con registro de cada término de la recompensa (terminos.csv), 3 M de pasos y galope 5 M, una semilla por marcha. graficas_convergencia.py: recompensa y castigo frente a pasos y épocas, épocas frente a pasos y castigos por término. Convergencia de la recompensa: gateo 0,60 M (2937 épocas), paso 0,73 M (3560), carrera 0,83 M (4044), trote 1,39 M (6758), galope 2,05 M (10 020). El avance por episodio baja durante el entrenamiento en todas. Añadida la sección 13.5 a la tesis (capítulo de políticas PPO), con 2 tablas y 5 figuras. El resto del documento sigue sin los resultados del 26 al 29-oct (viabilidad, carrera y galope en el capítulo de resultados, parecido simulación-robot).

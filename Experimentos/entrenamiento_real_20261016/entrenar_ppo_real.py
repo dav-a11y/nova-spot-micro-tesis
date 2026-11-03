@@ -222,6 +222,12 @@ def generar_marcha(control_dt):
     return marcha_paso(control_dt) if MARCHA == "paso" else marcha_b(control_dt)
 
 
+# 3-nov: con --registrar-perdidas, terminos.csv guarda por episodio cada término de la recompensa.
+RUTA_TERMINOS = None
+TERMINOS = ("vivo", "avance", "actitud", "altura", "base", "correccion", "lateral", "giro", "suavidad", "coxas",
+            "giro_ciclo")
+
+
 class NovaRealEnv(NovaMujocoResidualEnv):
     def __init__(self, actuador, seed=11, episode_cycles=6, domain_randomization=True,
                  sensor_noise_deg=1.0, control_dt=0.02):
@@ -283,6 +289,15 @@ class NovaRealEnv(NovaMujocoResidualEnv):
             yaw = float(np.arctan2(np.sin(_quat_yaw(self.data.xquat[self.base_body]) - self.initial_yaw),
                                    np.cos(_quat_yaw(self.data.xquat[self.base_body]) - self.initial_yaw)))
             rec -= w.get("lateral", 0.0) * lat ** 2 + w.get("giro", 0.0) * yaw ** 2
+        if RUTA_TERMINOS:
+            # 3-nov: desglose de la recompensa solo para registrarlo; no cambia el valor devuelto.
+            self._t = dict(vivo=1.0, avance=w.get("avance", 18.0) * dx,
+                           actitud=-w.get("actitud", 8.0) * (roll ** 2 + pitch ** 2),
+                           altura=-25.0 * (h - 0.235) ** 2, base=-0.25 * float(q_err @ q_err),
+                           correccion=-0.04 * float(residual @ residual))
+            if w.get("lateral") or w.get("giro"):
+                self._t["lateral"] = -w.get("lateral", 0.0) * lat ** 2
+                self._t["giro"] = -w.get("giro", 0.0) * yaw ** 2
         return float(rec)
 
     def reset(self, *, seed=None, options=None):
@@ -301,6 +316,26 @@ class NovaRealEnv(NovaMujocoResidualEnv):
         self.orden_previa = None
         self.yaw_ciclo = None
         return self._observation(), info
+
+    def _registrar_terminos(self, reward, terminated, truncated):
+        """3-nov: suma por episodio cada premio y castigo y escribe una fila en terminos.csv."""
+        if not hasattr(self, "_acum"):
+            self._acum, self._ep = dict.fromkeys(TERMINOS, 0.0), 0
+            self._pasos_ep, self._total_ep = 0, 0.0
+        for k, v in self._t.items():
+            self._acum[k] += v
+        self._pasos_ep += 1
+        self._total_ep += reward
+        if terminated or truncated:
+            nuevo = not RUTA_TERMINOS.exists()
+            with RUTA_TERMINOS.open("a") as f:
+                if nuevo:
+                    f.write("episodio,pasos_ep,total,caida," + ",".join(TERMINOS) + "\n")
+                f.write(f"{self._ep},{self._pasos_ep},{self._total_ep:.6f},{int(terminated)},"
+                        + ",".join(f"{self._acum[k]:.6f}" for k in TERMINOS) + "\n")
+            self._ep += 1
+            self._acum = dict.fromkeys(TERMINOS, 0.0)
+            self._pasos_ep, self._total_ep = 0, 0.0
 
     def step(self, action):
         action = np.asarray(action, dtype=float) * self.mascara
@@ -343,9 +378,13 @@ class NovaRealEnv(NovaMujocoResidualEnv):
         pesos = getattr(self, "pesos", {})
         if pesos.get("suavidad"):
             reward -= pesos["suavidad"] * float(np.sum((delta * self.mascara / 0.02) ** 2))
+            if RUTA_TERMINOS:
+                self._t["suavidad"] = -pesos["suavidad"] * float(np.sum((delta * self.mascara / 0.02) ** 2))
         if pesos.get("coxas"):
             err = np.degrees(self.data.qpos[self.qpos_ids][self.idx_coxas] - self.data.ctrl[self.idx_coxas])
             reward -= pesos["coxas"] * float(np.mean(err ** 2))
+            if RUTA_TERMINOS:
+                self._t["coxas"] = -pesos["coxas"] * float(np.mean(err ** 2))
         # 19-oct (v10): giro del cuerpo en cada ciclo completo. Sin IMU la política no ve el
         # rumbo; penalizar el giro por ciclo evita que se curve en caminatas largas.
         w_ciclo = getattr(self, "pesos", {}).get("giro_ciclo", 0.0)
@@ -356,6 +395,8 @@ class NovaRealEnv(NovaMujocoResidualEnv):
             if previo is not None:
                 giro = np.degrees(np.arctan2(np.sin(yaw - previo), np.cos(yaw - previo)))
                 reward -= w_ciclo * giro ** 2
+                if RUTA_TERMINOS:
+                    self._t["giro_ciclo"] = -w_ciclo * giro ** 2
             self.yaw_ciclo = yaw
         self.step_count += 1
         roll, pitch, h = self._cuerpo()
@@ -363,6 +404,8 @@ class NovaRealEnv(NovaMujocoResidualEnv):
         terminated = bool(not np.isfinite(obs).all() or h < 0.12 or h > 0.40
                           or abs(roll) > 0.60 or abs(pitch) > 0.60)
         truncated = self.step_count >= self.max_steps
+        if RUTA_TERMINOS:
+            self._registrar_terminos(reward, terminated, truncated)
         return obs, reward, terminated, truncated, {
             "roll": roll, "pitch": pitch, "height": h,
             "x": float(self.data.xpos[self.base_body, 0]),
@@ -446,6 +489,9 @@ def main():
                              giro_ciclo=a.w_giro_ciclo, suavidad=a.w_suavidad, coxas=a.w_coxas)
     out = a.output / f"semilla_{a.seed}"
     out.mkdir(parents=True, exist_ok=True)
+    global RUTA_TERMINOS
+    if a.registrar_perdidas:
+        RUTA_TERMINOS = out / "terminos.csv"
     env = NovaRealEnv(actuador, seed=a.seed, control_dt=a.dt, episode_cycles=a.ciclos_episodio)
     if a.registrar_perdidas:
         # 29-oct: monitor.csv con la recompensa cruda de cada episodio (para graficar ruido y convergencia).
@@ -471,6 +517,7 @@ def main():
     model.learn(total_timesteps=a.timesteps, reset_num_timesteps=not a.continuar,
                 callback=CallbackList([MetricsCallback(out / "training_trace.csv"), copias]))
     model.save(out / "policy.zip")
+    RUTA_TERMINOS = None  # 3-nov: los episodios de evaluación no son entrenamiento
     filas = evaluar(model, actuador, a.eval_seeds, control_dt=a.dt)
     with (out / "evaluacion.csv").open("w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(filas[0]))

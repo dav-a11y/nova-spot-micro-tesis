@@ -256,6 +256,151 @@ media móvil de 15 puntos.}
 \label{fig:curvas-semillas}
 \end{figure}
 
+\section{Convergencia del entrenamiento por marcha}
+\label{sec:convergencia-marchas}
+
+Para medir cuándo deja de mejorar cada marcha se realizó el 3 de noviembre de 2026
+una campaña específica (v31): las cinco marchas se entrenaron desde cero en MuJoCo,
+con los hiperparámetros de la Tabla~\ref{tab:hiperparametros-ppo}, durante 3~M de pasos
+(5~M en el galope, que a 1~M aún no se había estabilizado). Se usó una sola semilla por
+marcha. Las políticas de esta campaña no se probaron en el robot: la campaña se
+hizo únicamente para observar la convergencia. Además de la recompensa total, se
+registró en cada episodio el valor de cada término de la
+ecuación~\eqref{eq:recompensa-real}.
+
+\subsection{Composición de la recompensa}
+
+La recompensa tiene dos premios y nueve castigos. Los premios corresponden a lo que se
+quiere aumentar: seguir de pie (el término constante $+1$ por paso, que se pierde al
+caer porque el episodio termina) y avanzar. Los castigos corresponden a lo que se quiere
+llevar a cero: inclinación, variación de altura, alejamiento de la marcha nominal, tamaño
+de la corrección, desvío lateral, giro, giro por ciclo, brusquedad y desviación de las
+coxas. Los pesos se ajustaron a mano entre campañas a partir de los problemas observados
+en la simulación y en el robot; no proceden de una deducción analítica.
+
+Escribir un objetivo como premio o como castigo es equivalente para el aprendizaje,
+porque la política se ajusta según la diferencia entre acciones y no según el signo
+absoluto de la recompensa. Por ello, el valor negativo de la recompensa total no indica
+por sí solo un mal comportamiento: lo que se interpreta es su evolución. La
+Tabla~\ref{tab:terminos-recompensa} muestra que, al final del entrenamiento, los castigos
+siguen superando a los premios en todas las marchas.
+
+\begin{table}[H]
+\centering
+\caption{Principales términos de la recompensa por episodio al final del entrenamiento (media del último 10~\% de los episodios, en puntos).}
+\label{tab:terminos-recompensa}
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Marcha & Seguir de pie & Avance & Brusquedad & Coxas & Giro por ciclo \\
+\midrule
+Gateo & $+561$ & $+24$ & $-239$ & $-383$ & $-9$ \\
+Paso & $+435$ & $+10$ & $-234$ & $-283$ & $-15$ \\
+Carrera & $+357$ & $+3$ & $-125$ & $-313$ & $-10$ \\
+Trote & $+429$ & $+6$ & $-461$ & $-315$ & $-13$ \\
+Galope & $+357$ & $+5$ & $-116$ & $-729$ & $-114$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Lectura de las gráficas}
+
+Las Figuras~\ref{fig:convergencia-gateo} a~\ref{fig:convergencia-galope} tienen los mismos
+seis paneles. Los dos primeros muestran la recompensa total frente a los pasos de
+entrenamiento y frente a las épocas; los dos siguientes, la suma de los castigos con
+los mismos ejes, en valor positivo, de modo que en ellos una curva más baja es mejor. Un
+paso es una decisión de la política (cada 30~ms) y una época es una pasada de
+optimización sobre los 2048 pasos de una recolección. El quinto panel relaciona ambas
+escalas: es una recta porque cada recolección usó sus 10 épocas y el umbral de divergencia
+KL no interrumpió ninguna, de modo que 1~M de pasos equivale a unas 4880 épocas. El sexto
+panel separa los castigos de mayor peso y permite ver cuáles reduce la política y cuáles
+apenas cambian.
+
+Se adoptó el siguiente criterio de convergencia: sobre la media móvil de 100
+episodios, es el primer punto a partir del cual la curva ya no sale de una banda de
+$\pm5$~\% de su recorrido total alrededor de su valor final (media del último 10~\% de
+los episodios). Una curva cuyo punto cayera en el último 20~\% del entrenamiento se
+consideraría no convergida; ninguna quedó en ese caso. El criterio es una convención de
+este trabajo, y los puntos obtenidos corresponden a una sola semilla.
+
+\begin{table}[H]
+\centering
+\caption{Punto de convergencia de la recompensa y evolución de la recompensa, el castigo y el ruido por episodio (desviación típica del primer y del último 10~\% de los episodios; recompensa y castigo inicial: primer 1~\%).}
+\label{tab:convergencia-marchas}
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Marcha & Pasos (M) & Épocas & Recompensa & Castigo & Ruido \\
+\midrule
+Gateo & 0,60 & 2937 & $-1438 \to -103$ & $2028 \to 688$ & $242 \to 16$ \\
+Paso & 0,73 & 3560 & $-1214 \to -127$ & $1663 \to 572$ & $182 \to 18$ \\
+Carrera & 0,83 & 4044 & $-1740 \to -215$ & $2103 \to 574$ & $365 \to 14$ \\
+Trote & 1,39 & 6758 & $-1750 \to -439$ & $2186 \to 874$ & $321 \to 16$ \\
+Galope & 2,05 & 10\,020 & $-4699 \to -742$ & $5072 \to 1104$ & $1281 \to 281$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Resultados}
+
+La Tabla~\ref{tab:convergencia-marchas} resume los puntos de convergencia. La recompensa
+y el castigo convergen prácticamente en el mismo punto, porque los premios apenas varían
+durante el entrenamiento: la recompensa sube, sobre todo, porque bajan los castigos. El
+gateo, el paso y la carrera convergen antes de 1~M de pasos, el trote hacia 1,4~M y el
+galope hacia 2~M. El galope aprende en dos etapas, con una meseta entre 1 y 2~M de pasos,
+y es la marcha que conserva más ruido al final; también es la única con caídas durante el
+entrenamiento (7 en 14\,010 episodios).
+
+Por término, el giro por ciclo y la brusquedad son los castigos que más disminuyen. El
+castigo de las coxas baja menos en las cuatro primeras marchas, y en el galope prácticamente no
+cambia. La política no comanda las coxas: solo influye en ellas de forma indirecta,
+a través de las sacudidas del cuerpo.
+
+La convergencia indica que la recompensa dejó de mejorar, no que la marcha sea
+mejor para el objetivo de avanzar. El avance por episodio \emph{disminuyó} durante el
+entrenamiento en todas las marchas: de 0,74 a 0,60~m en el gateo, de 0,67 a 0,51~m en el
+paso, de 0,73 a 0,62~m en el trote, de 0,58 a 0,27~m en la carrera y de 0,57 a 0,15~m en el
+galope (primer 1~\% frente a último 10~\% de los episodios). El peso del avance es pequeño frente
+al de los castigos, de modo que la política aprende a moverse con más suavidad y con
+menos desvío a costa de avanzar menos. Este resultado es coherente con el hecho de que la mejor copia
+de una campaña no siempre sea la última, y justifica la selección que se describe a
+continuación.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth,height=0.86\textheight,keepaspectratio]{Resultados/ppo_convergencia_gateo.png}
+\caption{Convergencia del entrenamiento. Gateo (semilla 4009, 3~M de pasos). Tono claro: valor de cada episodio; tono oscuro: media móvil de 100 episodios; línea discontinua: punto de convergencia. Ejes verticales recortados al percentil 0,5--99,5.}
+\label{fig:convergencia-gateo}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth,height=0.86\textheight,keepaspectratio]{Resultados/ppo_convergencia_paso.png}
+\caption{Convergencia del entrenamiento. Paso (semilla 4109, 3~M de pasos). Tono claro: valor de cada episodio; tono oscuro: media móvil de 100 episodios; línea discontinua: punto de convergencia. Ejes verticales recortados al percentil 0,5--99,5.}
+\label{fig:convergencia-paso}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth,height=0.86\textheight,keepaspectratio]{Resultados/ppo_convergencia_carrera.png}
+\caption{Convergencia del entrenamiento. Carrera (semilla 4309, 3~M de pasos). Tono claro: valor de cada episodio; tono oscuro: media móvil de 100 episodios; línea discontinua: punto de convergencia. Ejes verticales recortados al percentil 0,5--99,5.}
+\label{fig:convergencia-carrera}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth,height=0.86\textheight,keepaspectratio]{Resultados/ppo_convergencia_trote.png}
+\caption{Convergencia del entrenamiento. Trote (semilla 4207, 3~M de pasos). Tono claro: valor de cada episodio; tono oscuro: media móvil de 100 episodios; línea discontinua: punto de convergencia. Ejes verticales recortados al percentil 0,5--99,5.}
+\label{fig:convergencia-trote}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth,height=0.86\textheight,keepaspectratio]{Resultados/ppo_convergencia_galope.png}
+\caption{Convergencia del entrenamiento. Galope (semilla 6403, 5~M de pasos). Tono claro: valor de cada episodio; tono oscuro: media móvil de 100 episodios; línea discontinua: punto de convergencia. Ejes verticales recortados al percentil 0,5--99,5.}
+\label{fig:convergencia-galope}
+\end{figure}
+
 \section{Selección de copias}
 
 Cada campaña deja una copia de la política cada $10^5$ pasos. La recompensa de
