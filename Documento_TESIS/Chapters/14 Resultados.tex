@@ -17,8 +17,11 @@ Contacto trasero & Precarga 2,0: dos ensayos de 18 ciclos con 18/18 vuelos filtr
 Supervisor & Nueve escenarios provocados emitieron motivo, activación y \texttt{stand}. & Integración ROS~2; no corte eléctrico. \\
 PPO residual (modelo nominal) & Cinco semillas y barrido de escala; ninguna escala positiva cumplió el criterio conjunto. & Resultado negativo en simulación; transferencia bloqueada. \\
 Modelo & 52.111 configuraciones exploradas; postura nominal con $\sigma_{\min}=0{,}038037$ m/rad. Geometría de patas y actuador identificados en el robot. & Masas, inercias y fricción sin identificar. \\
-Marchas en el robot & Gateo y trote nominales ejecutados con el robot suspendido; repeticiones de 3~min con CV entre 2 y 11~\% en una misma sesión. & Robot suspendido; sin medición de avance ni inclinación. \\
+Marchas en el robot & Gateo, paso, trote, carrera y galope nominales ejecutados con el robot suspendido; repeticiones de 3~min con CV entre 2 y 11~\% en una misma sesión. & Robot suspendido; sin medición de avance ni inclinación. \\
 PPO con actuador real & Políticas seleccionadas en el robot; gateo $-15$ a $-19$~\% de error frente a la marcha nominal en dos vueltas, trote $-19$~\% en una. & Seguimiento y estabilidad de coxas; locomoción apoyada sin medir. \\
+Viabilidad de las políticas & Paso, trote, carrera y gateo: 100~\% de 20 episodios; galope: 90~\%; sin caídas. & Solo simulación; copias elegidas con esos mismos episodios. \\
+Parecido robot--simulación & Paso 83~\%, trote 70~\%, carrera 69~\%; forma casi igual, amplitud distinta. & Robot suspendido; una toma de 60~s; gateo y galope elegidos sin probar. \\
+Convergencia & La recompensa se estabiliza entre 0,60~M (gateo) y 2,05~M de pasos (galope). & Simulación; una semilla por marcha (sección~\ref{sec:convergencia-marchas}). \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -506,7 +509,7 @@ reproducibles.
 \label{sec:resultados-robot-fisico}
 
 Esta sección reúne las pruebas de las políticas del
-capítulo~\ref{cap:ppo-fisico} en el robot real entre el 19 y el 21 de octubre de
+capítulo~\ref{cap:ppo-fisico} en el robot real entre el 19 y el 28 de octubre de
 2026. En todas el robot estuvo suspendido, sin apoyar las patas en el suelo, y
 se registraron los sensores articulares a 30~Hz y entre cuatro y cinco cámaras
 sincronizadas.
@@ -626,6 +629,149 @@ las caminatas de la vuelta 2 midió un retardo de 99~ms en todas las
 articulaciones con sensor, una histéresis de 0,6 a $1{,}5^\circ$ y un error que
 el modelo no explica de $1{,}8^\circ$ de media (brecha robot--modelo).
 
+\subsection{Comparación con la postura de trabajo del 27 de octubre}
+\label{sec:postura27}
+
+El 27 de octubre se adoptó una postura nueva, aprobada por el operador, en la que
+las tibias 2 y 4 se apoyan en otra posición y se mueven en sentido contrario al
+anterior (capítulo~\ref{cap:ppo-fisico}). Por eso las comparaciones anteriores a
+esa fecha no sirven para esta postura y se repitieron, con dos repeticiones por
+condición, Tabla~\ref{tab:postura27}.
+
+\begin{table}[H]
+\centering
+\caption{Marcha nominal frente a PPO con la postura del 27 de octubre (grados, menor es mejor; dos repeticiones).}
+\label{tab:postura27}
+\small
+\begin{tabular}{lrrrrrrl}
+\toprule
+& \multicolumn{2}{c}{Error de patas} & \multicolumn{2}{c}{Desviación de coxas} & \multicolumn{2}{c}{Puntuación} & \\
+Marcha & Nominal & PPO & Nominal & PPO & Nominal & PPO & Política \\
+\midrule
+Gateo & 2,44 & 3,28 & 3,88 & 2,66 & 2,92 & 3,07 & v14 semilla 43 \\
+Paso & 2,75 & 2,37 & 3,88 & 1,98 & 3,13 & 2,24 & v16 semilla 563 \\
+Trote & 4,09 & 2,68 & 10,11 & 3,80 & 6,10 & 3,06 & v15 semilla 307 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La puntuación baja un 28~\% en el paso y un 50~\% en el trote, y queda casi igual en
+el gateo, donde la PPO reduce la desviación de las coxas pero aumenta el error de
+patas. Estas cifras tienen tres límites. Hay solo dos repeticiones. La escala del
+encoder de la tibia 2 se corrigió al día siguiente, de modo que su error está
+sobrestimado (en el gateo v14 pesa mucho: $10{,}98^\circ$ frente a
+$4{,}13^\circ$). Y el 28 de octubre se comprobó que el potenciómetro de la coxa 2
+no sigue a la coxa, de modo que su lectura no es fiable. Además, un día antes, en
+la sesión del paso v16 (26 y 27 de octubre, postura anterior), la v16 no mejoró a
+la marcha nominal en las articulaciones con sensor fiable (diferencias de
+$\pm0{,}4^\circ$). Las políticas de esta tabla son también anteriores a las
+elegidas por viabilidad en la sección siguiente, que no se han comparado con la
+marcha nominal en el robot.
+
+En el galope, la v20 (dos repeticiones, marcha de entonces con fémur $16^\circ$ y
+tibia $14^\circ$) redujo el error de patas ($4{,}07^\circ$ frente a $4{,}63^\circ$)
+pero aumentó la desviación de las coxas ($9{,}52^\circ$ frente a $6{,}31^\circ$), de
+modo que no se puede decir que mejorara a la marcha nominal.
+
+\subsection{Viabilidad de las políticas en simulación}
+\label{sec:viabilidad-resultados}
+
+La Tabla~\ref{tab:viabilidad} muestra las políticas elegidas para cada marcha con el
+criterio de viabilidad de la ecuación~\eqref{eq:viabilidad}: 20 episodios simulados
+con aleatorización del dominio y del actuador. Estas son las políticas que hay
+actualmente para el robot, y las cinco incluyen ya las ganancias de tibia de la
+postura del 27 de octubre.
+
+\begin{table}[H]
+\centering
+\caption{Políticas elegidas por viabilidad (20 episodios en simulación, semillas 1001 a 1020). Entre paréntesis, la marcha nominal.}
+\label{tab:viabilidad}
+\small
+\begin{tabular}{llrrrrr}
+\toprule
+Marcha & Política (pasos) & Viabilidad & Avance (m) & Deriva (m) & Caídas & Incl. máx. \\
+\midrule
+Paso & v24 s.\ 4109 (0,2~M) & 100~\% & 1,16 (1,10) & 0,07 (0,22) & 0/20 & $2{,}7^\circ$ \\
+Trote & v24 s.\ 4209 (0,2~M) & 100~\% & 1,35 (1,25) & 0,24 (0,20) & 0/20 & $5{,}6^\circ$ \\
+Carrera & v24 s.\ 4309 (0,2~M) & 100~\% & 1,20 (1,14) & 0,12 (0,11) & 0/20 & $4{,}8^\circ$ \\
+Gateo & v27 s.\ 7013 (4,1~M) & 100~\% & 0,99 (1,03) & 0,03 (0,14) & 0/20 & $4{,}5^\circ$ \\
+Galope & v28 s.\ 8417 (0,175~M) & 90~\% & 2,00 (2,03) & 0,33 (0,29) & 0/20 & $7{,}4^\circ$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Ninguna política se cayó, y la marcha nominal tampoco. La ventaja de PPO en
+simulación es modesta y depende de la marcha: paso, trote y carrera avanzan entre un
+5 y un 8~\% más que la nominal, y paso y gateo reducen claramente la deriva, pero el
+gateo avanza un 4~\% menos y el trote, la carrera y el galope se desvían algo más. En
+el galope la viabilidad se quedó en el 90~\% en las campañas v27 y v28, por lo que
+entrenar más con la misma marcha base no parece suficiente.
+
+Estos porcentajes deben leerse con cautela. Con 20 episodios, el intervalo de
+confianza de Wilson al 95~\% es de 84 a 100~\% para el 100~\% y de 70 a 97~\% para
+el 90~\%. Además, las copias se eligieron con los mismos 20 episodios con los que
+se informan, de modo que el resultado es optimista. El criterio también es sensible
+a su umbral de avance: copias vecinas de una misma semilla pueden dar valores muy
+distintos (en la semilla 7001 de la v27, 30, 100 y 60~\% en copias separadas por
+50\,000 pasos). Faltaría repetir la evaluación con semillas nuevas.
+
+Con las ganancias de tibia en la simulación, la marcha base del galope usada hasta
+entonces (fémur $16^\circ$, tibia $14^\circ$) se cayó en los 20 episodios, con
+inclinaciones de hasta $37^\circ$. Un barrido de amplitudes
+(\path{barrido_nominal.py}) llevó a fémur $18^\circ$ y tibia $7^\circ$, que avanza
+2,10~m sin caídas y con $7^\circ$ de inclinación en el barrido. Es la marcha base de
+las campañas de galope desde la v25.
+
+\subsection{Parecido entre el robot y la simulación}
+\label{sec:parecido-sim-real}
+
+Para saber si el robot se mueve como la simulación, cada caminata grabada se repite en
+MuJoCo con el robot colgado, sin aleatorización, con la misma marcha y política. Para
+cada articulación con sensor se compara el ciclo medio del ángulo en el robot y en la
+simulación: $r_j$ es la correlación de los dos ciclos tras alinear el desfase, y
+$A_j$ la razón entre el recorrido del robot y el de la simulación. Entonces
+\begin{equation}
+    \text{parecido}_j = 100\,\max(0,r_j)\,\min\!\left(A_j,\frac{1}{A_j}\right),
+    \label{eq:parecido}
+\end{equation}
+y el parecido de la caminata es la media de sus articulaciones con sensor válido. La
+Tabla~\ref{tab:parecido} da el resultado de las tres políticas probadas el 28 de
+octubre, en tomas de 60~s con la coxa 2 ya ajustada y la calibración corregida.
+
+\begin{table}[H]
+\centering
+\caption{Parecido robot--simulación por articulación (28 de octubre de 2026, una toma de 60~s por política). Entre paréntesis, la amplitud relativa $A_j$.}
+\label{tab:parecido}
+\footnotesize
+\begin{tabular}{lrrr}
+\toprule
+Articulación & Paso v24 s.\ 4109 & Trote v24 s.\ 4209 & Carrera v24 s.\ 4309 \\
+\midrule
+Fémur delantero derecho & 96 (1,04) & 77 (1,29) & 71 (1,41) \\
+Fémur delantero izquierdo & 90 (0,92) & 84 (1,18) & 72 (1,38) \\
+Fémur trasero derecho & 94 (0,97) & 5 (0,18) & 56 (1,77) \\
+Fémur trasero izquierdo & 58 (0,62) & 95 (1,04) & 79 (1,24) \\
+Tibia delantera izquierda & 83 (1,18) & 90 (1,10) & 76 (1,29) \\
+Tibia trasera izquierda & 73 (1,34) & 73 (1,36) & 61 (1,61) \\
+\midrule
+\textbf{Caminata} & \textbf{83} & \textbf{70} & \textbf{69} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La forma del movimiento coincide casi por completo: $r$ está entre 0,93 y 1,00 en
+todas las articulaciones salvo una, y el robot va de 60 a 130~ms por detrás de la
+simulación. La diferencia está en la amplitud, sobre todo en la carrera, cuyos
+fémures se mueven de 1,2 a 1,8 veces lo simulado; la causa no se ha identificado. El
+caso aislado es el fémur trasero derecho en la toma de trote ($r=0{,}25$), que por
+sí solo baja el valor de la caminata: sin él sería 84~\%. Al tratarse de una sola
+toma, no se puede saber si fue un fallo puntual de ese sensor.
+
+La métrica depende de la calibración. Antes de corregir la escala del encoder de la
+tibia 2 (de $-0{,}59$ a $-1{,}15$, regresión con $r\approx0{,}97$ en tres
+caminatas), los mismos valores eran 76, 63 y 63~\%. Las políticas de gateo y galope
+elegidas no se han probado en el robot.
+
 \subsection{Ensayos inválidos y su interpretación}
 
 Se conservan y explican los ensayos detenidos por la comprobación de salud,
@@ -646,6 +792,14 @@ porque su causa cambia la lectura de los resultados:
     tardíos, los fémures 2 a 4 siguieron la orden con $r=0{,}88$--$0{,}93$
     frente a $0{,}97$--$0{,}99$ por la mañana, tras unas doce horas de
     ensayos.
+    \item \textbf{Paso v16 y conexiones.} La tercera repetición del paso v16
+    (26 de octubre) se invalidó por saltos del multiplexor analógico, que daban
+    desviaciones de coxas de unos $80^\circ$, y la cuarta ronda se cortó a los
+    3~s porque el análisis de video agotó la memoria del PC (se limitó a dos
+    procesos). Esta sesión se hizo con la comprobación de salud desactivada a
+    petición del operador.
+    \item \textbf{Bus I$^2$C.} El 27 de octubre el bus volvió a cortarse. La causa
+    fue el cable del encoder del fémur 2; tras repararlo, el bus quedó estable.
 \end{itemize}
 
 \subsection{Inventario de entrenamientos y ensayos}
@@ -664,16 +818,24 @@ real, de los cuales \InvRealDistintas{} son ejecuciones distintas y
 grabaron \InvGrabaciones{} sesiones de vídeo y sensores, de las cuales
 \InvCaminatasValidas{} son caminatas de comparación válidas y
 \InvCaminatasFallo{} se descartaron por la comprobación de salud
-(sección~\ref{sec:resultados-robot-fisico}). Se llevaron al robot doce
-políticas PPO: de gateo, la v4 (semilla 37, antes de instalar las cámaras), la
+(sección~\ref{sec:resultados-robot-fisico}). Las campañas v29 a v31 se hicieron
+solo para obtener las gráficas de entrenamiento y sus políticas no se usaron. Se
+llevaron al robot diecinueve políticas PPO: de gateo, la v4 (semilla 37, antes de instalar las cámaras), la
 v6 y la v10 (semilla 11), la v12 (semilla 41), la v14 (semilla 43) y las dos del
-ciclo de mejora (semilla 401); de paso, la v10 y la v11 (semilla 71), y de trote,
-la de la primera campaña (semilla 37) y dos de la v15 (semillas 307 y 211).
+ciclo de mejora (semilla 401); de paso, la v10 y la v11 (semilla 71), la v16 (semilla 563) y la v24 (semilla
+4109); de trote, la de la primera campaña (semilla 37), dos de la v15 (semillas 307
+y 211) y la v24 (semilla 4209); de carrera, la v24 (semilla 4309), y de galope, la
+v18, la v19 y la v20. Con la v24 no se hizo aún una comparación repetida con la
+marcha nominal: se midió su parecido con la simulación
+(sección~\ref{sec:parecido-sim-real}).
 
 \subsection{Mejores políticas por marcha}
 
 La Tabla~\ref{tab:mejores-politicas} reúne la mejor política de cada marcha
-según su comparación con la marcha nominal dentro de la misma sesión.
+según su comparación con la marcha nominal en el robot, dentro de una misma sesión.
+No coincide con las políticas elegidas por viabilidad
+(Tabla~\ref{tab:viabilidad}), que son posteriores y aún no tienen esa comparación.
+Los valores de la postura del 27 de octubre no son comparables con los anteriores.
 
 \begin{table}[H]
 \centering
@@ -684,9 +846,11 @@ según su comparación con la marcha nominal dentro de la misma sesión.
 \toprule
 Marcha & Política & Resultado frente a la marcha nominal \\
 \midrule
-Gateo & v14, semilla 43 (1,7~M pasos) & Menor puntuación en las vueltas 1 (1,52 frente a 1,87) y 2 (1,26 frente a 1,49) del ciclo; empate en la vuelta 3 (1,63 frente a 1,66, con una repetición nominal). \\
-Trote & v15, semilla 307 (0,1~M pasos) & Empate en la vuelta 1 (1,67 frente a 1,69) y mejora en la vuelta 2 (1,92 frente a 2,36). \\
-Paso & Ninguna aceptada & Las v10 (1,76 frente a 1,55) y v11 (1,69 frente a 1,59) quedaron por detrás. La candidata es la v16 (Tabla~\ref{tab:campanas-ppo}), pendiente de ensayo. \\
+Gateo & v14, semilla 43 (1,7~M pasos) & Menor puntuación en las vueltas 1 (1,52 frente a 1,87) y 2 (1,26 frente a 1,49) del ciclo; empate en la vuelta 3 (1,63 frente a 1,66, con una repetición nominal) y con la postura del 27 de octubre (3,07 frente a 2,92). \\
+Trote & v15, semilla 307 (0,1~M pasos) & Empate en la vuelta 1 (1,67 frente a 1,69), mejora en la vuelta 2 (1,92 frente a 2,36) y con la postura del 27 de octubre (3,06 frente a 6,10). \\
+Paso & v16, semilla 563 (1,6~M pasos) & Con la postura del 27 de octubre, 2,24 frente a 3,13; en la sesión anterior no mejoró a la nominal. Las v10 (1,76 frente a 1,55) y v11 (1,69 frente a 1,59) quedaron por detrás. \\
+Carrera & Sin comparación & Solo se midió su parecido con la simulación. \\
+Galope & Ninguna aceptada & La v20 reduce el error de patas, pero aumenta la desviación de las coxas. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -699,23 +863,27 @@ cambiar de una sesión a otra.
 
 \subsection{Ensayos pendientes}
 
-Para cerrar la comparación faltan: el ensayo del paso v16 frente al paso
-nominal (cinco repeticiones por condición); completar al menos diez
-repeticiones válidas por marcha y condición, como fijó el plan metodológico
-(unas 45 a 50 caminatas adicionales con el robot suspendido), y los ensayos
-apoyados en el suelo con la IMU y el margen de estabilidad estática, que
-requieren antes la parada de emergencia y el fusible de la línea de los servos.
-No se prevén nuevas campañas de semillas salvo para refinar una política de
-paso que supere a la marcha nominal en el robot.
+Para cerrar la comparación faltan: probar en el robot las políticas de gateo y
+galope elegidas por viabilidad; comparar con la marcha nominal las cinco políticas
+elegidas, en la postura actual; completar al menos diez repeticiones válidas por
+marcha y condición, como fijó el plan metodológico; repetir la viabilidad con
+semillas nuevas, y los ensayos apoyados en el suelo con la IMU y el margen de
+estabilidad estática, que requieren antes la parada de emergencia y el fusible de
+la línea de los servos. El firmware ya admite la IMU BNO055, pero no se ha probado.
 
 \subsection{Alcance de estos resultados}
 
 Los resultados muestran que la política PPO de gateo, ejecutada en el robot
-físico, sigue la marcha con menor error y desvía menos las coxas que la marcha
-nominal, de forma repetida en varias sesiones y vueltas. No muestran una mejora
-de la locomoción: con el robot suspendido no se midieron avance, desvío ni
-inclinación del cuerpo, que son los objetivos para los que se diseñó la
-recompensa. Las dos tibias sin sensor (1 y 3) se evaluaron con la orden como
-estimación, el número de repeticiones por condición es pequeño (dos o tres) y
-la vuelta 3 quedó incompleta. La validación sobre el suelo, con medición del
-movimiento del cuerpo, sigue pendiente.
+físico, siguió la marcha con menor error y desvió menos las coxas que la marcha
+nominal en varias vueltas del ciclo de mejora, aunque con la postura del 27 de
+octubre quedó empatada. Muestran también que las políticas elegidas son viables en
+simulación y que el robot reproduce la forma de los movimientos simulados, con
+amplitudes distintas. No muestran una mejora de la locomoción: con el robot
+suspendido no se midieron avance, desvío ni inclinación del cuerpo, que son los
+objetivos para los que se diseñó la recompensa, y el avance y la deriva de la
+Tabla~\ref{tab:viabilidad} proceden solo de la simulación. La tibia 1 no tiene
+sensor; el potenciómetro de la tibia 3 responde, pero el firmware aún no lo
+transmite; ambas se evaluaron con la orden como estimación, y el potenciómetro de la
+coxa 2 no sigue a la coxa. El número de repeticiones por condición es pequeño (una
+a tres) y la vuelta 3 quedó incompleta. La validación sobre el suelo, con medición
+del movimiento del cuerpo, sigue pendiente.

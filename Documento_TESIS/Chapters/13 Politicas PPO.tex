@@ -2,7 +2,7 @@
 \label{cap:ppo-fisico}
 
 Este capítulo describe cómo se formuló, entrenó, seleccionó y ejecutó la capa
-correctiva PPO en el robot real entre el 16 y el 21 de octubre de 2026. Completa
+correctiva PPO en el robot real entre el 16 de octubre y el 3 de noviembre de 2026. Completa
 el contrato de corrección residual (sección~\ref{sec:contrato-residual}) y las
 campañas preparatorias en Gazebo y MuJoCo del capítulo de resultados: aquellas usaban un
 modelo nominal del actuador, mientras que las de este capítulo se entrenan con
@@ -62,24 +62,59 @@ Largo del cuerpo & 265 & 230 \\
 \subsection{Marchas nominales}
 
 La marcha nominal $\mathbf{q}^{\text{nom}}(\phi)$ de la ecuación~\eqref{eq:residual}
-es una de las siguientes, con las coxas fijas en su posición de equilibrio:
+es una de las cinco de la Tabla~\ref{tab:marchas-nominales}:
 \begin{itemize}
     \item \textbf{Gateo}: una pata en el aire cada vez, en el orden delantera
-    izquierda, trasera derecha, delantera derecha, trasera izquierda;
-    0,5~s por fase con una pausa entre fases (ciclo de 2,64~s). Fémur
-    $\pm15^\circ$ y elevación de tibia de $10^\circ$.
-    \item \textbf{Paso}: igual secuencia pero continua (ciclo de 2,0~s). Se
-    abandonó el 20 de octubre: con las coxas fijas resultaba un gateo continuo,
-    visualmente indistinguible del gateo.
-    \item \textbf{Trote}: patas diagonales a la vez (delantera izquierda con
-    trasera derecha y viceversa), dos en el aire y dos apoyadas; ciclo de
-    1,0~s, fémur $\pm12^\circ$ y tibia $12^\circ$.
+    izquierda, trasera derecha, delantera derecha, trasera izquierda, con una
+    pausa entre fases.
+    \item \textbf{Paso}: igual secuencia pero continua. Se dejó el 20 de octubre
+    porque, con las coxas fijas, resultaba un gateo continuo visualmente
+    indistinguible del gateo; se retomó el 22 de octubre (v16) con el actuador
+    medido.
+    \item \textbf{Trote}: patas diagonales a la vez, dos en el aire y dos apoyadas.
+    \item \textbf{Carrera} (desde el 27 de octubre): también por pares diagonales,
+    con un ciclo más corto y una fracción de apoyo de 0,45, de modo que en la
+    referencia hay un breve instante sin pies apoyados.
+    \item \textbf{Galope transverso} (desde el 27 de octubre): las patas de cada eje
+    casi a la vez, con fases trasera izquierda 0, trasera derecha 0,1, delantera
+    derecha 0,5 y delantera izquierda 0,6, y fracción de apoyo de 0,40. Es la única
+    marcha que mueve coxas: las traseras se abren $4^\circ$ al levantar, y las
+    delanteras quedan fijas, porque con la coxa 2 en movimiento la pata cedía y
+    con una sola delantera moviéndose el galope retrocedía en simulación.
 \end{itemize}
-Desde el 20 de octubre ambas marchas usan una \emph{postura abierta}: el punto
-neutro de los fémures delanteros se adelanta y el de los traseros se atrasa
-($8^\circ$ en gateo y $5^\circ$ en trote). Con la geometría real, las patas de
+
+\begin{table}[H]
+\centering
+\caption{Parámetros de las marchas nominales actuales.}
+\label{tab:marchas-nominales}
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Marcha & Ciclo (s) & Fémur & Tibia & Apertura & Peso de avance $w_{\text{av}}$ \\
+\midrule
+Gateo & 2,64 & $\pm15^\circ$ & $10^\circ$ & $8^\circ$ & 40 \\
+Paso & 2,0 & $\pm15^\circ$ & $10^\circ$ & $8^\circ$ & 20 \\
+Trote & 1,0 & $\pm12^\circ$ & $12^\circ$ & $5^\circ$ & 10 \\
+Carrera & 0,8 & $\pm12^\circ$ & $12^\circ$ & $5^\circ$ & 10 \\
+Galope & 0,8 & $\pm18^\circ$ & $7^\circ$ & $5^\circ$ & 30 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Desde el 20 de octubre las marchas usan una \emph{postura abierta}: el punto
+neutro de los fémures delanteros se adelanta y el de los traseros se atrasa según la
+columna de apertura. Con la geometría real, las patas de
 un mismo lado se acercaban hasta 69~mm bajo el centro del cuerpo y llegaban a
 chocar; con la apertura el hueco mínimo entre pies sube a 133~mm.
+
+Desde el 27 de octubre la tibia de cada pata amplía su movimiento con una ganancia
+propia (tibias 1 a 4: 2,0; 1,4; 1,6 y 1,8), y las tibias 2 y 4 se mueven en sentido
+de servo contrario a las 1 y 3. Es la postura de trabajo aprobada por el operador. Estas
+ganancias se incorporaron a la simulación desde la campaña v24; la lectura de los
+sensores se divide por la misma ganancia, de modo que la política ve el ángulo del
+modelo. Con ellas, el galope anterior (fémur $16^\circ$, tibia $14^\circ$) se caía
+siempre, y su marcha base se reajustó a los valores de la tabla
+(sección~\ref{sec:viabilidad-resultados}).
 
 \subsection{Acción}
 
@@ -94,8 +129,7 @@ cada servo.
 
 \subsection{Observación}
 
-La observación incluye solo magnitudes medibles en el robot, porque este no
-dispone de IMU. Desde la versión 6 tiene 22 componentes:
+La observación incluye solo magnitudes medibles en el robot suspendido, sin IMU. Desde la versión 6 tiene 22 componentes:
 \begin{itemize}
     \item desviación de las ocho articulaciones de fémur y tibia respecto a su
     postura de referencia (8), con ruido gaussiano de $1^\circ$ y un sesgo
@@ -126,7 +160,8 @@ y $\overline{e_{\text{coxa}}^2}$, la media del cuadrado de la desviación de las
 coxas respecto a su orden (en grados). Además, al completar cada ciclo se resta
 $w_{\text{gc}}\,(\Delta\psi_{\text{ciclo}})^2$, con el giro del ciclo en grados,
 porque sin IMU la política no observa el rumbo y tendía a curvarse en caminatas
-largas. Los pesos de cada versión están en la Tabla~\ref{tab:campanas-ppo}.
+largas. Los pesos de cada versión están en las
+tablas~\ref{tab:campanas-ppo} y~\ref{tab:campanas-ppo-2}.
 
 El término de suavidad (versión 11 en adelante) se añadió porque en el robot la
 primera PPO del paso daba correcciones más rápidas de lo que los servos podían
@@ -153,7 +188,8 @@ caminatas nominales registradas por los sensores del robot (retardo de 65 a
 actualizó después con escalones, senoides y barridos de rango.
 
 En cada episodio se aleatorizan el retardo (2 a 4 pasos; desde el 21 de
-octubre, el intervalo medido en el robot), la ganancia de cada servo
+octubre, el intervalo medido en el robot, que en las políticas elegidas es de 1 a 4
+pasos, es decir, de 30 a 120~ms), la ganancia de cada servo
 ($\pm5$~\%) y el sesgo de los sensores ($\pm1^\circ$), según la estrategia de
 aleatorización del dominio descrita en el marco teórico.
 
@@ -187,7 +223,7 @@ Coeficiente del crítico $c_1$ & 0,5 & peso del error de valor \\
 Coeficiente de entropía $c_2$ & 0 & sin bonificación de exploración \\
 Norma máxima del gradiente & 0,5 & recorte del gradiente \\
 KL objetivo & 0,03 & corta las épocas si la política cambia mucho \\
-Copias intermedias & cada $10^5$ pasos & para la selección posterior \\
+Copias intermedias & cada $10^5$ pasos & para la selección; más densas en campañas cortas \\
 Evaluación final & semillas 801--805 & 5 episodios deterministas \\
 \bottomrule
 \end{tabular}
@@ -195,12 +231,13 @@ Evaluación final & semillas 801--805 & 5 episodios deterministas \\
 
 \section{Campañas de entrenamiento y semillas}
 
-La Tabla~\ref{tab:campanas-ppo} recoge todas las campañas con el actuador real.
+La Tabla~\ref{tab:campanas-ppo} recoge las primeras campañas con el actuador real.
 Cada fila es una configuración entrenada con varias semillas independientes; la
 columna de pasos indica el máximo alcanzado (en las continuaciones, contando los
 pasos de la política de partida). Las semillas 11, 23, 37, 53 y 71 son las
 congeladas en el protocolo; las demás se añadieron para ampliar la muestra. Las
-continuaciones parten de la mejor política de una campaña anterior y siguen
+tablas~\ref{tab:campanas-ppo} y~\ref{tab:campanas-ppo-2} dividen las campañas en
+dos periodos. Las continuaciones parten de la mejor política de una campaña anterior y siguen
 entrenando con la configuración nueva.
 
 \begin{table}[H]
@@ -226,7 +263,7 @@ v14 & 21/10 & gateo, trote & gateo 13, 29, 41, 43, 67; trote 19, 31, 37, 47, 89 
 v15 & 21/10 & trote & 19, 211, 223, 241, 263, 281, 307 & 3--5 M & $w_{\text{av}}=20$, $w_{\text{suav}}=0{,}1$. Elegida: semilla 307 (0,1 M). \\
 ciclo 1 & 21/10 & gateo, trote & 401$^{\dagger}$ & +1 M & Continúan las ganadoras en el robot. Elegida gateo: copia de 2,7 M. \\
 ciclo 2 & 21/10 & gateo, trote & 401$^{\dagger}$ & +1 M & Actuador medido en el robot en la vuelta anterior. Elegida gateo: copia de 2,4 M. \\
-v16 & 22/10 & paso & continuación: 503, 509, 521, 523; desde cero: 541, 547, 557, 563 & 6,4 M / 3,0 M & Retoma el paso con el actuador medido (ciclo 2) y la postura corregida ($8^\circ$); las continuaciones parten de la v11 semilla 71 (4,9 M). En curso; la semilla 563 alcanzó la mayor recompensa ($\approx-32$ frente a $-125$ a $-150$). \\
+v16 & 22/10 & paso & continuación: 503, 509, 521, 523; desde cero: 541, 547, 557, 563 & 6,4 M / 3,0 M & Retoma el paso con el actuador medido (ciclo 2) y la postura corregida ($8^\circ$); las continuaciones parten de la v11 semilla 71 (4,9 M). Elegida: semilla 563 (1,6 M); en simulación, deriva de 0,021 m frente a 0,391 m de la nominal y avance $-12$~\%. \\
 \bottomrule
 \multicolumn{6}{p{0.95\textwidth}}{\footnotesize $^{\dagger}$ Se lanzaron con las semillas 401, 409, 419 y 421, pero las cuatro ejecuciones resultaron idénticas: al continuar desde una política guardada, la biblioteca restaura la semilla almacenada en ella e ignora la indicada. Cada una de estas campañas equivale a una sola ejecución. El error se corrigió el 22 de octubre de 2026 (se impone la semilla pedida tras cargar la política).}
 \end{tabular}
@@ -255,6 +292,38 @@ los pesos de la recompensa difieren entre campañas. Curvas suavizadas con una
 media móvil de 15 puntos.}
 \label{fig:curvas-semillas}
 \end{figure}
+
+Del 26 de octubre en adelante, las campañas se dedicaron a añadir la carrera y el
+galope, a incorporar la postura de trabajo nueva y a elegir las políticas por
+viabilidad (sección de selección de copias), Tabla~\ref{tab:campanas-ppo-2}. Los
+pesos de la recompensa son los de la v4 con suavidad 0,3 y coxas 1, cambiando el
+peso de avance $w_{\text{av}}$ y, en el galope, $w_{\text{lat}}=30$.
+
+\begin{table}[H]
+\centering
+\caption{Campañas PPO con el actuador real, 26 de octubre a 3 de noviembre de 2026.}
+\label{tab:campanas-ppo-2}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{p{0.07\textwidth}p{0.07\textwidth}p{0.16\textwidth}p{0.11\textwidth}p{0.49\textwidth}}
+\toprule
+Versión & Fecha & Marcha & Semillas & Cambio principal y resultado \\
+\midrule
+v17 & 26/10 & paso & 4 & Continúan la v16 semilla 563; ninguna la supera (mejor puntuación 2,50 frente a 2,45). \\
+v18 & 27/10 & carrera, galope & 4 y 4 & Primeras campañas de ambas marchas, desde cero. \\
+v19--v21 & 27/10 & galope & 4 cada una & Pruebas de coxas en movimiento. Mejor: v21 semilla 827 (0,1~M), 90~\% de viabilidad. \\
+v22 & 27/10 & gateo, paso, trote, carrera & 4, 6, 4, 4 & Primera selección por viabilidad; 100~\% en las cuatro, aún sin las ganancias de tibia en la simulación. Paso con $w_{\text{av}}=20$. \\
+v23 & 27/10 & galope & 8 & Detenida antes de su política final; no se usó. \\
+v24 & 27--28/10 & gateo, paso, trote, carrera, galope & 4 cada una & Ganancias de tibia en la simulación. 100~\%: paso semilla 4109, trote 4209 y carrera 4309, las tres a 0,2~M. Gateo $\leq$55~\%. La marcha base del galope se cae en todos los episodios. \\
+v25 & 28/10 & gateo, galope & 4 y 4 & $w_{\text{av}}=25$ y 15; galope con fémur $18^\circ$ y tibia $7^\circ$. Galope 65~\%, gateo $\leq$55~\%. \\
+v26 & 28/10 & gateo, galope & 4 y 4 & $w_{\text{av}}=40$ y 30. Galope 85~\%, gateo $\leq$55~\%. \\
+v27 & 28/10 & gateo, galope & 4 y 6 & Elegida gateo: semilla 7013 (4,1~M), 100~\%; continúa la v22. Galope 90~\%. \\
+v28 & 28/10 & galope & 8 & Continúan copias de la v27. Elegida: semilla 8417 (0,175~M), 90~\%. \\
+v29, v30 & 29/10 & trote; las cinco & 3; 1 cada una & Solo para registrar pérdidas y recompensa por episodio, 1~M de pasos. Políticas no usadas. \\
+v31 & 3/11 & las cinco & 1 cada una & Solo para medir la convergencia (sección~\ref{sec:convergencia-marchas}); 3~M de pasos, galope 5~M. Políticas no usadas. \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Convergencia del entrenamiento por marcha}
 \label{sec:convergencia-marchas}
@@ -424,6 +493,22 @@ guarda en \path{ppo_v10_robot/} junto con sus metadatos (marcha, amplitudes,
 apertura, versión del actuador y resultado de la evaluación), que el programa
 del robot lee para reproducir exactamente la misma configuración.
 
+Desde el 27 de octubre, esta selección se completa con un criterio más directo, la
+\emph{viabilidad} (\path{evaluar_viabilidad.py}), que mide si la copia puede
+sustituir a la marcha nominal cuando cambian las condiciones. Sobre 20 episodios con
+semillas 1001 a 1020, aleatorización del dominio y del actuador, un episodio $i$ es
+viable si cumple a la vez
+\begin{equation}
+    \text{sin caída},\quad
+    x_i \geq 0{,}9\,x_{\text{nom}},\quad
+    \left(d_i \leq d_{\text{nom}} \ \text{o}\ d_i < 0{,}5~\text{m}\right),\quad
+    \theta_i < 15^\circ,
+    \label{eq:viabilidad}
+\end{equation}
+con $x_i$ el avance, $d_i$ la deriva lateral y $\theta_i$ la inclinación máxima del
+episodio. La viabilidad es el porcentaje de episodios que lo cumplen. Sus resultados
+están en la sección~\ref{sec:viabilidad-resultados}.
+
 \section{Ejecución en el robot}
 
 \subsection{Programa de control y realimentación}
@@ -446,7 +531,7 @@ análisis posterior.
 
 \begin{table}[H]
 \centering
-\caption{Fuentes de realimentación por articulación al 21 de octubre de 2026.}
+\caption{Fuentes de realimentación por articulación según la revisión del 28 de octubre de 2026.}
 \label{tab:sensores-articulaciones}
 \footnotesize
 \begin{tabular}{llll}
@@ -454,16 +539,20 @@ análisis posterior.
 Articulación & Principal & Respaldo & Estado \\
 \midrule
 Fémur 1 (delantera derecha) & potenciómetro C8 & encoder ENC\_F1 & operativo \\
-Fémur 2 (delantera izquierda) & potenciómetro C5 & --- & operativo \\
+Fémur 2 (delantera izquierda) & potenciómetro C5 & encoder en 0x70/4 & operativo \\
 Fémur 3 (trasera derecha) & potenciómetro C9 & --- & operativo \\
 Fémur 4 (trasera izquierda) & potenciómetro C6 & encoder ENC\_F4 & operativo \\
-Tibia 1 & encoder ENC\_T1 & --- & sin lecturas: orden retrasada \\
-Tibia 2 & encoder ENC\_T2 & --- & operativo \\
-Tibia 3 & potenciómetro C11 & --- & sin señal: orden retrasada \\
+Tibia 1 & --- & --- & sin sensor: orden retrasada \\
+Tibia 2 & encoder ENC\_T2 (0x70/3) & --- & operativo; escala corregida \\
+Tibia 3 & potenciómetro C12 & --- & responde, sin transmitir: orden retrasada \\
 Tibia 4 & potenciómetro C10 & --- & operativo \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+Las coxas se miden con los potenciómetros C0 a C3; el de la coxa 2 (C1) no sigue a
+la coxa, por lo que su lectura no se considera fiable, y por eso el firmware no
+corregía su caída.
 
 \subsection{Correcciones necesarias para que el robot reproduzca la simulación}
 
@@ -493,6 +582,18 @@ robot--modelo:
     de 40~ms de retraso. Se reservaron dos núcleos para el bucle de control, la
     red se evalúa con un único hilo y los análisis corren con prioridad mínima;
     con el PC entrenando a la vez, el número de pasos tardíos bajó a cero.
+    \item \textbf{Postura de trabajo} (27 de octubre). El operador aprobó una postura
+    nueva, con otras posiciones de apoyo y el movimiento de las tibias 2 y 4 invertido
+    (sección de marchas nominales). Las comparaciones anteriores se repitieron por
+    ello (sección~\ref{sec:postura27}). Ese día se detectó también que las políticas
+    de gateo v14 y trote v15 se habían ejecutado sin la apertura de los fémures, porque
+    un programa de selección dañó sus metadatos; se corrigió y se repararon los archivos.
+    \item \textbf{Coxa 2} (28 de octubre). Se caía hacia adentro al caminar. Se ajustó
+    en vivo con el operador hasta que dejó de caer: su base pasó de $48^\circ$ a
+    $42^\circ$ en el firmware y en el programa de control.
+    \item \textbf{Escala de la tibia 2} (28 de octubre). La escala de su encoder
+    duplicaba la amplitud medida. Una regresión de la lectura frente a la orden en tres
+    caminatas ($r\approx0{,}97$) la cambió de $-0{,}59$ a $-1{,}15$.
 \end{itemize}
 
 \section{Ciclo de mejora en la plataforma física}

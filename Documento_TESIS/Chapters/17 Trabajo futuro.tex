@@ -12,11 +12,12 @@ tesis.
 Una primera línea consiste en consolidar la plataforma como banco experimental
 instrumentado. La realimentación articular de esta tesis (potenciómetros y
 encoders) ya permite medir seguimiento, retardo, holgura y repetibilidad, pero
-dos tibias quedaron sin sensor operativo y varios encoders tienen imanes débiles.
+la tibia 1 sigue sin sensor, la tibia 3 sin transmitir el suyo, el potenciómetro de la
+coxa 2 no sigue a la coxa y varios encoders tienen imanes débiles.
 Completar la cobertura con un sensor fiable por articulación y migrar el bucle de
 control a la Raspberry~Pi, con un convertidor ADS1115 para los potenciómetros y
 una fuente adecuada, cerraría la arquitectura embebida prevista. La
-incorporación posterior de una IMU, sensores de contacto en los pies y medición
+prueba de la IMU, ya admitida en el firmware, y la incorporación de sensores de contacto en los pies y medición
 de tensión y corriente permitiría observar la orientación corporal, el apoyo y
 el esfuerzo eléctrico durante la locomoción. Con esta instrumentación, la
 plataforma podría utilizarse para campañas sistemáticas de identificación y
@@ -53,11 +54,11 @@ experimentos comparables sin alterar la arquitectura cinemática de base.
 
 \section{Control de locomoción y repertorio de marchas}
 
-El generador cinemático actual puede extenderse desde postura, paso y gateo
-hacia transiciones suaves entre marchas, cambios de dirección, giro sobre el
-sitio, retroceso y regulación de velocidad. El trote ya se implementó y se
-ejecutó con el robot suspendido; su ensayo sobre el suelo, junto con marchas más
-rápidas y estrategias de recuperación ante pequeñas perturbaciones, requiere
+El generador cinemático actual, con gateo, paso, trote, carrera y galope, puede
+extenderse hacia transiciones suaves entre marchas, cambios de dirección, giro sobre el
+sitio, retroceso y regulación de velocidad. Las cinco marchas se
+ejecutaron con el robot suspendido; su ensayo sobre el suelo, sobre todo el de las más
+rápidas, junto con estrategias de recuperación ante pequeñas perturbaciones, requiere
 antes una alimentación capaz de sostener sus picos de corriente. Estas
 extensiones deberían conservar límites articulares, velocidad acotada,
 supervisión independiente y criterios de parada, de modo que el aumento de

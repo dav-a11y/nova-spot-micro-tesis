@@ -13,7 +13,7 @@ La arquitectura se ejecutó de forma reproducible en Gazebo y MuJoCo, y el
 supervisor reaccionó con la orden \texttt{stand} en los nueve escenarios
 provocados evaluados. En el prototipo físico, las doce articulaciones se ejecutaron con
 el robot suspendido mediante el PCA9685, con topes por articulación, límite de
-cambio por paso y realimentación de diez de ellas; la arquitectura se definió
+cambio por paso y realimentación de nueve de ellas (revisión del 28 de octubre); la arquitectura se definió
 con la Raspberry~Pi~4 como controlador embebido. Quedan abiertas la seguridad
 eléctrica y la alimentación separada de electrónica y servos.
 
@@ -31,7 +31,7 @@ digital.
 
 \item \textbf{OE3 -- estrategia de control basada en aprendizaje automático.}
 Se completó el diseño, entrenamiento y evaluación en simulación de una capa PPO
-residual para gateo y paso. La política recibe observaciones del estado
+residual para cinco marchas: gateo, paso, trote, carrera y galope. La política recibe observaciones del estado
 simulado y propone doce correcciones articulares acotadas que se suman a la
 marcha nominal. Las primeras configuraciones, entrenadas con el modelo nominal,
 no superaron la referencia nominal y se rechazaron. Las entrenadas con el
@@ -40,7 +40,13 @@ sus propios datos: la política de gateo redujo entre un 15 y un 19~\% el error
 medio de seguimiento y de desviación de las coxas frente a la marcha nominal en
 dos vueltas completas, y la de trote un 19~\% en una vuelta. Estos resultados
 acreditan que la corrección aprendida es ejecutable y estable en el hardware;
-su efecto sobre la locomoción apoyada no se ha medido.
+su efecto sobre la locomoción apoyada no se ha medido. Con la postura definitiva del 27
+de octubre, el paso y el trote mejoraron a la marcha nominal (dos repeticiones) y el
+gateo quedó empatado. En simulación, las políticas elegidas alcanzaron una viabilidad del
+100~\% en gateo, paso, trote y carrera, y del 90~\% en galope, en 20 episodios con
+aleatorización y sin caídas, aunque con una ventaja modesta sobre la marcha nominal y
+con copias elegidas sobre esos mismos episodios. Las políticas de gateo y galope
+elegidas no se han probado en el robot.
 
 \item \textbf{OE4 -- evaluación del modelo de caminata.}
 Se completaron instrumentos y campañas reproducibles en simulación para las
@@ -53,7 +59,10 @@ La marcha paso completó dos repeticiones nominales de 21 y 22 ciclos sin
 activaciones del supervisor. En el robot suspendido se completaron la Prueba de Seguimiento
 de Posición Articular, con sensores en diez articulaciones, y la Prueba de
 Repetibilidad, con repeticiones de 3~min en orden alternado (CV entre 2 y 11~\%
-dentro de una misma sesión). La Prueba de Margen de Estabilidad Estática sigue
+dentro de una misma sesión). Se añadió una medida de parecido entre el robot y la
+simulación: 83~\% en paso, 70~\% en trote y 69~\% en carrera, con una toma por política
+y el robot suspendido; la forma del movimiento coincide y la diferencia está en la
+amplitud. La Prueba de Margen de Estabilidad Estática sigue
 sin medición física, porque requiere el robot apoyado y la orientación del
 cuerpo.
 \end{enumerate}
@@ -62,6 +71,7 @@ En consecuencia, la tesis cuenta con resultados concluyentes sobre el
 desarrollo y la evaluación reproducible en simulación, y con resultados
 físicos sobre la ejecución, el seguimiento y la repetibilidad de las marchas y de
 las políticas PPO con el robot suspendido. La locomoción apoyada, el margen de
-estabilidad físico y la realimentación de las dos tibias sin sensor operativo se
+estabilidad físico, la realimentación de las tibias 1 y 3 y de la coxa 2 y la
+comparación con la marcha nominal de las políticas elegidas por viabilidad se
 mantienen fuera de estas conclusiones hasta disponer de evidencia experimental
 equivalente.

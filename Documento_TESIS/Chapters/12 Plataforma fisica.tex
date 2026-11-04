@@ -1,7 +1,7 @@
 \chapter{Plataforma física, instrumentación y adquisición}
 \label{cap:plataforma-fisica}
 
-Este capítulo describe el robot real tal como se operó entre el 15 y el 21 de
+Este capítulo describe el robot real tal como se operó entre el 15 y el 28 de
 octubre de 2026: su electrónica, el firmware, la instrumentación articular, el
 sistema de cámaras y el protocolo de ensayos. Es la base sobre la que se
 ejecutaron las marchas nominales y las políticas PPO de los capítulos
@@ -79,7 +79,7 @@ de octubre, también en el programa de control.
 
 \begin{table}[H]
 \centering
-\caption{Canales, posición base y topes de cada articulación (grados de servo), 21 de octubre de 2026.}
+\caption{Canales, posición base y topes de cada articulación (grados de servo), 28 de octubre de 2026.}
 \label{tab:mapa-articulaciones}
 \small
 \begin{tabular}{llrrr}
@@ -87,23 +87,29 @@ de octubre, también en el programa de control.
 Articulación & Canal PCA & Base & Tope mínimo & Tope máximo \\
 \midrule
 Coxa 1 (delantera derecha) & CH0 & 159 & 105 & 170 \\
-Coxa 2 (delantera izquierda) & CH1 & 45 & 10 & 85 \\
-Coxa 3 (trasera derecha) & CH2 & 61 & 25 & 90 \\
+Coxa 2 (delantera izquierda) & CH1 & 42 & 10 & 85 \\
+Coxa 3 (trasera derecha) & CH2 & 64 & 25 & 90 \\
 Coxa 4 (trasera izquierda) & CH3 & 82 & 60 & 105 \\
 Fémur 1 & CH4 & 110 & 30 & 140 \\
 Fémur 2 & CH5 & 100 & 45 & 135 \\
 Fémur 3 & CH6 & 100 & 40 & 160 \\
 Fémur 4 & CH7 & 100 & 25 & 135 \\
-Tibia 1 & CH8 & 100 & 25 & 160 \\
-Tibia 2 & CH9 & 80 & 25 & 90 \\
+Tibia 1 & CH12 & 100 & 18 & 160 \\
+Tibia 2 & CH9 & 166 & 155 & 180 \\
 Tibia 3 & CH10 & 100 & 11 & 160 \\
-Tibia 4 & CH14 & 70 & 15 & 105 \\
+Tibia 4 & CH14 & 144 & 130 & 175 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Las coxas permanecen fijas en su posición de equilibrio durante todas las
-marchas y nunca se dejan sin señal al terminar, porque la coxa 2 cede por su
+Los cambios respecto a la postura del 21 de octubre son del 26 al 28 de octubre: la
+tibia 1 pasó de CH8 a CH12 porque su servo actuaba de forma intermitente; las bases
+de las tibias 2 y 4 son las de la postura de trabajo del 27 de octubre, y las bases de
+las coxas 2 y 3 se ajustaron con el operador porque se veían caídas o subidas. La tibia
+1 y la tibia 3 se apoyan a $40^\circ$ y $82^\circ$ mediante desviaciones sobre su base.
+
+Las coxas permanecen fijas en su posición de equilibrio durante las
+marchas, salvo las traseras en el galope (modo \texttt{+} del firmware), y nunca se dejan sin señal al terminar, porque la coxa 2 cede por su
 propio peso. La equivalencia entre los ángulos del modelo y los grados de servo
 usa un signo por articulación: los fémures y las tibias de cada lado están
 montados en espejo. El signo de las tibias izquierdas se corrigió el 21 de
@@ -111,7 +117,7 @@ octubre (capítulo~\ref{cap:ppo-fisico}).
 
 \section{Firmware de la interfaz de E/S}
 
-El firmware de la interfaz (\path{movimiento_suspendido_11_servos.ino}) ofrece tres
+El firmware de la interfaz (\path{movimiento_suspendido_11_servos.ino}) ofrece estos
 modos de operación relevantes:
 \begin{itemize}
     \item \textbf{Reposo con telemetría}: arranca con las salidas apagadas y
@@ -124,13 +130,21 @@ modos de operación relevantes:
     paso una línea con los doce ángulos y la interfaz responde con todas las
     lecturas de sensores. Es el modo de las marchas nominales y de las políticas
     PPO desde el PC.
+    \item \textbf{Transmisión con coxas} (orden \texttt{+}): igual que la anterior,
+    pero las coxas también siguen órdenes, con una corrección de su caída por el peso.
+    Se usa para el galope y para ajustar coxas en vivo.
+    \item \textbf{Revisión de sensores} (órdenes \texttt{\$} y \texttt{\^{}}): transmite
+    los dieciséis canales del multiplexor y dieciséis encoders, y explora el bus I$^2$C.
 \end{itemize}
+El firmware admite además una IMU BNO055 en la dirección 0x28, añadiendo sus campos
+a la respuesta; este soporte aún no se ha probado con el sensor en una caminata.
 Como protecciones, el firmware recorta cada orden a los topes de su canal,
 limita el cambio de cada articulación a $3^\circ$ por línea, apaga todas las
 salidas con la orden \texttt{x} y usa un tiempo máximo en el bus I$^2$C para no
 quedar bloqueado si una línea se queda fija. El bit de respuesta a la dirección
 común del PCA9685 se desactivó, porque coincidía con la dirección 0x70 del
-primer multiplexor I$^2$C.
+primer multiplexor I$^2$C. Además, un servicio del sistema del PC de control envía
+\texttt{x} al apagarse el equipo, para no dejar servos activos.
 
 \section{Bucle de control}
 
@@ -200,9 +214,16 @@ encontrados y su solución fueron:
     tibia 3) y dos encoders sin respuesta, por lo que esas articulaciones usan
     el potenciómetro.
     \item \textbf{Tibia 1}: su encoder no dio lecturas válidas en ninguna caminata
-    diagnosticada (79 de 79).
+    diagnosticada (79 de 79), y en la revisión del 28 de octubre sigue sin sensor útil.
     \item \textbf{Tibia 3}: su potenciómetro (C11) dejó de responder el 21 de
-    octubre; con la cámara se comprobó que el servo sí se movía.
+    octubre; con la cámara se comprobó que el servo sí se movía. En la revisión del
+    28 de octubre responde en el canal C12, que el firmware aún no transmite.
+    \item \textbf{Coxa 2}: su potenciómetro (C1) queda fijo en unas 646 cuentas y no
+    sigue a la coxa, de modo que el firmware no podía corregir su caída.
+    \item \textbf{Conexiones flojas} (26 y 27 de octubre): en cada manipulación
+    fallaban sensores distintos. El bus I$^2$C se cortó varias veces; la causa
+    localizada el 28 de octubre fue el cable del encoder del fémur 2 (multiplexor
+    0x70, canal 4), que colgaba el bus. Reparado, el encoder volvió a funcionar.
     \item \textbf{Reinicio de la interfaz de E/S} durante un trote (21 de octubre), compatible
     con una caída de tensión en los picos de corriente de los servos.
 \end{itemize}
@@ -320,4 +341,7 @@ Los ensayos siguen el programa \path{protocolo_repetibilidad.py}:
 \end{enumerate}
 Todas las caminatas se catalogan con su fecha, condición, diagnóstico y estado,
 lo que permite reconstruir cualquier resultado a partir de los registros
-originales.
+originales. Los videos, comprimidos, se conservan en un disco externo; los datos de
+sensores y los análisis, también en el PC. Las comparaciones robot--simulación del 28
+de octubre usaron además tomas más cortas, de 60~s
+(sección~\ref{sec:parecido-sim-real}).

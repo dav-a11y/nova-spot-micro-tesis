@@ -101,8 +101,46 @@ hacerse dentro de una misma sesión, con orden alternado y varias repeticiones.
 
 El paso, con las coxas fijas, resultó en la práctica un gateo continuo: una pata
 en el aire cada vez, sin el desplazamiento lateral del cuerpo que lo distinguía
-en el diseño. Por eso se sustituyó por el trote, de pares diagonales, que sí es
-una marcha distinta. El trote resultó más exigente para el hardware: sus picos
+en el diseño. Por eso se añadió el trote, de pares diagonales, que sí es
+una marcha distinta, y más tarde la carrera y el galope. El paso se retomó después con el
+actuador medido, pero no debe contarse como una marcha realmente distinta del gateo. El trote resultó más exigente para el hardware: sus picos
 de corriente coincidieron con el único reinicio de la interfaz de E/S y con la
 mayor parte de los problemas de seguimiento, lo que hace de la alimentación de
 los servos un requisito previo para ensayarlo sobre el suelo.
+
+\section{Qué significan la convergencia y la viabilidad}
+
+La convergencia de la recompensa no equivale a una política mejor para el robot. En
+las cinco marchas, mientras la recompensa se estabilizaba, el avance por episodio
+bajaba (sección~\ref{sec:convergencia-marchas}): la recompensa total sube sobre todo
+porque bajan los castigos. Esto explica un resultado llamativo de la
+Tabla~\ref{tab:viabilidad}: tres de las políticas elegidas tienen solo 0,2~M de pasos,
+mucho antes de converger. Las copias tempranas conservan el avance de la marcha nominal;
+las tardías derivan menos, pero avanzan menos y dejan de cumplir el criterio. Por
+ejemplo, en el paso v24 semilla 4109 la copia de 0,2~M avanza 1,16~m con 0,07~m de
+deriva, y la final, 0,87~m con 0,03~m. El gateo necesitó lo contrario, un peso de avance de 40 y 4,1~M de pasos,
+para no perder avance. El peso de avance decide, por tanto, cuánto de cada cosa se
+obtiene, y no hay un valor único válido para todas las marchas.
+
+También hay que matizar lo que PPO aporta en simulación. Ninguna política se cayó,
+pero la marcha nominal tampoco. La mejora de las políticas elegidas es de pocos puntos
+de avance o de menos deriva, según la marcha, no un cambio cualitativo. La viabilidad
+indica que la política no empeora a la marcha nominal cuando cambian las condiciones;
+no que sea mucho mejor que ella.
+
+\section{Parecido entre el robot y la simulación}
+
+El parecido del 69 al 83~\% (Tabla~\ref{tab:parecido}) se debe a la amplitud, no a la
+forma: las correlaciones casi siempre superan 0,93, de modo que el modelo del actuador
+reproduce bien cuándo se mueve cada articulación, pero no cuánto. Además, la diferencia
+crece en los ciclos cortos, ya que la carrera se mueve hasta 1,8 veces lo simulado.
+Esto importa, porque una política entrenada con una amplitud distinta de la real
+corrige sobre un movimiento diferente. El modelo del actuador se identificó sobre todo
+con marchas lentas, por lo que conviene repetir la identificación con la carrera y el
+galope antes de ensayarlas apoyadas.
+
+Corregir una sola escala de sensor cambió el parecido en 7 puntos, lo que confirma lo
+visto el 21 de octubre: buena parte de la brecha entre simulación y robot está en
+la interfaz y no en la dinámica. Por otra parte, en estos ensayos la simulación
+también está colgada, de modo que el parecido no dice nada sobre el contacto con el
+suelo, donde se espera la mayor diferencia.

@@ -41,7 +41,7 @@ def huella(d):
 
 
 def marcha(nombre):
-    for m in ("gateo", "trote", "paso"):
+    for m in ("gateo", "trote", "paso", "carrera", "galope"):
         if m in nombre:
             return m
     return "previas"
@@ -61,7 +61,7 @@ def activos():
 def fase_real():
     corriendo = activos()
     filas = collections.OrderedDict((m, dict(campanas=[], total=0, distintas=0, curso=0, incompletas=0))
-                                    for m in ("gateo", "trote", "paso", "previas"))
+                                    for m in ("gateo", "trote", "paso", "carrera", "galope", "previas"))
     for c in sorted(REAL.iterdir()):
         semillas = [d for d in sorted(c.glob("semilla_*")) if d.is_dir() and es_entrenamiento(d)] if c.is_dir() else []
         if not semillas:
@@ -108,7 +108,8 @@ def ensayos_robot():
         n = {}
         for r in csv.DictReader(f.open()):
             n[r["condicion"]] = int(r["n"])
-        sesiones.append((f.stem.removeprefix("repetibilidad_"), n))
+        if n:
+            sesiones.append((f.stem.removeprefix("repetibilidad_"), n))
     return validas, fallo, otras, sesiones
 
 
@@ -125,7 +126,7 @@ def main():
     d_real = sum(f["distintas"] for f in real.values())
     curso = sum(f["curso"] for f in real.values())
     incompletas = sum(f["incompletas"] for f in real.values())
-    nombres = dict(gateo="Gateo", trote="Trote", paso="Paso", previas="Versiones previas del entorno")
+    nombres = dict(gateo="Gateo", trote="Trote", paso="Paso", carrera="Carrera", galope="Galope", previas="Versiones previas del entorno")
     L = [f"% Generado por generar_inventario_resultados.py el {datetime.datetime.now():%Y-%m-%d %H:%M}. No editar a mano.",
          rf"\newcommand{{\InvSimulacion}}{{{sim}}}",
          rf"\newcommand{{\InvReal}}{{{t_real}}}",
@@ -143,7 +144,7 @@ def main():
          r"\toprule", r"Marcha & Campañas (semillas) & Semillas & Distintas & En curso \\", r"\midrule",
          rf"\multicolumn{{5}}{{l}}{{\textit{{Fase de simulación con el modelo nominal (septiembre)}}}} \\",
          rf"Todas & {tex(', '.join(f'{c} ({n})' for c, n in sorted(campanas_sim.items())))} & {sim} & --- & 0 \\",
-         rf"\multicolumn{{5}}{{l}}{{\textit{{Fase con el modelo del robot real (octubre)}}}} \\"]
+         rf"\multicolumn{{5}}{{l}}{{\textit{{Fase con el modelo del robot real (octubre y noviembre)}}}} \\"]
     for m, f in real.items():
         if f["total"]:
             L.append(rf"{nombres[m]} & {tex(', '.join(f['campanas']))} & {f['total']} & {f['distintas']} & {f['curso']} \\")

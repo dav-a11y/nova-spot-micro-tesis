@@ -19,10 +19,10 @@ Objetivo & Resultado demostrable & Evidencia principal & Estado y faltante \\
 Objetivo & Resultado demostrable & Evidencia principal & Estado y faltante \\
 \midrule
 \endhead
-OE1 & Doce articulaciones ejecutadas en el robot suspendido, con topes, límite de cambio y realimentación de diez. & Capítulo~\ref{cap:plataforma-fisica}, registros de caminatas, firmware y nueve escenarios del supervisor. & Parcial; seguridad eléctrica, alimentación separada y migración del bucle a la Raspberry~Pi. \\
+OE1 & Doce articulaciones ejecutadas en el robot suspendido, con topes, límite de cambio y realimentación de nueve. & Capítulo~\ref{cap:plataforma-fisica}, registros de caminatas, firmware y nueve escenarios del supervisor. & Parcial; seguridad eléctrica, alimentación separada y migración del bucle a la Raspberry~Pi. \\
 OE2 & Modelo nominal con geometría medida y actuador identificado. & Capítulo~\ref{cap:modelo}, \path{nova_sm3_real.xml} y modelos del actuador. & Parcial; identificar masas, inercias y fricción. \\
-OE3 & Políticas PPO residuales entrenadas con el actuador real y seleccionadas en el robot; mejora del 15--19~\% en gateo. & Capítulo~\ref{cap:ppo-fisico}, Tabla~\ref{tab:ciclo-mejora} y políticas en \path{ppo_v10_robot/}. & Parcial; efecto sobre la locomoción apoyada sin medir. \\
-OE4 & Seguimiento articular y repetibilidad medidos en el robot suspendido; margen nominal en simulación. & Diagnósticos por caminata, Tabla~\ref{tab:repetibilidad-fisica}. & Parcial; margen de estabilidad físico con el robot apoyado e IMU. \\
+OE3 & Políticas PPO residuales para cinco marchas, con el actuador real; mejora del 15--19~\% en gateo en el robot y viabilidad del 90--100~\% en simulación. & Capítulo~\ref{cap:ppo-fisico}, tablas~\ref{tab:ciclo-mejora} y~\ref{tab:viabilidad} y políticas en \path{ppo_v10_robot/}. & Parcial; efecto sobre la locomoción apoyada sin medir; gateo y galope elegidos sin probar en el robot. \\
+OE4 & Seguimiento articular, repetibilidad y parecido con la simulación medidos en el robot suspendido; margen nominal en simulación. & Diagnósticos por caminata, tablas~\ref{tab:repetibilidad-fisica} y~\ref{tab:parecido}. & Parcial; margen de estabilidad físico con el robot apoyado e IMU. \\
 \bottomrule
 \end{longtable}
 
