@@ -387,10 +387,12 @@ apenas cambian.
 
 Se adoptó el siguiente criterio de convergencia: sobre la media móvil de 100
 episodios, es el primer punto a partir del cual la curva ya no sale de una banda de
-$\pm5$~\% de su recorrido total alrededor de su valor final (media del último 10~\% de
+$\pm2$~\% de su recorrido total alrededor de su valor final (media del último 10~\% de
 los episodios). Una curva cuyo punto cayera en el último 20~\% del entrenamiento se
-consideraría no convergida; ninguna quedó en ese caso. El criterio es una convención de
-este trabajo, y los puntos obtenidos corresponden a una sola semilla.
+consideraría no convergida; es el caso del galope. Una primera versión del criterio usaba una
+banda de $\pm5$~\%, pero situaba el punto cuando la curva aún subía de forma visible: como
+la banda se mide sobre todo el recorrido, que empieza muy abajo, quedaba demasiado ancha.
+El criterio es una convención de este trabajo, y los puntos obtenidos corresponden a una sola semilla.
 
 \begin{table}[H]
 \centering
@@ -401,11 +403,11 @@ este trabajo, y los puntos obtenidos corresponden a una sola semilla.
 \toprule
 Marcha & Pasos (M) & Épocas & Recompensa & Castigo & Ruido \\
 \midrule
-Gateo & 0,60 & 2937 & $-1438 \to -103$ & $2028 \to 688$ & $242 \to 16$ \\
-Paso & 0,73 & 3560 & $-1214 \to -127$ & $1663 \to 572$ & $182 \to 18$ \\
-Carrera & 0,83 & 4044 & $-1740 \to -215$ & $2103 \to 574$ & $365 \to 14$ \\
-Trote & 1,39 & 6758 & $-1750 \to -439$ & $2186 \to 874$ & $321 \to 16$ \\
-Galope & 2,05 & 10\,020 & $-4699 \to -742$ & $5072 \to 1104$ & $1281 \to 281$ \\
+Gateo & 0,89 & 4353 & $-1438 \to -103$ & $2028 \to 688$ & $242 \to 16$ \\
+Paso & 0,95 & 4641 & $-1214 \to -127$ & $1663 \to 572$ & $182 \to 18$ \\
+Carrera & 1,23 & 5989 & $-1740 \to -215$ & $2103 \to 574$ & $365 \to 14$ \\
+Trote & 2,06 & 10\,030 & $-1750 \to -439$ & $2186 \to 874$ & $321 \to 16$ \\
+Galope & no converge & --- & $-4699 \to -742$ & $5072 \to 1104$ & $1281 \to 281$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -413,11 +415,12 @@ Galope & 2,05 & 10\,020 & $-4699 \to -742$ & $5072 \to 1104$ & $1281 \to 281$ \\
 \subsection{Resultados}
 
 La Tabla~\ref{tab:convergencia-marchas} resume los puntos de convergencia. La recompensa
-y el castigo convergen prácticamente en el mismo punto, porque los premios apenas varían
+y el castigo convergen en el mismo punto o muy cerca (en el gateo, el castigo a 0,80~M), porque los premios apenas varían
 durante el entrenamiento: la recompensa sube, sobre todo, porque bajan los castigos. El
-gateo, el paso y la carrera convergen antes de 1~M de pasos, el trote hacia 1,4~M y el
-galope hacia 2~M. El galope aprende en dos etapas, con una meseta entre 1 y 2~M de pasos,
-y es la marcha que conserva más ruido al final; también es la única con caídas durante el
+gateo y el paso convergen antes de 1~M de pasos, la carrera hacia 1,2~M y el trote hacia
+2,1~M. El galope no converge en 5~M de pasos: aprende en dos etapas, con una meseta entre
+1 y 2~M de pasos y un salto hacia los 2~M, tras el cual sigue mejorando lentamente hasta
+casi el final (su curva solo queda dentro de la banda a partir de 4,8~M), y es la marcha que conserva más ruido al final; también es la única con caídas durante el
 entrenamiento (7 en 14\,010 episodios).
 
 Por término, el giro por ciclo y la brusquedad son los castigos que más disminuyen. El
@@ -466,7 +469,7 @@ continuación.
 \begin{figure}[p]
 \centering
 \includegraphics[width=\textwidth,height=0.86\textheight,keepaspectratio]{Resultados/ppo_convergencia_galope.png}
-\caption{Convergencia del entrenamiento. Galope (semilla 6403, 5~M de pasos). Tono claro: valor de cada episodio; tono oscuro: media móvil de 100 episodios; línea discontinua: punto de convergencia. Ejes verticales recortados al percentil 0,5--99,5.}
+\caption{Convergencia del entrenamiento. Galope (semilla 6403, 5~M de pasos). Tono claro: valor de cada episodio; tono oscuro: media móvil de 100 episodios. Sin línea discontinua, porque no converge con el criterio usado. Ejes verticales recortados al percentil 0,5--99,5.}
 \label{fig:convergencia-galope}
 \end{figure}
 

@@ -5,7 +5,7 @@ Por marcha, convergencia_<marcha>.png con 6 paneles: recompensa y castigo frente
 frente a pasos y castigos por término. Además convergencia.csv y terminos_inicio_final.csv.
 
 Criterio de convergencia de una curva (media móvil de 100 episodios): el primer punto a partir del cual la curva ya
-no sale de una banda de ±5 % del recorrido total alrededor de su valor final (media del último 10 % de episodios).
+no sale de una banda de ±2 % del recorrido total alrededor de su valor final (media del último 10 % de episodios).
 Si ese punto cae en el último 20 % del entrenamiento, la curva se declara NO convergida.
 
 Época: una pasada sobre los 2048 pasos de una recolección (train/n_updates de Stable-Baselines3, acumulado; el freno
@@ -33,7 +33,7 @@ NOMBRES = dict(vivo="Seguir de pie", avance="Avance", actitud="Inclinación", al
 # Paleta categórica validada con la skill dataviz (modo claro).
 AZUL, NARANJA, AGUA, AMARILLO, MAGENTA = "#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4"
 GRIS, TINTA, TINTA2 = "#8f8e86", "#1f1f1d", "#5f5e58"
-BANDA, FINAL, VENTANA = 0.05, 0.10, 100
+BANDA, FINAL, VENTANA = 0.02, 0.10, 100
 
 
 def media_movil(y, n=VENTANA):
@@ -95,7 +95,8 @@ def curva(ax, x, y, color, conv, etiqueta_x, unidad, titulo, eje_y, escala=1.0):
     bajo, alto = np.percentile(y, [0.5, 99.5])
     m = 0.06 * (alto - bajo)
     ax.set_ylim(bajo - m, alto + m)
-    ax.axvline(x[i], color=TINTA, linewidth=1.2, linestyle="--")
+    if ok:
+        ax.axvline(x[i], color=TINTA, linewidth=1.2, linestyle="--")
     texto = f"converge en {x[i]:,.2f} {unidad}" if ok else "no convergió"
     if escala == 1:
         texto = f"converge en {x[i]:,.0f} {unidad}" if ok else "no convergió"
@@ -149,7 +150,7 @@ def figura(marcha, d, salida, vertical=False):
         plt.close(fig)
         return cr_p, cc_p
     fig.text(0.01, 0.005, "Claro: cada episodio. Oscuro: media móvil de 100 episodios. Línea discontinua: punto de "
-             "convergencia (entra y ya no sale de ±5 % del recorrido alrededor del valor final). "
+             "convergencia (entra y ya no sale de ±2 % del recorrido alrededor del valor final). "
              "Ejes verticales recortados al percentil 0,5–99,5.", fontsize=8.5, color=TINTA2)
     fig.tight_layout(rect=(0, 0.025, 1, 0.95))
     fig.savefig(salida / f"convergencia_{marcha}.png", dpi=160, facecolor="#fcfcfb")
