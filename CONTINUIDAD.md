@@ -2871,3 +2871,11 @@ Campaña v31 (cola_v31.sh): las 5 marchas desde cero con registro de cada térmi
 ### 3-nov-2026 — tesis actualizada con los resultados del 26-oct al 3-nov
 
 Cap. 12: mapa de articulaciones (coxa 2 a 42, coxa 3 a 64, tibia 1 en CH12, bases y topes de tibias 2 y 4), modos + $ ^ del firmware, fallos nuevos. Cap. 13: tabla de marchas (5), ganancias de tibia, campañas v17–v31 (tabla nueva), viabilidad (ecuación), sensores al 28-oct. Cap. 14: postura del 27-oct, viabilidad, parecido sim–real por articulación, mejores políticas, pendientes y alcance. Cap. 15–17, resumen y anexo actualizados. generar_inventario_resultados.py separa carrera y galope. Inferencias nuevas señaladas en el texto: copias elegidas con las mismas 20 semillas (optimista) y copias vecinas muy distintas (s7001 v27: 30/100/60 %). No actualizada: MATRIZ_OBJETIVO_EVIDENCIA.md.
+
+### 5-nov-2026 — gateo y galope en el robot suspendido; convergencia a ±2 %
+
+- graficas_convergencia.py con banda ±2 % (antes ±5 %, marcaba la línea cuando la curva aún subía): gateo 0,89 M, paso 0,95, carrera 1,23, trote 2,06; galope no converge en 5 M. Tesis 13.5 actualizada (commit dc7dad8).
+- robot05_gateo_v27_7013_60s_1811 y robot05_galope_v28_8417_60s_1813: inválidas, ningún sensor sigue la orden (r≈0, coxas 23–51°); probablemente servos sin fuerza en ese momento. revisar_sensores.py --completo (18:17) sí respondió: fémures M5/M6/M8/M9 r≈0,98, tibia 2 E70_3, tibia 3 M12; coxas y tibia 4 sin lectura.
+- Repetidas: gateo v27 r2_1822 parecido 76 % (90 % sin tibia 4; fémures r 0,94–0,99, coxas ≈1,7°); galope v28 r2_1825 parecido 66 % (fémur 2 deriva −13,9°, fémur 4 r 0,80 con ciclos negativos, desplazamiento común 60 cuentas; tibias 1,2–1,8× la simulación). pc2-camara se cayó de la red durante el galope: su video quedó en remota_incompleta.
+- Tibia 4 (C10) ya no sigue a su servo (r≈0,1 en caminata y sin lectura en la revisión).
+- Python con MuJoCo: ../../.venv-mujoco/bin/python (comparar_sim_real.py y revisar_sensores.py lo necesitan).
