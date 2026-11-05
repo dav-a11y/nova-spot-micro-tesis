@@ -1,0 +1,11 @@
+# PyTorch solo CPU: para políticas MLP pequeñas la CPU rinde igual o mejor que
+# la GPU y la descarga es mucho menor. Quita esta línea para usar CUDA.
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+mujoco>=3.2
+gymnasium>=1.0
+stable-baselines3>=2.4
+torch
+pyserial>=3.5
+platformio>=6.1
+pytest>=8
