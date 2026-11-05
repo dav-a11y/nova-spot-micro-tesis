@@ -34,8 +34,8 @@ el error medio de seguimiento y de desviación de las coxas frente a la marcha
 nominal en dos vueltas completas, y la de trote un 19~\% en una de ellas. Las
 políticas elegidas alcanzaron en simulación una viabilidad del 100~\% en cuatro marchas
 y del 90~\% en galope, en 20 episodios con aleatorización y sin caídas, y el robot
-reprodujo la forma de los movimientos simulados, con un parecido del 69 al 83~\% en las
-tres marchas probadas. La
+reprodujo la forma de los movimientos simulados, con un parecido del 66 al 83~\% en las
+cinco marchas. La
 comparación con cámaras reveló y permitió corregir errores de la interfaz
 robot--modelo, como el sentido invertido de dos articulaciones y una postura
 base distinta de la simulada.
@@ -43,8 +43,7 @@ base distinta de la simulada.
 Estos resultados se obtuvieron con el robot suspendido: miden el seguimiento de
 las órdenes y la estabilidad de las coxas, no el avance ni la estabilidad sobre
 el suelo. La validación de la locomoción apoyada, con medición de la
-orientación del cuerpo, la prueba en el robot de las políticas de gateo y galope
-elegidas y la realimentación de dos tibias y una coxa permanecen pendientes y no se presentan como logros terminados.
+orientación del cuerpo y la realimentación de tres tibias y una coxa permanecen pendientes y no se presentan como logros terminados.
 
 \textbf{Palabras clave:} robot cuadrúpedo, locomoción, ROS~2, Gazebo, MuJoCo,
 contacto, estabilidad, aprendizaje por refuerzo, PPO, transferencia
@@ -73,8 +72,8 @@ update and retraining selected policies on the real robot: the crawl policy
 reduced the mean tracking and hip-deviation error by 15--19~\% relative to the
 nominal gait in two complete rounds, and the trot policy by 19~\% in one round.
 In simulation, the selected policies reached 100~\% viability in four gaits and 90~\% in
-gallop over 20 randomized episodes, with no falls; on the robot, the three gaits tested
-reproduced the shape of the simulated motion, with a similarity of 69--83~\%.
+gallop over 20 randomized episodes, with no falls; on the robot, the five gaits
+reproduced the shape of the simulated motion, with a similarity of 66--83~\%.
 These results were obtained with the robot suspended; they measure command
 tracking and hip stability, not locomotion on the ground, which remains to be
 validated.
