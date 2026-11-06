@@ -20,8 +20,8 @@ Modelo & 52.111 configuraciones exploradas; postura nominal con $\sigma_{\min}=0
 Marchas en el robot & Gateo, paso, trote, carrera y galope nominales ejecutados con el robot suspendido; repeticiones de 3~min con CV entre 2 y 11~\% en una misma sesión. & Robot suspendido; sin medición de avance ni inclinación. \\
 PPO con actuador real & Políticas seleccionadas en el robot; gateo $-15$ a $-19$~\% de error frente a la marcha nominal en dos vueltas, trote $-19$~\% en una. & Seguimiento y estabilidad de coxas; locomoción apoyada sin medir. \\
 Viabilidad de las políticas & Paso, trote, carrera y gateo: 100~\% de 20 episodios; galope: 90~\%; sin caídas. & Solo simulación; copias elegidas con esos mismos episodios. \\
-Parecido robot--simulación & Paso 83~\%, trote 70~\%, carrera 69~\%; forma casi igual, amplitud distinta. & Robot suspendido; una toma de 60~s; gateo y galope elegidos sin probar. \\
-Convergencia & La recompensa se estabiliza entre 0,60~M (gateo) y 2,05~M de pasos (galope). & Simulación; una semilla por marcha (sección~\ref{sec:convergencia-marchas}). \\
+Parecido robot--simulación & Paso 83~\%, gateo 76~\%, trote 70~\%, carrera 69~\%, galope 66~\%; forma casi igual, amplitud distinta. & Robot suspendido; una toma de 60~s por marcha. \\
+Convergencia & La recompensa se estabiliza entre 0,89~M (gateo) y 2,06~M de pasos (trote); el galope no converge en 5~M. & Simulación; una semilla por marcha (sección~\ref{sec:convergencia-marchas}). \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -735,42 +735,50 @@ $A_j$ la razón entre el recorrido del robot y el de la simulación. Entonces
     \label{eq:parecido}
 \end{equation}
 y el parecido de la caminata es la media de sus articulaciones con sensor válido. La
-Tabla~\ref{tab:parecido} da el resultado de las tres políticas probadas el 28 de
-octubre, en tomas de 60~s con la coxa 2 ya ajustada y la calibración corregida.
+Tabla~\ref{tab:parecido} da el resultado de las cinco políticas elegidas: paso, trote y
+carrera el 28 de octubre, y gateo y galope el 5 de noviembre, en tomas de 60~s con la
+coxa 2 ya ajustada y la calibración corregida.
 
 \begin{table}[H]
 \centering
-\caption{Parecido robot--simulación por articulación (28 de octubre de 2026, una toma de 60~s por política). Entre paréntesis, la amplitud relativa $A_j$.}
+\caption{Parecido robot--simulación por articulación (28 de octubre y 5 de noviembre de 2026, una toma de 60~s por política). Entre paréntesis, la amplitud relativa $A_j$. Políticas: paso v24 s.~4109, gateo v27 s.~7013, trote v24 s.~4209, carrera v24 s.~4309 y galope v28 s.~8417.}
 \label{tab:parecido}
 \footnotesize
-\begin{tabular}{lrrr}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrrrr}
 \toprule
-Articulación & Paso v24 s.\ 4109 & Trote v24 s.\ 4209 & Carrera v24 s.\ 4309 \\
+Articulación & Paso & Gateo & Trote & Carrera & Galope \\
 \midrule
-Fémur delantero derecho & 96 (1,04) & 77 (1,29) & 71 (1,41) \\
-Fémur delantero izquierdo & 90 (0,92) & 84 (1,18) & 72 (1,38) \\
-Fémur trasero derecho & 94 (0,97) & 5 (0,18) & 56 (1,77) \\
-Fémur trasero izquierdo & 58 (0,62) & 95 (1,04) & 79 (1,24) \\
-Tibia delantera izquierda & 83 (1,18) & 90 (1,10) & 76 (1,29) \\
-Tibia trasera izquierda & 73 (1,34) & 73 (1,36) & 61 (1,61) \\
+Fémur delantero derecho & 96 (1,04) & 92 (1,08) & 77 (1,29) & 71 (1,41) & 72 (1,39) \\
+Fémur delantero izquierdo & 90 (0,92) & 99 (1,00) & 84 (1,18) & 72 (1,38) & 81 (1,22) \\
+Fémur trasero derecho & 94 (0,97) & 82 (1,22) & 5 (0,18) & 56 (1,77) & 66 (1,51) \\
+Fémur trasero izquierdo & 58 (0,62) & 86 (0,89) & 95 (1,04) & 79 (1,24) & 70 (0,76) \\
+Tibia delantera izquierda & 83 (1,18) & 91 (1,08) & 90 (1,10) & 76 (1,29) & 55 (1,80) \\
+Tibia trasera izquierda & 73 (1,34) & 7 (0,22) & 73 (1,36) & 61 (1,61) & 54 (0,63) \\
 \midrule
-\textbf{Caminata} & \textbf{83} & \textbf{70} & \textbf{69} \\
+\textbf{Caminata} & \textbf{83} & \textbf{76} & \textbf{70} & \textbf{69} & \textbf{66} \\
+\bottomrule
 \bottomrule
 \end{tabular}
 \end{table}
 
-La forma del movimiento coincide casi por completo: $r$ está entre 0,93 y 1,00 en
-todas las articulaciones salvo una, y el robot va de 60 a 130~ms por detrás de la
-simulación. La diferencia está en la amplitud, sobre todo en la carrera, cuyos
+La forma del movimiento coincide casi por completo: $r$ está entre 0,86 y 1,00 en
+todas las articulaciones salvo dos, y el robot va de 60 a 130~ms por detrás de la
+simulación (210~ms en la tibia trasera izquierda del galope). La diferencia está en la amplitud, sobre todo en la carrera, cuyos
 fémures se mueven de 1,2 a 1,8 veces lo simulado; la causa no se ha identificado. El
 caso aislado es el fémur trasero derecho en la toma de trote ($r=0{,}25$), que por
 sí solo baja el valor de la caminata: sin él sería 84~\%. Al tratarse de una sola
-toma, no se puede saber si fue un fallo puntual de ese sensor.
+toma, no se puede saber si fue un fallo puntual de ese sensor. El otro caso es la
+tibia trasera izquierda en el gateo ($r=0{,}31$, amplitud 0,22): su potenciómetro (C10)
+dejó de seguir al servo el 5 de noviembre, también en la revisión de sensores de ese
+día, de modo que el valor refleja un fallo del sensor; sin ella, el gateo daría 90~\%.
+El galope es la marcha con menor parecido: sus fémures y la tibia delantera izquierda se
+mueven hasta 1,8 veces lo simulado, y en esa toma el fémur 2 derivó $14^\circ$ y el
+fémur 4 tuvo ciclos en que no siguió la orden.
 
 La métrica depende de la calibración. Antes de corregir la escala del encoder de la
 tibia 2 (de $-0{,}59$ a $-1{,}15$, regresión con $r\approx0{,}97$ en tres
-caminatas), los mismos valores eran 76, 63 y 63~\%. Las políticas de gateo y galope
-elegidas no se han probado en el robot.
+caminatas), los valores del paso, el trote y la carrera eran 76, 63 y 63~\%.
 
 \subsection{Ensayos inválidos y su interpretación}
 
@@ -798,6 +806,12 @@ porque su causa cambia la lectura de los resultados:
     3~s porque el análisis de video agotó la memoria del PC (se limitó a dos
     procesos). Esta sesión se hizo con la comprobación de salud desactivada a
     petición del operador.
+    \item \textbf{Servos sin fuerza} (5 de noviembre). Las primeras tomas de gateo y
+    galope de ese día se invalidaron: ningún sensor, ni siquiera el encoder de la tibia 2,
+    siguió la orden ($r\approx0$) y las coxas se desviaron de 23 a $51^\circ$. Una
+    revisión de sensores hecha cuatro minutos después respondió con normalidad, y las
+    caminatas repetidas fueron válidas, por lo que lo más probable es que los servos no
+    tuvieran alimentación en esas tomas.
     \item \textbf{Bus I$^2$C.} El 27 de octubre el bus volvió a cortarse. La causa
     fue el cable del encoder del fémur 2; tras repararlo, el bus quedó estable.
 \end{itemize}
@@ -863,8 +877,7 @@ cambiar de una sesión a otra.
 
 \subsection{Ensayos pendientes}
 
-Para cerrar la comparación faltan: probar en el robot las políticas de gateo y
-galope elegidas por viabilidad; comparar con la marcha nominal las cinco políticas
+Para cerrar la comparación faltan: comparar con la marcha nominal las cinco políticas
 elegidas, en la postura actual; completar al menos diez repeticiones válidas por
 marcha y condición, como fijó el plan metodológico; repetir la viabilidad con
 semillas nuevas, y los ensayos apoyados en el suelo con la IMU y el margen de
@@ -883,7 +896,7 @@ suspendido no se midieron avance, desvío ni inclinación del cuerpo, que son lo
 objetivos para los que se diseñó la recompensa, y el avance y la deriva de la
 Tabla~\ref{tab:viabilidad} proceden solo de la simulación. La tibia 1 no tiene
 sensor; el potenciómetro de la tibia 3 responde, pero el firmware aún no lo
-transmite; ambas se evaluaron con la orden como estimación, y el potenciómetro de la
-coxa 2 no sigue a la coxa. El número de repeticiones por condición es pequeño (una
+transmite; ambas se evaluaron con la orden como estimación, y los potenciómetros de la
+coxa 2 y, desde el 5 de noviembre, de la tibia 4 no siguen a su articulación. El número de repeticiones por condición es pequeño (una
 a tres) y la vuelta 3 quedó incompleta. La validación sobre el suelo, con medición
 del movimiento del cuerpo, sigue pendiente.

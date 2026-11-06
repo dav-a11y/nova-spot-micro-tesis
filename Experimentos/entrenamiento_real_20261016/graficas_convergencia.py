@@ -5,7 +5,7 @@ Por marcha, convergencia_<marcha>.png con 6 paneles: recompensa y castigo frente
 frente a pasos y castigos por término. Además convergencia.csv y terminos_inicio_final.csv.
 
 Criterio de convergencia de una curva (media móvil de 100 episodios): el primer punto a partir del cual la curva ya
-no sale de una banda de ±5 % del recorrido total alrededor de su valor final (media del último 10 % de episodios).
+no sale de una banda de ±2 % del recorrido total alrededor de su valor final (media del último 10 % de episodios).
 Si ese punto cae en el último 20 % del entrenamiento, la curva se declara NO convergida.
 
 Época: una pasada sobre los 2048 pasos de una recolección (train/n_updates de Stable-Baselines3, acumulado; el freno
@@ -14,6 +14,7 @@ KL puede cortar épocas, así que no siempre son 10 por recolección).
 Uso: graficas_convergencia.py [--salida graficas/convergencia]
 """
 import argparse
+import json
 import csv
 from pathlib import Path
 
@@ -33,12 +34,16 @@ NOMBRES = dict(vivo="Seguir de pie", avance="Avance", actitud="Inclinación", al
 # Paleta categórica validada con la skill dataviz (modo claro).
 AZUL, NARANJA, AGUA, AMARILLO, MAGENTA = "#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4"
 GRIS, TINTA, TINTA2 = "#8f8e86", "#1f1f1d", "#5f5e58"
-BANDA, FINAL, VENTANA = 0.05, 0.10, 100
+CAMPANA, SEMILLA = "v31", {}
+BANDA, FINAL, VENTANA = 0.02, 0.10, 100
 
 
 def media_movil(y, n=VENTANA):
     n = min(n, max(1, len(y) // 5))
-    return np.convolve(np.pad(y, (n // 2, n - 1 - n // 2), mode="edge"), np.ones(n) / n, mode="valid")
+    # 5-nov: en los bordes se promedian solo los episodios que existen (antes se repetía el último episodio n/2 veces,
+    # y un episodio raro al final torcía la curva y el punto de convergencia).
+    k = np.ones(n)
+    return np.convolve(y, k, mode="same") / np.convolve(np.ones(len(y)), k, mode="same")
 
 
 def convergencia(x, y):
@@ -54,7 +59,11 @@ def convergencia(x, y):
 
 
 def cargar(marcha):
-    d = next((HERE / f"ppo_v31_{marcha}").glob("semilla_*"))
+    d = next((HERE / f"ppo_{CAMPANA}_{marcha}").glob(f"semilla_{SEMILLA.get(marcha, '*')}"))
+    meta = json.loads((d / "metadata.json").read_text()) if (d / "metadata.json").exists() else {}
+    origen = "desde cero" if not meta.get("continuado_desde") else "continúa la política elegida"
+    if meta.get("actuador", {}).get("ganancia_marcha"):
+        origen += ", modelo de servos ajustado"
     with (d / "terminos.csv").open() as f:
         filas = list(csv.DictReader(f))
     # Al terminar, evaluar() de entrenar_ppo_real.py añadió sus episodios de prueba (episodio vuelve a 0): no son
@@ -71,7 +80,7 @@ def cargar(marcha):
     epocas = np.interp(pasos, xp, ep, left=0)
     premio = sum(t[k] for k in PREMIOS)
     castigo = -sum(t[k] for k in CASTIGOS)
-    return dict(semilla=d.name.split("_")[1], t=t, pasos=pasos, epocas=epocas, premio=premio, castigo=castigo,
+    return dict(semilla=d.name.split("_")[1], origen=origen, t=t, pasos=pasos, epocas=epocas, premio=premio, castigo=castigo,
                 total=t["total"], xp=xp, ep=ep, caidas=int(t["caida"].sum()))
 
 
@@ -95,7 +104,8 @@ def curva(ax, x, y, color, conv, etiqueta_x, unidad, titulo, eje_y, escala=1.0):
     bajo, alto = np.percentile(y, [0.5, 99.5])
     m = 0.06 * (alto - bajo)
     ax.set_ylim(bajo - m, alto + m)
-    ax.axvline(x[i], color=TINTA, linewidth=1.2, linestyle="--")
+    if ok:
+        ax.axvline(x[i], color=TINTA, linewidth=1.2, linestyle="--")
     texto = f"converge en {x[i]:,.2f} {unidad}" if ok else "no convergió"
     if escala == 1:
         texto = f"converge en {x[i]:,.0f} {unidad}" if ok else "no convergió"
@@ -141,7 +151,7 @@ def figura(marcha, d, salida, vertical=False):
     h.set_xlabel("Pasos de entrenamiento (millones)", fontsize=9, color=TINTA2)
     h.set_ylabel("Castigo del episodio (puntos)", fontsize=9, color=TINTA2)
     h.legend(frameon=False, fontsize=8.5)
-    fig.suptitle(f"{marcha.capitalize()}: convergencia del entrenamiento (semilla {d['semilla']}, desde cero)", x=0.01,
+    fig.suptitle(f"{marcha.capitalize()}: convergencia del entrenamiento (semilla {d['semilla']}, {d['origen']})", x=0.01,
                  ha="left", fontsize=14, color=TINTA)
     if vertical:
         fig.tight_layout(rect=(0, 0, 1, 0.96))
@@ -149,7 +159,7 @@ def figura(marcha, d, salida, vertical=False):
         plt.close(fig)
         return cr_p, cc_p
     fig.text(0.01, 0.005, "Claro: cada episodio. Oscuro: media móvil de 100 episodios. Línea discontinua: punto de "
-             "convergencia (entra y ya no sale de ±5 % del recorrido alrededor del valor final). "
+             "convergencia (entra y ya no sale de ±2 % del recorrido alrededor del valor final). "
              "Ejes verticales recortados al percentil 0,5–99,5.", fontsize=8.5, color=TINTA2)
     fig.tight_layout(rect=(0, 0.025, 1, 0.95))
     fig.savefig(salida / f"convergencia_{marcha}.png", dpi=160, facecolor="#fcfcfb")
@@ -160,7 +170,13 @@ def figura(marcha, d, salida, vertical=False):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--salida", type=Path, default=HERE / "graficas" / "convergencia")
+    # 5-nov: otra campaña (v33: desde cero con el modelo ajustado) y, si tiene varias semillas, cuál por marcha.
+    ap.add_argument("--campana", default="v31")
+    ap.add_argument("--semilla", action="append", default=[], help="marcha=semilla")
     a = ap.parse_args()
+    global CAMPANA
+    CAMPANA = a.campana
+    SEMILLA.update(dict(x.split("=") for x in a.semilla))
     a.salida.mkdir(parents=True, exist_ok=True)
     resumen, terminos = [], []
     for m in MARCHAS:

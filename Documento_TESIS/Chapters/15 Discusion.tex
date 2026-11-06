@@ -130,10 +130,10 @@ no que sea mucho mejor que ella.
 
 \section{Parecido entre el robot y la simulación}
 
-El parecido del 69 al 83~\% (Tabla~\ref{tab:parecido}) se debe a la amplitud, no a la
-forma: las correlaciones casi siempre superan 0,93, de modo que el modelo del actuador
+El parecido del 66 al 83~\% (Tabla~\ref{tab:parecido}) se debe a la amplitud, no a la
+forma: las correlaciones casi siempre superan 0,86, de modo que el modelo del actuador
 reproduce bien cuándo se mueve cada articulación, pero no cuánto. Además, la diferencia
-crece en los ciclos cortos, ya que la carrera se mueve hasta 1,8 veces lo simulado.
+crece en los ciclos cortos, ya que la carrera y el galope, de ciclo de 0,8~s, se mueven hasta 1,8 veces lo simulado, mientras que el gateo, el más lento, llega al 90~\% sin la tibia de sensor averiado.
 Esto importa, porque una política entrenada con una amplitud distinta de la real
 corrige sobre un movimiento diferente. El modelo del actuador se identificó sobre todo
 con marchas lentas, por lo que conviene repetir la identificación con la carrera y el

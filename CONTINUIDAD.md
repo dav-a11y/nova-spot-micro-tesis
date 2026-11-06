@@ -2871,3 +2871,34 @@ Campaña v31 (cola_v31.sh): las 5 marchas desde cero con registro de cada térmi
 ### 3-nov-2026 — tesis actualizada con los resultados del 26-oct al 3-nov
 
 Cap. 12: mapa de articulaciones (coxa 2 a 42, coxa 3 a 64, tibia 1 en CH12, bases y topes de tibias 2 y 4), modos + $ ^ del firmware, fallos nuevos. Cap. 13: tabla de marchas (5), ganancias de tibia, campañas v17–v31 (tabla nueva), viabilidad (ecuación), sensores al 28-oct. Cap. 14: postura del 27-oct, viabilidad, parecido sim–real por articulación, mejores políticas, pendientes y alcance. Cap. 15–17, resumen y anexo actualizados. generar_inventario_resultados.py separa carrera y galope. Inferencias nuevas señaladas en el texto: copias elegidas con las mismas 20 semillas (optimista) y copias vecinas muy distintas (s7001 v27: 30/100/60 %). No actualizada: MATRIZ_OBJETIVO_EVIDENCIA.md.
+
+### 5-nov-2026 — gateo y galope en el robot suspendido; convergencia a ±2 %
+
+- graficas_convergencia.py con banda ±2 % (antes ±5 %, marcaba la línea cuando la curva aún subía): gateo 0,89 M, paso 0,95, carrera 1,23, trote 2,06; galope no converge en 5 M. Tesis 13.5 actualizada (commit dc7dad8).
+- robot05_gateo_v27_7013_60s_1811 y robot05_galope_v28_8417_60s_1813: inválidas, ningún sensor sigue la orden (r≈0, coxas 23–51°); probablemente servos sin fuerza en ese momento. revisar_sensores.py --completo (18:17) sí respondió: fémures M5/M6/M8/M9 r≈0,98, tibia 2 E70_3, tibia 3 M12; coxas y tibia 4 sin lectura.
+- Repetidas: gateo v27 r2_1822 parecido 76 % (90 % sin tibia 4; fémures r 0,94–0,99, coxas ≈1,7°); galope v28 r2_1825 parecido 66 % (fémur 2 deriva −13,9°, fémur 4 r 0,80 con ciclos negativos, desplazamiento común 60 cuentas; tibias 1,2–1,8× la simulación). pc2-camara se cayó de la red durante el galope: su video quedó en remota_incompleta.
+- Tibia 4 (C10) ya no sigue a su servo (r≈0,1 en caminata y sin lectura en la revisión).
+- Python con MuJoCo: ../../.venv-mujoco/bin/python (comparar_sim_real.py y revisar_sensores.py lo necesitan).
+
+### 5-nov-2026 (tarde) — modelo de servos ajustado por marcha (v32) y tope de la tibia 1
+
+- ajustar_ganancia_marcha.py: ganancia por articulación = amplitud robot/sim de las tomas de 60 s (r ≥ 0,8) → actuadores_<marcha>_articulacion.json. En tomas no usadas para el ajuste el parecido subió: paso 78/80 → 91/88, trote 61/79 → 69/87, carrera 66 → 76 % (la ganancia única por marcha no mejoraba). comparar_sim_real.py y evaluar_viabilidad.py aceptan --actuador.
+- v32 (cola_v32.sh + viabilidad_v32.sh): 4 semillas por marcha continuando las elegidas con el modelo ajustado. Con este modelo, la marcha nominal empeora mucho en simulación (carrera cae 19/20, galope retrocede). Viabilidad: paso 9109 300k 100 %, gateo 9009 4,6 M 100 %, carrera 9301 500k 95 %, trote 9209 650k 60 %, galope 9407 475k 60 %; las de partida con el modelo nuevo: paso y gateo 100 %, trote 5 %, carrera y galope 0 %. Copias en ppo_v10_robot/ppo_v32_*.
+- Robot suspendido (parecido sin tibia 4, cuyo potenciómetro C10 ya no sigue): trote 70 → 80, carrera 71 → 83, galope 69 → 82 (r2_1936; la primera toma se cortó a 45 s por desconexión USB), paso 85 → 81, gateo 90 → 84. Elegidas para el robot: paso v24, gateo v27, trote/carrera/galope v32. En el galope los potenciómetros de los fémures 2 y 4 se alteran (deriva 13°).
+- Tibia 1: se mueve (probar_tibia1.py). Tope mínimo 18 → 12 en firmware (copia .antes_tope_t1_20261105) y ejecutar_politica_robot.py; en el trote va ahora de 42 a 15°.
+- v33 (cola_v33.sh) en el PC 2 (pc2-camara, ~/Cuadrupedo_entreno, venv copiado): las 5 marchas desde cero con el modelo ajustado y registro, para las gráficas de convergencia (graficas_convergencia.py --campana v33).
+
+### 5-nov-2026 (noche) — convergencia con el modelo ajustado (v33, PC 2), videos de evidencia, visor MuJoCo
+
+- v33 en el PC 2 (5 marchas desde cero, modelo de servos ajustado, semilla 9900). Convergencia ±2 %: trote 1,28 M, carrera 0,35 M pero degenerada (cae en el 100 % de los episodios al final, 47 pasos: con recompensa por paso negativa, caer pronto da más retorno), paso no converge (sigue subiendo a 3 M), gateo y galope tampoco con ±2 % (planos a la vista desde ~1,5 y ~2 M). Con el modelo ajustado la marcha nominal de carrera cae; de ahí el fracaso desde cero (la v32, que continúa una política buena, no lo sufre).
+- graficas_convergencia.py: --campana/--semilla; media móvil sin repetir el último episodio en los bordes (v31 no cambia). Gráficas para la presentación en Documentacion/graficas_convergencia_20261105 (v31 y v33) y en el Escritorio.
+- Caminatas de evidencia (19:45-19:57, 60 s, 5 cámaras): gateo v27, paso v24, trote/carrera/galope v32; videos 2×2 en ~/Escritorio/Videos_evidencia_5nov (video_evidencia.py); datos en grabaciones/evidencia_*_1945.
+- ver_politica_mujoco.py: política en MuJoCo, ventana (ffplay) o video, piso o colgado. Etiqueta politicas-elegidas-20261105 en GitHub con README, SHA256SUMS, verificar.sh, requirements.txt y firmware.
+
+### Para continuar el 6-nov-2026
+
+- Gráficas de convergencia con fecha y hora: ~/Escritorio/Graficas_convergencia_2026-11-05_2027 (también en el Escritorio del PC 2) y Documentacion/graficas_convergencia_20261105. Se regeneran con `python3 graficas_convergencia.py [--campana v33 --salida graficas/convergencia_v33]` a partir de los terminos.csv/progress.csv de ppo_v31_* y ppo_v33_* (ya en el repositorio).
+- Decisión pendiente del operador sobre la v33: (1) usar en la presentación las v31 y la v33 solo como diapositiva extra (recomendado), o (2) quitar la línea de la carrera v33 y marcarla como degenerada. Motivo: con ±2 % del recorrido la línea de la carrera v33 queda en 0,35 M y la curva aún sube hasta ~0,5 M (empezó en −2800 por las caídas); ninguna regla única (1 %, ruido final, codo, 95 % de la mejora) acierta en todas las marchas.
+- Políticas elegidas para el robot (etiqueta politicas-elegidas-20261105): gateo v27 7013 4,1 M, paso v24 4109 0,2 M, trote v32 9209 650k, carrera v32 9301 500k, galope v32 9407 475k.
+- Pendientes: probar el visor de Gazebo en el PC 2 (si se decide), cables de los potenciómetros de los fémures 2 y 4 y de la tibia 4, cámara General (0 fotogramas), subir videos a YouTube (los sube el operador) y poner los enlaces en la tesis, ventiladores del PC 2 a automático.
+- Copias de seguridad de ppo_v32_* y ppo_v33_* en el PC 2 (~/Cuadrupedo_entreno/Experimentos/entrenamiento_real_20261016).

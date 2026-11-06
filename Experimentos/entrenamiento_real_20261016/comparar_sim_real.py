@@ -41,6 +41,9 @@ def main():
     ap.add_argument("--figura", action="store_true")
     ap.add_argument("--calibracion-actual", action="store_true",
                     help="28-oct: usar sensores_robot.json de hoy en vez de la calibración guardada con la caminata")
+    # 5-nov: probar un modelo del actuador distinto (p. ej. con la ganancia ajustada por marcha) sin pisar el resultado.
+    ap.add_argument("--actuador", type=Path, default=HERE / "actuadores_ciclo2.json")
+    ap.add_argument("--salida", default="comparacion_sim_real.json", help="nombre del json de resultados en la caminata")
     a = ap.parse_args()
     import csv
     import entrenar_ppo_real as E
@@ -73,7 +76,7 @@ def main():
         E.PASO_CICLO_S = valor("--ciclo-paso", E.PASO_CICLO_S)
     E.SENSADAS, E.SIN_RESIDUAL = E.SENSADAS_COMPLETO, E.SIN_RESIDUAL_COMPLETO
     E.ALEATORIZAR = False
-    actuador = json.loads((HERE / "actuadores_ciclo2.json").read_text())
+    actuador = json.loads(a.actuador.read_text())
     dt = cfg.get("dt", 0.03)
     n_ciclos = int(np.ceil(len(filas) * dt / (len(E.generar_marcha(dt)) * dt))) + 2
     env = E.NovaRealEnv(actuador, seed=901, control_dt=dt, episode_cycles=n_ciclos, domain_randomization=False)
@@ -131,7 +134,7 @@ def main():
         print(f"  {n:24s} forma r={v['r']:+.2f}  amplitud robot/sim {v['amplitud']:.2f}  desfase {v['desfase_ms']:+d} ms"
               f"  parecido {v['parecido']:.0f} %")
     print(f"PARECIDO DE LA CAMINATA: {total:.0f} %")
-    (a.caminata / "comparacion_sim_real.json").write_text(json.dumps(dict(
+    (a.caminata / a.salida).write_text(json.dumps(dict(
         parecido=round(float(total), 1), articulaciones={k: {kk: vv for kk, vv in v.items() if kk not in ("robot", "sim")}
                                                           for k, v in resultados.items()}), indent=2, ensure_ascii=False))
     if a.figura and resultados:
