@@ -2894,3 +2894,11 @@ Cap. 12: mapa de articulaciones (coxa 2 a 42, coxa 3 a 64, tibia 1 en CH12, base
 - graficas_convergencia.py: --campana/--semilla; media móvil sin repetir el último episodio en los bordes (v31 no cambia). Gráficas para la presentación en Documentacion/graficas_convergencia_20261105 (v31 y v33) y en el Escritorio.
 - Caminatas de evidencia (19:45-19:57, 60 s, 5 cámaras): gateo v27, paso v24, trote/carrera/galope v32; videos 2×2 en ~/Escritorio/Videos_evidencia_5nov (video_evidencia.py); datos en grabaciones/evidencia_*_1945.
 - ver_politica_mujoco.py: política en MuJoCo, ventana (ffplay) o video, piso o colgado. Etiqueta politicas-elegidas-20261105 en GitHub con README, SHA256SUMS, verificar.sh, requirements.txt y firmware.
+
+### Para continuar el 6-nov-2026
+
+- Gráficas de convergencia con fecha y hora: ~/Escritorio/Graficas_convergencia_2026-11-05_2027 (también en el Escritorio del PC 2) y Documentacion/graficas_convergencia_20261105. Se regeneran con `python3 graficas_convergencia.py [--campana v33 --salida graficas/convergencia_v33]` a partir de los terminos.csv/progress.csv de ppo_v31_* y ppo_v33_* (ya en el repositorio).
+- Decisión pendiente del operador sobre la v33: (1) usar en la presentación las v31 y la v33 solo como diapositiva extra (recomendado), o (2) quitar la línea de la carrera v33 y marcarla como degenerada. Motivo: con ±2 % del recorrido la línea de la carrera v33 queda en 0,35 M y la curva aún sube hasta ~0,5 M (empezó en −2800 por las caídas); ninguna regla única (1 %, ruido final, codo, 95 % de la mejora) acierta en todas las marchas.
+- Políticas elegidas para el robot (etiqueta politicas-elegidas-20261105): gateo v27 7013 4,1 M, paso v24 4109 0,2 M, trote v32 9209 650k, carrera v32 9301 500k, galope v32 9407 475k.
+- Pendientes: probar el visor de Gazebo en el PC 2 (si se decide), cables de los potenciómetros de los fémures 2 y 4 y de la tibia 4, cámara General (0 fotogramas), subir videos a YouTube (los sube el operador) y poner los enlaces en la tesis, ventiladores del PC 2 a automático.
+- Copias de seguridad de ppo_v32_* y ppo_v33_* en el PC 2 (~/Cuadrupedo_entreno/Experimentos/entrenamiento_real_20261016).
