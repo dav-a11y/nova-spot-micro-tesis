@@ -212,7 +212,43 @@ def marcha_ciclica(control_dt, desfases, apoyo):
     return np.asarray(muestras)
 
 
+# 6-nov (operador): «pace» (ambladura) puro: las dos patas del mismo lado a la vez (FL+RL, luego FR+RR),
+# medio ciclo en el aire y medio apoyadas, como el trote pero con pares laterales. Al apoyarse en un solo
+# costado el cuerpo tiende a caer hacia el lado en el aire, así que las coxas llevan el cuerpo hacia el lado
+# apoyado: la coxa de la pata en el aire abre COXA_AMP_DEG (+q = afuera) y la de la pata apoyada cierra lo
+# mismo, en una senoide continua. Ganancia por pata en GANANCIA_COXA_PACE (número de pata 1-4; 1 si falta).
+PARES_PACE = {"FL": 0.0, "RL": 0.0, "FR": 0.5, "RR": 0.5}
+GANANCIA_COXA_PACE = {}
+COXA_DESFASE_PACE = 0.0   # adelanto (fracción de ciclo) del movimiento de las coxas respecto a las patas
+
+
+def marcha_pace(control_dt):
+    """Muestras articulares (rad) del pace: fémur y tibia como el trote, coxas en contrafase por lado."""
+    a = np.deg2rad(FEMUR_AMP_DEG)
+    n = round(TROTE_CICLO_S / control_dt)
+    muestras = []
+    for k in range(n):
+        q = np.tile(STAND, 4).astype(float)
+        for pata, desfase in PARES_PACE.items():
+            fase = (k / n + desfase) % 1.0
+            if fase < 0.5:                       # en el aire: avanza y levanta
+                t = fase / 0.5
+                o = a * (-1.0 + (1.0 - np.cos(np.pi * t)))
+                lift = np.deg2rad(TIBIA_AMP_DEG) * np.sin(np.pi * t)
+            else:                                # apoyada: retrocede a velocidad constante
+                o, lift = a * (1.0 - 2.0 * (fase - 0.5) / 0.5), 0.0
+            b = LEG_JOINT_BASE[pata]
+            q[b] = STAND[0] + np.deg2rad(COXA_AMP_DEG) * GANANCIA_COXA_PACE.get(NUM_PATA_LETRAS[pata], 1.0) \
+                * np.sin(2.0 * np.pi * (fase + COXA_DESFASE_PACE))     # + en el aire (abre), − apoyada (cierra)
+            q[b + 1] = STAND[1] - (o + apertura(pata))
+            q[b + 2] = STAND[2] - lift * ganancia_tibia(pata)
+        muestras.append(q)
+    return np.asarray(muestras)
+
+
 def generar_marcha(control_dt):
+    if MARCHA == "pace":
+        return marcha_pace(control_dt)
     if MARCHA == "trote":
         return marcha_trote(control_dt)
     if MARCHA == "galope":
@@ -456,9 +492,9 @@ def main():
     p.add_argument("--w-giro-ciclo", type=float, default=0.0, help="penalización por grado² de giro en cada ciclo")
     p.add_argument("--w-suavidad", type=float, default=0.0, help="penalización del cambio del residual (v11)")
     p.add_argument("--w-coxas", type=float, default=0.0, help="penalización de la desviación de las coxas en grados² (v11)")
-    p.add_argument("--marcha", choices=("gateo", "paso", "trote", "galope", "carrera"), default="gateo")
+    p.add_argument("--marcha", choices=("gateo", "paso", "trote", "galope", "carrera", "pace"), default="gateo")
     p.add_argument("--apertura", type=float, default=0.0, help="apertura delante-detrás de los fémures (°)")
-    p.add_argument("--coxa", type=float, default=0.0, help="galope y carrera: apertura de la coxa al levantar la pata (°)")
+    p.add_argument("--coxa", type=float, default=0.0, help="galope, carrera y pace: amplitud de la coxa (°)")
     p.add_argument("--ciclo-trote", type=float, default=1.4, help="duración del ciclo del trote (s)")
     p.add_argument("--ciclo-paso", type=float, default=2.4, help="duración del ciclo del paso (s)")
     p.add_argument("--ciclos-episodio", type=int, default=6, help="ciclos de marcha por episodio")

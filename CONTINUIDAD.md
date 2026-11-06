@@ -2902,3 +2902,11 @@ Cap. 12: mapa de articulaciones (coxa 2 a 42, coxa 3 a 64, tibia 1 en CH12, base
 - Políticas elegidas para el robot (etiqueta politicas-elegidas-20261105): gateo v27 7013 4,1 M, paso v24 4109 0,2 M, trote v32 9209 650k, carrera v32 9301 500k, galope v32 9407 475k.
 - Pendientes: probar el visor de Gazebo en el PC 2 (si se decide), cables de los potenciómetros de los fémures 2 y 4 y de la tibia 4, cámara General (0 fotogramas), subir videos a YouTube (los sube el operador) y poner los enlaces en la tesis, ventiladores del PC 2 a automático.
 - Copias de seguridad de ppo_v32_* y ppo_v33_* en el PC 2 (~/Cuadrupedo_entreno/Experimentos/entrenamiento_real_20261016).
+
+### 6-nov-2026 — marcha nueva «pace» (v34), lista para probar en el robot
+
+- Pedido del operador: el paso v24 se veía igual que el gateo (mismo orden de patas, de a una; el paso solo no hace pausas). Se agregó el **pace** puro en entrenar_ppo_real.py (`--marcha pace`): FL+RL y luego FR+RR, apoyo 0,5, coxas ±8° en contrafase por lado (la pata en el aire abre, la apoyada cierra). Con ciclo 1 s solo se balanceaba (0,4 m/20 s); con **0,45 s** avanza 3,5 m/20 s sin caídas (barrido en MuJoCo; coxas al revés retrocede). Aprobada por el operador en MuJoCo.
+- Campaña v34 (cola_pace.sh, cola_pace_extra.txt): pesos del trote v32/v33, modelo actuadores_trote_articulacion.json, `--w-coxas 0.1` (con 1.0 el castigo por la coxa en movimiento, que la política no controla, hacía preferible caerse), 27 ciclos por episodio. 4 semillas desde cero (3 M) y 8 desde el trote v32 9209 (1 M).
+- **Elegida: ppo_v10_robot/ppo_v34_pace_semilla_9517_1600k**, 100 % viable en 60 episodios (40 nuevos), avance 3,75 m (base 3,27), deriva 0,22 m (base 0,58), 0 caídas, incl. 7,9°. Paquete para reproducir: politica_pace_20261106/ (README, SHA256SUMS, verificar.sh); etiqueta politica-pace-20261106.
+- Gráficas: graficas_pace_v34.py → graficas/convergencia_v34_pace (recompensa frente a pasos/episodios/épocas, castigo, pérdidas de PPO, línea de convergencia). 9501 (desde cero) converge en 2,03 M. La 9517 y la 9521 se continúan 2 M más (cola_pace_parte2.sh) para ver su convergencia.
+- Siguiente: probar en el robot colgado (ver precauciones en politica_pace_20261106/README.md: ciclo rápido, cuatro coxas en movimiento, coxa 2 rebotaba en el galope).

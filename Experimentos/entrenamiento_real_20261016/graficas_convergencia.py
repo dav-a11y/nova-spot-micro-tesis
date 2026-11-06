@@ -173,13 +173,15 @@ def main():
     # 5-nov: otra campaña (v33: desde cero con el modelo ajustado) y, si tiene varias semillas, cuál por marcha.
     ap.add_argument("--campana", default="v31")
     ap.add_argument("--semilla", action="append", default=[], help="marcha=semilla")
+    # 6-nov: otras marchas o variantes (p. ej. --marchas pace pace_desde_trote, carpetas ppo_<campaña>_<marcha>).
+    ap.add_argument("--marchas", nargs="+", default=MARCHAS)
     a = ap.parse_args()
     global CAMPANA
     CAMPANA = a.campana
     SEMILLA.update(dict(x.split("=") for x in a.semilla))
     a.salida.mkdir(parents=True, exist_ok=True)
     resumen, terminos = [], []
-    for m in MARCHAS:
+    for m in a.marchas:
         d = cargar(m)
         cr, cc = figura(m, d, a.salida)
         figura(m, d, a.salida, vertical=True)

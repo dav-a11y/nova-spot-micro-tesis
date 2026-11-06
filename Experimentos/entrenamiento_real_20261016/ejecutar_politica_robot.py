@@ -153,7 +153,7 @@ def main():
     p.add_argument("--femur", type=float)
     p.add_argument("--tibia", type=float)
     p.add_argument("--fase", type=float)
-    p.add_argument("--marcha", choices=("gateo", "paso", "trote", "galope", "carrera"))
+    p.add_argument("--marcha", choices=("gateo", "paso", "trote", "galope", "carrera", "pace"))
     p.add_argument("--ciclo-trote", type=float)
     p.add_argument("--apertura", type=float, help="apertura delante-detrás de los fémures (°)")
     p.add_argument("--coxa", type=float, help="galope y carrera: apertura de la coxa al levantar la pata (°)")
