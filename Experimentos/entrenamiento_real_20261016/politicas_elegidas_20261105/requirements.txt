@@ -1,0 +1,10 @@
+# Entorno usado el 5-nov-2026 (Python 3.10.12, Ubuntu 22.04.5). torch es la versión CPU:
+#   pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
+mujoco==3.9.0
+stable_baselines3==2.3.2
+torch==2.3.1+cpu
+gymnasium==0.29.1
+numpy==2.2.6
+cloudpickle==3.1.2
+matplotlib==3.10.9
+pandas==2.3.3
