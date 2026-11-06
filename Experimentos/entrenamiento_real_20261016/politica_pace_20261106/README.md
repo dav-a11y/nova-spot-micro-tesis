@@ -71,6 +71,19 @@ y 9517 continuando el trote, con sus dos partes unidas. Cada figura tiene 9 pane
 
 La línea discontinua marca el punto de convergencia. Ese criterio está explicado en el encabezado del script.
 
+| | Desde cero (9501) | Continúa el trote (9517, la elegida) |
+|---|---|---|
+| Recompensa converge en | 2,03 M pasos · 4646 episodios · 9926 épocas | 0,96 M pasos · 2187 episodios · 4667 épocas |
+| Pérdidas total y del crítico | 2,26 M | no convergen: suben desde ~2,5 M |
+| Pérdida de la política / KL | 2,30 M / 2,37 M | 0,56 M / 2,33 M |
+| Entropía | sigue bajando (normal en PPO) | sigue bajando |
+
+En la 9517 la recompensa queda plana desde 0,96 M hasta unos 2,5 M de pasos de pace. Después empeora un poco:
+la recompensa baja de −700 a −770, el castigo sube y vuelven a subir el error del crítico y la pérdida total.
+Por eso la copia elegida, con ~0,95 M de pasos de pace, está en el punto de convergencia, y entrenar más no
+aporta. La segunda parte también dio copias de la 9521 al 100 % con 20 episodios
+(`viabilidad_todas_ppo_v34_pace_parte2.txt`), sin ventaja sobre la elegida.
+
 ## Reproducirlo mañana en el robot
 
 1. **Obtener el código** de esta fecha:

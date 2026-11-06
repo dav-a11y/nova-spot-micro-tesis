@@ -168,8 +168,9 @@ def figura(carpeta, semilla, salida):
         x, y = d["perd"][col]
         res[col] = panel(ax, x, y, color, titulo, nota, pm, eje_y, "M de pasos", 1e6, ventana=25, log=log,
                          limite=0.03 if col == "train/approx_kl" else None)
-    fig.suptitle(f"Pace v34 · semilla {semilla} ({d['origen']}): {len(d['total']):,} episodios, "
-                 f"{d['pasos'][-1] / 1e6:.2f} M de pasos, {d['ep'][-1]:,.0f} épocas".replace(",", " "),
+    miles = lambda v: f"{v:,.0f}".replace(",", " ")
+    fig.suptitle(f"Pace v34 · semilla {semilla} ({d['origen']}): {miles(len(d['total']))} episodios · "
+                 f"{d['pasos'][-1] / 1e6:.2f} M de pasos · {miles(d['ep'][-1])} épocas",
                  x=0.01, ha="left", fontsize=14, color=TINTA)
     fig.text(0.01, 0.006, f"Claro: cada episodio (o cada actualización de PPO en las pérdidas). Oscuro: media móvil de "
              f"100 episodios (25 actualizaciones).\nLínea discontinua: punto de convergencia, desde el que la tendencia ya "
