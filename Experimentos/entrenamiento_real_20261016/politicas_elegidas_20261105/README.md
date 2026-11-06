@@ -95,3 +95,34 @@ En `Experimentos/camaras/grabaciones/<carpeta>/` están `caminata.csv` (órdenes
   - coxa 2, el potenciómetro C1 no sigue a la coxa.
   En el galope, además, los potenciómetros de los fémures 2 y 4 se alteran.
 - **Limitaciones:** una toma por política; robot suspendido; viabilidad optimista.
+
+## Ver las políticas en MuJoCo (sin el robot)
+
+`ver_politica_mujoco.py` reproduce en la simulación la marcha nominal más la corrección de una política. Usa la
+misma marcha, los mismos pesos y el mismo modelo de servos con que se entrenó; todo eso sale de su `metadata.json`.
+Puede mostrarla en una ventana en vivo o guardarla en video, con el robot en el piso o colgado como en la barra.
+
+Para verla, la política sola no basta: hacen falta también `metadata.json`, `entrenar_ppo_real.py`,
+`Experimentos/entrenar_ppo_mujoco.py`, el modelo `src/nova_sm3_description/mujoco/nova_sm3_real.xml` y
+`calibracion_postura.json`. Todos están en el repositorio.
+
+Desde `Experimentos/entrenamiento_real_20261016/`, con el entorno de `requirements.txt` y ffmpeg instalado
+(`sudo apt install ffmpeg`):
+```
+P=../../.venv-mujoco/bin/python
+$P ver_politica_mujoco.py ppo_v10_robot/ppo_v32_trote_semilla_9209_650k                       # ventana, en el piso
+$P ver_politica_mujoco.py ppo_v10_robot/ppo_v32_trote_semilla_9209_650k --suspendido          # ventana, colgado
+$P ver_politica_mujoco.py ppo_v10_robot/ppo_v27_gateo_semilla_7013_4100k --video gateo.mp4 --segundos 30
+$P ver_politica_mujoco.py ppo_v10_robot/ppo_v24_paso_semilla_4109_200k --nominal              # solo la marcha base
+```
+- La ventana en vivo usa `ffplay`. `--visor` abre en cambio el visor interactivo de MuJoCo, que permite girar la
+  cámara con el ratón; en el PC del laboratorio se colgaba por el controlador gráfico.
+- En un PC sin pantalla, `--video` funciona con `MUJOCO_GL=egl` o `MUJOCO_GL=osmesa`.
+- En el piso, el programa imprime al final cuánto avanzó el robot.
+
+## Videos de evidencia del 5-nov-2026 (robot suspendido)
+
+Las 5 políticas se ejecutaron 60 s seguidas, a partir de las 19:45: gateo, paso, trote, carrera y galope, en ese
+orden. Las grabaron 4 cámaras sincronizadas. Los datos de sensores de esas tomas están en
+`Experimentos/camaras/grabaciones/evidencia_<marcha>_<política>_1945/`. Los videos se armaron con
+`Experimentos/camaras/video_evidencia.py`.
