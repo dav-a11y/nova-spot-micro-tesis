@@ -47,7 +47,7 @@ def episodio(trabajo):
     from stable_baselines3 import PPO
     import entrenar_ppo_real as E
     import seleccionar_copias as S
-    ruta, m, ciclos, semilla = trabajo
+    ruta, m, ciclos, semilla, ruta_act = trabajo
     E.MARCHA = m["tipo"]
     E.PASO_CICLO_S, E.TROTE_CICLO_S = m.get("ciclo_paso_s", 2.0), m.get("ciclo_trote_s", 1.0)
     E.FEMUR_AMP_DEG, E.TIBIA_AMP_DEG, E.FASE_MOV_S = m["femur_deg"], m["tibia_deg"], m.get("fase_s", 0.5)
@@ -55,7 +55,7 @@ def episodio(trabajo):
     E.NovaRealEnv.pesos = dict(avance=10.0, actitud=30.0, lateral=20.0, giro=10.0)
     E.SENSADAS, E.SIN_RESIDUAL = E.SENSADAS_COMPLETO, E.SIN_RESIDUAL_COMPLETO
     E.ALEATORIZAR = True
-    actuador = json.loads((HERE / "actuadores_ciclo2.json").read_text())
+    actuador = json.loads(Path(ruta_act).read_text())
     env = E.NovaRealEnv(actuador, seed=semilla, control_dt=0.03, episode_cycles=ciclos)
     if actuador.get("retardo_pasos_rango"):
         env.rango_retardo = tuple(actuador["retardo_pasos_rango"])
@@ -76,6 +76,8 @@ def main():
     ap.add_argument("--top", type=int, default=5)
     ap.add_argument("--episodios", type=int, default=20)
     ap.add_argument("--procesos", type=int, default=10)
+    # 5-nov: modelo del actuador de la evaluación (v32: ganancia ajustada por marcha); nominal y copias con el mismo.
+    ap.add_argument("--actuador", type=Path, default=HERE / "actuadores_ciclo2.json")
     a = ap.parse_args()
     rutas = [str(p) for p in a.politica]
     if a.carpeta:
@@ -89,7 +91,7 @@ def main():
     m = marcha_de(rutas[0])
     ciclos = ciclos_para(m)
     semillas = list(range(1001, 1001 + a.episodios))
-    trabajos = [(r, m, ciclos, s) for r in ["nominal"] + rutas for s in semillas]
+    trabajos = [(r, m, ciclos, s, str(a.actuador)) for r in ["nominal"] + rutas for s in semillas]
     with Pool(a.procesos) as pool:
         res = pool.map(episodio, trabajos)
     por = {}

@@ -2879,3 +2879,11 @@ Cap. 12: mapa de articulaciones (coxa 2 a 42, coxa 3 a 64, tibia 1 en CH12, base
 - Repetidas: gateo v27 r2_1822 parecido 76 % (90 % sin tibia 4; fémures r 0,94–0,99, coxas ≈1,7°); galope v28 r2_1825 parecido 66 % (fémur 2 deriva −13,9°, fémur 4 r 0,80 con ciclos negativos, desplazamiento común 60 cuentas; tibias 1,2–1,8× la simulación). pc2-camara se cayó de la red durante el galope: su video quedó en remota_incompleta.
 - Tibia 4 (C10) ya no sigue a su servo (r≈0,1 en caminata y sin lectura en la revisión).
 - Python con MuJoCo: ../../.venv-mujoco/bin/python (comparar_sim_real.py y revisar_sensores.py lo necesitan).
+
+### 5-nov-2026 (tarde) — modelo de servos ajustado por marcha (v32) y tope de la tibia 1
+
+- ajustar_ganancia_marcha.py: ganancia por articulación = amplitud robot/sim de las tomas de 60 s (r ≥ 0,8) → actuadores_<marcha>_articulacion.json. En tomas no usadas para el ajuste el parecido subió: paso 78/80 → 91/88, trote 61/79 → 69/87, carrera 66 → 76 % (la ganancia única por marcha no mejoraba). comparar_sim_real.py y evaluar_viabilidad.py aceptan --actuador.
+- v32 (cola_v32.sh + viabilidad_v32.sh): 4 semillas por marcha continuando las elegidas con el modelo ajustado. Con este modelo, la marcha nominal empeora mucho en simulación (carrera cae 19/20, galope retrocede). Viabilidad: paso 9109 300k 100 %, gateo 9009 4,6 M 100 %, carrera 9301 500k 95 %, trote 9209 650k 60 %, galope 9407 475k 60 %; las de partida con el modelo nuevo: paso y gateo 100 %, trote 5 %, carrera y galope 0 %. Copias en ppo_v10_robot/ppo_v32_*.
+- Robot suspendido (parecido sin tibia 4, cuyo potenciómetro C10 ya no sigue): trote 70 → 80, carrera 71 → 83, galope 69 → 82 (r2_1936; la primera toma se cortó a 45 s por desconexión USB), paso 85 → 81, gateo 90 → 84. Elegidas para el robot: paso v24, gateo v27, trote/carrera/galope v32. En el galope los potenciómetros de los fémures 2 y 4 se alteran (deriva 13°).
+- Tibia 1: se mueve (probar_tibia1.py). Tope mínimo 18 → 12 en firmware (copia .antes_tope_t1_20261105) y ejecutar_politica_robot.py; en el trote va ahora de 42 a 15°.
+- v33 (cola_v33.sh) en el PC 2 (pc2-camara, ~/Cuadrupedo_entreno, venv copiado): las 5 marchas desde cero con el modelo ajustado y registro, para las gráficas de convergencia (graficas_convergencia.py --campana v33).

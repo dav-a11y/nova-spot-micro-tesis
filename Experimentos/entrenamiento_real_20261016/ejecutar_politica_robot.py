@@ -61,7 +61,7 @@ DT = 0.02  # se reemplaza por control_dt del metadata.json de la política
 # en el orden de índices del firmware (0-3 coxas, 4-7 fémures, 8-11 tibias: CH8, CH9, CH10, CH14).
 # El firmware recorta igual; aquí se recorta para que el registro refleje la orden que se aplica.
 # 27-oct: topes de las tibias 2 (155-180) y 4 (130-175) alrededor de su apoyo nuevo; coxa 3 en 64 (antes 61).
-TOPE_MIN = [105, 10, 25, 60, 30, 45, 40, 25, 18, 155, 11, 130]   # 27-oct: tibia 1 hasta 18
+TOPE_MIN = [105, 10, 25, 60, 30, 45, 40, 25, 12, 155, 11, 130]   # 27-oct: tibia 1 hasta 18; 5-nov: hasta 12 (operador)
 TOPE_MAX = [170, 85, 90, 105, 140, 135, 160, 135, 160, 180, 160, 175]
 
 
