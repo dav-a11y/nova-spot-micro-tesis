@@ -40,7 +40,10 @@ BANDA, FINAL, VENTANA = 0.02, 0.10, 100
 
 def media_movil(y, n=VENTANA):
     n = min(n, max(1, len(y) // 5))
-    return np.convolve(np.pad(y, (n // 2, n - 1 - n // 2), mode="edge"), np.ones(n) / n, mode="valid")
+    # 5-nov: en los bordes se promedian solo los episodios que existen (antes se repetía el último episodio n/2 veces,
+    # y un episodio raro al final torcía la curva y el punto de convergencia).
+    k = np.ones(n)
+    return np.convolve(y, k, mode="same") / np.convolve(np.ones(len(y)), k, mode="same")
 
 
 def convergencia(x, y):

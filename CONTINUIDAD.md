@@ -2887,3 +2887,10 @@ Cap. 12: mapa de articulaciones (coxa 2 a 42, coxa 3 a 64, tibia 1 en CH12, base
 - Robot suspendido (parecido sin tibia 4, cuyo potenciómetro C10 ya no sigue): trote 70 → 80, carrera 71 → 83, galope 69 → 82 (r2_1936; la primera toma se cortó a 45 s por desconexión USB), paso 85 → 81, gateo 90 → 84. Elegidas para el robot: paso v24, gateo v27, trote/carrera/galope v32. En el galope los potenciómetros de los fémures 2 y 4 se alteran (deriva 13°).
 - Tibia 1: se mueve (probar_tibia1.py). Tope mínimo 18 → 12 en firmware (copia .antes_tope_t1_20261105) y ejecutar_politica_robot.py; en el trote va ahora de 42 a 15°.
 - v33 (cola_v33.sh) en el PC 2 (pc2-camara, ~/Cuadrupedo_entreno, venv copiado): las 5 marchas desde cero con el modelo ajustado y registro, para las gráficas de convergencia (graficas_convergencia.py --campana v33).
+
+### 5-nov-2026 (noche) — convergencia con el modelo ajustado (v33, PC 2), videos de evidencia, visor MuJoCo
+
+- v33 en el PC 2 (5 marchas desde cero, modelo de servos ajustado, semilla 9900). Convergencia ±2 %: trote 1,28 M, carrera 0,35 M pero degenerada (cae en el 100 % de los episodios al final, 47 pasos: con recompensa por paso negativa, caer pronto da más retorno), paso no converge (sigue subiendo a 3 M), gateo y galope tampoco con ±2 % (planos a la vista desde ~1,5 y ~2 M). Con el modelo ajustado la marcha nominal de carrera cae; de ahí el fracaso desde cero (la v32, que continúa una política buena, no lo sufre).
+- graficas_convergencia.py: --campana/--semilla; media móvil sin repetir el último episodio en los bordes (v31 no cambia). Gráficas para la presentación en Documentacion/graficas_convergencia_20261105 (v31 y v33) y en el Escritorio.
+- Caminatas de evidencia (19:45-19:57, 60 s, 5 cámaras): gateo v27, paso v24, trote/carrera/galope v32; videos 2×2 en ~/Escritorio/Videos_evidencia_5nov (video_evidencia.py); datos en grabaciones/evidencia_*_1945.
+- ver_politica_mujoco.py: política en MuJoCo, ventana (ffplay) o video, piso o colgado. Etiqueta politicas-elegidas-20261105 en GitHub con README, SHA256SUMS, verificar.sh, requirements.txt y firmware.
