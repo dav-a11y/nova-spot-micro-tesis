@@ -2910,3 +2910,13 @@ Cap. 12: mapa de articulaciones (coxa 2 a 42, coxa 3 a 64, tibia 1 en CH12, base
 - **Elegida: ppo_v10_robot/ppo_v34_pace_semilla_9517_1600k**, 100 % viable en 60 episodios (40 nuevos), avance 3,75 m (base 3,27), deriva 0,22 m (base 0,58), 0 caídas, incl. 7,9°. Paquete para reproducir: politica_pace_20261106/ (README, SHA256SUMS, verificar.sh); etiqueta politica-pace-20261106.
 - Gráficas: graficas_pace_v34.py → graficas/convergencia_v34_pace (recompensa frente a pasos/episodios/épocas, castigo, pérdidas de PPO, línea de convergencia). 9501 (desde cero) converge en 2,03 M. La 9517 y la 9521 se continúan 2 M más (cola_pace_parte2.sh) para ver su convergencia.
 - Siguiente: probar en el robot colgado (ver precauciones en politica_pace_20261106/README.md: ciclo rápido, cuatro coxas en movimiento, coxa 2 rebotaba en el galope).
+
+### 6-nov-2026 (noche) — gráficas de presentación y diapositivas de la sustentación
+- Gráficas de 4 paneles por marcha (`graficas_presentacion_pace_v34.py`): pace v34 9517 con líneas de convergencia
+  elegidas por el usuario; gateo, trote y galope tomados de la v33 desde cero (semilla 9900), porque las v32 eran
+  ajustes finos con curvas planas. El usuario aprobó estas gráficas y descartó reentrenar.
+- Presentación de sustentación sobre la plantilla USTA del anteproyecto:
+  `ProyectoII_Clases/Sustentacion_20261106/Sustentacion_Proyecto_Grado_II_v3.odp` (33 diapositivas). El usuario
+  la edita a mano; se agregó la diapositiva 16, «Conexión del hardware» (PC → Arduino Uno → PCA9685, TCA9548A
+  0x70/0x71 y CD74HC4067).
+- Ver `ProyectoII_Clases/Sustentacion_20261106/LEEME.md`, que tiene las reglas de edición y los pendientes.
