@@ -158,6 +158,8 @@ def main():
     p.add_argument("--apertura", type=float, help="apertura delante-detrás de los fémures (°)")
     p.add_argument("--coxa", type=float, help="galope y carrera: apertura de la coxa al levantar la pata (°)")
     p.add_argument("--ciclo-paso", type=float)
+    p.add_argument("--sin-vigilancia", action="store_true",
+                   help="11-nov: no detener la caminata aunque los potenciómetros indiquen que los servos no se mueven")
     a = p.parse_args()
     global DT
     modelo = None
@@ -227,6 +229,9 @@ def main():
                  and ref.get(cal[n].get("respaldo", {}).get("campo"), -1) < 0]
     for n in estimadas:
         print(f"AVISO: el sensor {cal[n]['campo']} de {n} no responde; se usa la orden retrasada como estimación.")
+    # 11-nov: todos los encoders en -1 = bus I2C de los TCA caído (falso contacto en SDA/SCL o 5 V/GND lógicos).
+    if all(ref.get(n, -1) < 0 for n in SENSORES if n.startswith("ENC_")):
+        print("AVISO: ningún encoder responde (TCA 0x70/0x71 sin respuesta): revisar SDA/SCL y 5 V/GND del bus I2C.")
     historial_ordenes = []
     estimaciones = {}
 
@@ -241,6 +246,13 @@ def main():
     obs_q = np.zeros(len(sensadas))
     ultimo_valido = {n: v for n, v in ref.items() if v >= 0}
     perdidas_seguidas = {}
+    # 11-nov: vigilancia de movimiento. Si en 2,5 s menos de 3 potenciómetros se mueven más de 40 cuentas
+    # mientras la orden cambia, los servos no están obedeciendo (sin potencia, OE en alto o PCA sin I2C):
+    # se detiene la caminata. Validado con 38 caminatas buenas (siempre ≥ 4) y las 3 fallidas del 11-nov (0).
+    from collections import deque
+    potes = [n for n in SENSORES if n.startswith("C")]
+    vent_potes, vent_orden = deque(maxlen=round(2.5 / DT)), deque(maxlen=round(2.5 / DT))
+    quieto_seguidos, detenida = 0, None
     t0 = time.time()
     # 19-oct: hora real de inicio, para sincronizar con el video de las cámaras.
     salida.with_suffix('.inicio.txt').write_text(f"{t0:.6f}\n")
@@ -306,6 +318,17 @@ def main():
             obs_q = np.deg2rad(medidas)
             w.writerow([round(time.time() - t0, 3), k, round(fase, 4), *grados, *grados_nom, *v,
                         *np.round(residual, 4)])
+            vent_potes.append([valores.get(n, -1) for n in potes]); vent_orden.append(grados)
+            if len(vent_potes) == vent_potes.maxlen and k >= rampa:
+                vp = np.array(vent_potes, float); vp[vp < 0] = np.nan
+                with np.errstate(all="ignore"):
+                    movidos = int(np.sum(np.nanmax(vp, 0) - np.nanmin(vp, 0) > 40))
+                orden_cambia = (np.ptp(np.array(vent_orden), 0) >= 8).any()
+                quieto_seguidos = quieto_seguidos + 1 if (orden_cambia and movidos < 3) else 0
+                if quieto_seguidos >= round(2.0 / DT) and not a.sin_vigilancia:
+                    detenida = (f"los servos no se mueven (solo {movidos} potenciómetros cambian en 2,5 s); "
+                                "revisar fuente/V+ del PCA, OE a GND y el bus I2C (SDA/SCL, 5 V/GND lógicos)")
+                    break
             espera = t0 + (k + 1) * DT - time.time()
             if espera > 0:
                 time.sleep(espera)
@@ -317,6 +340,9 @@ def main():
     if estimaciones:
         print("Pasos estimados con la orden por falta de sensor:", estimaciones)
     print("Registro:", salida, "| pasos:", k + 1, "| duración:", round(time.time() - t0, 1), "s")
+    if detenida:
+        print("CAMINATA DETENIDA:", detenida)
+        sys.exit(3)
 
 
 if __name__ == "__main__":
