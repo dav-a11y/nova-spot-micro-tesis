@@ -7,6 +7,9 @@
   Copia de `~/Downloads/Sustentacion_Proyecto_Grado_II_v3.odp`.
 - `graficas/`: las 4 gráficas de presentación por marcha (recompensa frente a pasos, episodios y épocas, y castigo
   frente a pasos) y su resumen. Copia de `~/Escritorio/Graficas_presentacion_marchas/`.
+  - `descartadas_v32_ajuste_fino/`: las mismas gráficas para gateo, trote y galope v32, que no se usaron.
+  - `pace_v34_variantes/`: el pace desde cero (semilla 9501) y la 9517 con la banda original de ±5 %.
+  - `convergencia_v31_v33_20261105/`: la convergencia por marcha de las campañas v31 y v33 (5-nov), con su LEEME.
   - `pace_v34_9517/`: líneas de convergencia puestas a mano por el usuario (1,1 M de pasos, 2 400 episodios,
     5 000 épocas y 1,25 M para el castigo).
   - `gateo_v33_desde_cero/`, `trote_v33_desde_cero/` y `galope_v33_desde_cero/`: entrenamientos v33 desde cero
