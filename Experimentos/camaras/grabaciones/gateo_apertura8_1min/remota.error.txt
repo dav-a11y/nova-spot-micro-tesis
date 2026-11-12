@@ -1,0 +1,1 @@
+Command '['scp', '-q', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=5', '-o', 'ServerAliveInterval=5', '-o', 'ServerAliveCountMax=3', 'pc2-camara:/tmp/cam_remota.mkv', '/home/pavilion/Documentos/Cuadrupedo/Experimentos/camaras/grabaciones/gateo_apertura8_1min/remota/video.mkv']' returned non-zero exit status 1.

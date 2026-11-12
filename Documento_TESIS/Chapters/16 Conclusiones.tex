@@ -1,0 +1,77 @@
+\chapter{Conclusiones}
+
+Las conclusiones se organizan según los cuatro objetivos específicos. Solo se
+incluyen resultados con evidencia verificable, y en cada una se indica si esa
+evidencia procede de la simulación o del robot físico; en este último caso, los
+ensayos se realizaron con el robot suspendido.
+
+\begin{enumerate}
+\item \textbf{OE1 -- hardware y software para la ejecución de movimiento.}
+Se completó la parte de software necesaria para generar postura, gateo y paso,
+publicar trayectorias articulares y supervisar condiciones inseguras en ROS~2.
+La arquitectura se ejecutó de forma reproducible en Gazebo y MuJoCo, y el
+supervisor reaccionó con la orden \texttt{stand} en los nueve escenarios
+provocados evaluados. En el prototipo físico, las doce articulaciones se ejecutaron con
+el robot suspendido mediante el PCA9685, con topes por articulación, límite de
+cambio por paso y realimentación de nueve de ellas (revisión del 28 de octubre); la arquitectura se definió
+con la Raspberry~Pi~4 como controlador embebido. Quedan abiertas la seguridad
+eléctrica y la alimentación separada de electrónica y servos.
+
+\item \textbf{OE2 -- modelado cinemático y dinámico para simulación.}
+Se completó un modelo nominal computable que integra geometría, cinemática
+directa e inversa, Jacobianos, trayectorias cartesianas y una representación
+dinámica configurable en URDF/Gazebo y MJCF/MuJoCo. El modelo permitió verificar
+alcanzabilidad, continuidad y cadencia de las referencias de gateo y paso. Su
+resultado comprobado es una base reproducible de simulación y diseño. Durante la
+fase física se incorporaron la geometría medida de las patas y un modelo del
+actuador identificado (retardo de $\approx99$~ms, zona muerta e histéresis
+inferiores a $1{,}5^\circ$), lo que lo acerca al ejemplar real; al no
+identificarse masas, inercias ni fricción, no se interpreta como un gemelo
+digital.
+
+\item \textbf{OE3 -- estrategia de control basada en aprendizaje automático.}
+Se completó el diseño, entrenamiento y evaluación en simulación de una capa PPO
+residual para cinco marchas: gateo, paso, trote, carrera y galope. La política recibe observaciones del estado
+simulado y propone doce correcciones articulares acotadas que se suman a la
+marcha nominal. Las primeras configuraciones, entrenadas con el modelo nominal,
+no superaron la referencia nominal y se rechazaron. Las entrenadas con el
+actuador identificado se ejecutaron en el robot suspendido, seleccionadas con
+sus propios datos: la política de gateo redujo entre un 15 y un 19~\% el error
+medio de seguimiento y de desviación de las coxas frente a la marcha nominal en
+dos vueltas completas, y la de trote un 19~\% en una vuelta. Estos resultados
+acreditan que la corrección aprendida es ejecutable y estable en el hardware;
+su efecto sobre la locomoción apoyada no se ha medido. Con la postura definitiva del 27
+de octubre, el paso y el trote mejoraron a la marcha nominal (dos repeticiones) y el
+gateo quedó empatado. En simulación, las políticas elegidas alcanzaron una viabilidad del
+100~\% en gateo, paso, trote y carrera, y del 90~\% en galope, en 20 episodios con
+aleatorización y sin caídas, aunque con una ventaja modesta sobre la marcha nominal y
+con copias elegidas sobre esos mismos episodios.
+
+\item \textbf{OE4 -- evaluación del modelo de caminata.}
+Se completaron instrumentos y campañas reproducibles en simulación para las
+tres líneas de evaluación: cálculo del margen de estabilidad estática,
+seguimiento articular y repetibilidad del patrón de marcha. La línea base de
+gateo acumuló cinco ejecuciones válidas y 191 ciclos de régimen en Gazebo, con
+$0{,}023955$~m/ciclo y $0{,}005545$~m/s; además, dos repeticiones de la
+cadencia corregida difirieron menos del $0{,}2$~\% en sus medias seleccionadas.
+La marcha paso completó dos repeticiones nominales de 21 y 22 ciclos sin
+activaciones del supervisor. En el robot suspendido se completaron la Prueba de Seguimiento
+de Posición Articular, con sensores en diez articulaciones, y la Prueba de
+Repetibilidad, con repeticiones de 3~min en orden alternado (CV entre 2 y 11~\%
+dentro de una misma sesión). Se añadió una medida de parecido entre el robot y la
+simulación: 83~\% en paso, 76~\% en gateo, 70~\% en trote, 69~\% en carrera y 66~\% en
+galope, con una toma por política
+y el robot suspendido; la forma del movimiento coincide y la diferencia está en la
+amplitud. La Prueba de Margen de Estabilidad Estática sigue
+sin medición física, porque requiere el robot apoyado y la orientación del
+cuerpo.
+\end{enumerate}
+
+En consecuencia, la tesis cuenta con resultados concluyentes sobre el
+desarrollo y la evaluación reproducible en simulación, y con resultados
+físicos sobre la ejecución, el seguimiento y la repetibilidad de las marchas y de
+las políticas PPO con el robot suspendido. La locomoción apoyada, el margen de
+estabilidad físico, la realimentación de las tibias 1, 3 y 4 y de la coxa 2 y la
+comparación con la marcha nominal de las políticas elegidas por viabilidad se
+mantienen fuera de estas conclusiones hasta disponer de evidencia experimental
+equivalente.

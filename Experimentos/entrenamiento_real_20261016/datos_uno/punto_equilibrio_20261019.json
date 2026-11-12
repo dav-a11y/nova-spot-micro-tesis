@@ -1,0 +1,54 @@
+{
+  "sesion": 147,
+  "fecha": "2026-10-19",
+  "adc_por_canal": [
+    169,
+    490,
+    372,
+    436,
+    452,
+    347,
+    340,
+    11,
+    743,
+    383,
+    400,
+    330,
+    411,
+    553,
+    582,
+    733
+  ],
+  "estimacion": {
+    "coxa1": {
+      "canal_mux": "C0",
+      "adc": 169,
+      "angulo_servo_estimado": 158.6
+    },
+    "coxa2": {
+      "canal_mux": "C1",
+      "adc": 490,
+      "angulo_servo_estimado": 45.4
+    },
+    "coxa3": {
+      "canal_mux": "C3",
+      "adc": 436,
+      "angulo_servo_estimado": 53.8
+    },
+    "coxa4": {
+      "canal_mux": "C2",
+      "adc": 372,
+      "angulo_servo_estimado": 112.4
+    },
+    "femur2": {
+      "canal_mux": "C5",
+      "adc": 347,
+      "angulo_servo_estimado": 100.0
+    },
+    "femur4": {
+      "canal_mux": "C6",
+      "adc": 340,
+      "angulo_servo_estimado": 79.6
+    }
+  }
+}

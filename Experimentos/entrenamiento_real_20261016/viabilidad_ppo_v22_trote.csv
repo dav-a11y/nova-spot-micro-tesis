@@ -1,0 +1,6 @@
+copia,marcha,viabilidad,episodios,avance_m,avance_nominal_m,deriva_m,deriva_nominal_m,caidas,caidas_nominal,inclinacion_max_deg
+ppo_v22_trote/semilla_3221/intermedias/policy_100000_steps.zip,trote,100.0,20,1.784,1.901,0.038,0.085,0,0,3.55
+ppo_v22_trote/semilla_3221/intermedias/policy_200000_steps.zip,trote,0.0,20,1.596,1.901,0.045,0.085,0,0,4.02
+ppo_v22_trote/semilla_3221/intermedias/policy_300000_steps.zip,trote,0.0,20,1.328,1.901,0.056,0.085,0,0,2.9
+ppo_v22_trote/semilla_3203/intermedias/policy_200000_steps.zip,trote,100.0,20,1.861,1.901,0.039,0.085,0,0,3.08
+ppo_v22_trote/semilla_3217/intermedias/policy_600000_steps.zip,trote,100.0,20,1.792,1.901,0.115,0.085,0,0,4.44

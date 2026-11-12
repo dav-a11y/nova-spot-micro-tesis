@@ -5,7 +5,25 @@ pca9685_address: 0x40
 pwm_frequency_hz: 50
 oe_bcm_gpio: 17
 watchdog_timeout_s: 0.5
+feedback_timeout_s: 0.15
 require_measured_motion_limits: true
+
+# Puerta final de control en la Raspberry. Cada valor queda nulo hasta medir
+# cero AS5600, sentido, rango útil, velocidad y error aceptable. La interfaz
+# ROS rechaza habilitar PWM mientras esta tabla esté incompleta.
+joint_feedback:
+  front_left_coxa_joint:  {encoder_zero_deg: null, encoder_direction: null, joint_min_rad: null, joint_max_rad: null, max_velocity_rad_s: null, max_tracking_error_rad: null}
+  front_left_femur_joint: {encoder_zero_deg: null, encoder_direction: null, joint_min_rad: null, joint_max_rad: null, max_velocity_rad_s: null, max_tracking_error_rad: null}
+  front_left_tibia_joint: {encoder_zero_deg: null, encoder_direction: null, joint_min_rad: null, joint_max_rad: null, max_velocity_rad_s: null, max_tracking_error_rad: null}
+  front_right_coxa_joint:  {encoder_zero_deg: null, encoder_direction: null, joint_min_rad: null, joint_max_rad: null, max_velocity_rad_s: null, max_tracking_error_rad: null}
+  front_right_femur_joint: {encoder_zero_deg: null, encoder_direction: null, joint_min_rad: null, joint_max_rad: null, max_velocity_rad_s: null, max_tracking_error_rad: null}
+  front_right_tibia_joint: {encoder_zero_deg: null, encoder_direction: null, joint_min_rad: null, joint_max_rad: null, max_velocity_rad_s: null, max_tracking_error_rad: null}
+  rear_left_coxa_joint:  {encoder_zero_deg: null, encoder_direction: null, joint_min_rad: null, joint_max_rad: null, max_velocity_rad_s: null, max_tracking_error_rad: null}
+  rear_left_femur_joint: {encoder_zero_deg: null, encoder_direction: null, joint_min_rad: null, joint_max_rad: null, max_velocity_rad_s: null, max_tracking_error_rad: null}
+  rear_left_tibia_joint: {encoder_zero_deg: null, encoder_direction: null, joint_min_rad: null, joint_max_rad: null, max_velocity_rad_s: null, max_tracking_error_rad: null}
+  rear_right_coxa_joint:  {encoder_zero_deg: null, encoder_direction: null, joint_min_rad: null, joint_max_rad: null, max_velocity_rad_s: null, max_tracking_error_rad: null}
+  rear_right_femur_joint: {encoder_zero_deg: null, encoder_direction: null, joint_min_rad: null, joint_max_rad: null, max_velocity_rad_s: null, max_tracking_error_rad: null}
+  rear_right_tibia_joint: {encoder_zero_deg: null, encoder_direction: null, joint_min_rad: null, joint_max_rad: null, max_velocity_rad_s: null, max_tracking_error_rad: null}
 
 # Deben identificarse por servo. La interfaz PWM no puede imponer torque en un
 # MG996R; torque_limite_nm queda como dato para supervisión/modelo. El límite de

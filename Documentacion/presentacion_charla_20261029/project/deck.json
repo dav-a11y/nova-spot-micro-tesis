@@ -1,0 +1,29 @@
+{
+  "v": 4,
+  "createdOnFiles": {"v": 1, "at": "2026-10-30T01:10:00Z"},
+  "lists": "css",
+  "title": "Nova Spot Micro: lo que hicimos",
+  "order": ["portada", "linea",
+    "e01-hardware", "e02-sensores", "e03-firmware", "e04-camaras",
+    "e05-cinematica", "e05-dinamica", "e06-simulacion",
+    "e07-servo", "e08-marchas",
+    "e09-ppo", "e10-agente", "e10-recompensa",
+    "e11-entrenamiento",
+    "paso-r", "paso-p", "trote-r", "trote-p", "carrera-r", "carrera-p", "gateo-r", "gateo-p", "galope-r", "galope-p",
+    "e12-robot", "e13-resultados", "siguiente", "cierre"],
+  "sections": {
+    "s1": {"description": "Qué es el proyecto y la línea de tiempo completa.", "start": "portada"},
+    "s2": {"description": "Pasos 1 a 4: el robot físico, sus sensores, el firmware y las cámaras.", "start": "e01-hardware"},
+    "s3": {"description": "Pasos 5 y 6: el modelo matemático y la primera etapa en simulación.", "start": "e05-cinematica"},
+    "s4": {"description": "Pasos 7 y 8: el servo real medido y las cinco marchas base.", "start": "e07-servo"},
+    "s5": {"description": "Pasos 9 y 10: PPO y cómo se construyó el agente.", "start": "e09-ppo"},
+    "s6": {"description": "Paso 11: el entrenamiento, con las gráficas de recompensa y pérdidas de cada marcha.", "start": "e11-entrenamiento"},
+    "s7": {"description": "Pasos 12 y 13: el robot físico y la tabla de resultados.", "start": "e12-robot"},
+    "s8": {"description": "Lo que sigue.", "start": "siguiente"}
+  },
+  "faces": {
+    "ibm-plex-sans": {"family": "IBM Plex Sans", "href": "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap"},
+    "source-serif-4": {"family": "Source Serif 4", "href": "https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap"}
+  },
+  "designSystems": []
+}

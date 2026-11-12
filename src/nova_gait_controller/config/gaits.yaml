@@ -18,8 +18,8 @@ gait_controller:
     # el seno histórico; valores mayores aceleran la liberación temprana sin
     # cambiar la elevación máxima. Mantener nominal fuera de exploraciones.
     crawl_rear_liftoff_height_ratio: 0.7071067811865476
-    step_phase_duration: 0.18
-    step_samples: 32
+    step_phase_duration: 0.12
+    step_samples: 48
     step_length: 0.016
     step_height: 0.008
     step_weight_shift: 0.004

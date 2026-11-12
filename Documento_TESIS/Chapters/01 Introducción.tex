@@ -1,0 +1,44 @@
+\chapter{Introducción}
+
+La locomoción de robots cuadrúpedos ha sido ampliamente estudiada debido a su capacidad para desplazarse sobre terrenos irregulares y mantener la estabilidad ante perturbaciones. Plataformas como MIT Cheetah~3 y ANYmal muestran que una arquitectura mecánica articulada, combinada con estimación de estado y control de cuerpo completo, permite ejecutar desplazamientos robustos en condiciones experimentales exigentes~\cite{bledt2018cheetah3,hutter2016anymal}.
+
+El desempeño locomotor depende de la configuración estructural, la posición del cuerpo, las trayectorias de los pies y las fuerzas de contacto. Por esta razón, el modelado cinemático y dinámico, el cálculo de las referencias articulares y la coordinación de las fases de apoyo y oscilación son elementos centrales del diseño de la marcha~\cite{zamani2011dynamics,bellicoso2018dynamic}.
+
+Los enfoques modernos incorporan el estado del robot y la interacción pie--suelo para ajustar el movimiento. El control predictivo basado en modelo y la optimización de cuerpo completo permiten imponer restricciones de contacto y de los actuadores, además de responder a perturbaciones durante la locomoción~\cite{dicarlo2018mpc,neunert2018wholebody}. Estos resultados evidencian que el desarrollo de un sistema cuadrúpedo requiere integrar de manera coherente el diseño mecánico, el modelo matemático, la simulación y la arquitectura electrónica de control.
+
+En plataformas de bajo costo, la incorporación de aprendizaje por refuerzo
+requiere una delimitación adicional. Una política aprendida puede modificar la
+respuesta locomotora, pero si actúa directamente sobre los actuadores o si se
+entrena con observaciones que no existen en el robot físico, la comparación
+deja de ser trazable y aumenta el riesgo de transferencia. Por esta razón, en
+esta tesis el aprendizaje por refuerzo se plantea como una capa correctiva
+acotada sobre una marcha nominal: la referencia de paso o gateo define el
+movimiento principal y la política solo puede proponer ajustes limitados,
+supervisados y comparables contra esa misma referencia sin aprendizaje.
+
+El presente proyecto desarrolló progresivamente el sistema de locomoción de la
+plataforma Nova Spot Micro. Se construyeron modelos matemáticos y descripciones
+para dos simuladores, se implementó una arquitectura de control en ROS~2 y se
+obtuvieron líneas base reproducibles para postura, marcha paso y gateo. Además,
+se incorporaron métricas de pose y articulaciones, contacto de los cuatro pies,
+una IMU simulada, margen de estabilidad nominal y un supervisor de seguridad.
+
+El desarrollo se organizó como una secuencia verificable: cada modificación de
+la marcha se vinculó con su configuración, pruebas automatizadas, bolsa de datos
+y análisis. Este criterio permitió identificar que el avance visual del robot
+no garantizaba el cumplimiento del patrón de contactos previsto. Los resultados
+presentados distinguen los componentes comprobados en simulación de los
+comprobados en el robot físico suspendido, y estos de la locomoción apoyada en
+el suelo, que todavía no tiene evidencia.
+
+La evaluación se estructura alrededor de una comparación entre dos condiciones:
+la marcha nominal y la misma marcha nominal con corrección aprendida. El
+funcionamiento se juzga mediante margen de estabilidad estática, seguimiento de
+posición articular y repetibilidad del patrón de marcha, de modo que una mejora
+solo puede aceptarse si conserva continuidad, estabilidad y repetibilidad bajo
+las mismas condiciones experimentales. Las primeras campañas, en simulación,
+documentaron modelos, supervisión y un resultado negativo de PPO residual. Las
+campañas posteriores, con un modelo del actuador identificado en el robot real,
+llevaron las políticas al prototipo físico suspendido, donde la política de gateo
+mejoró el seguimiento y la estabilidad de las coxas frente a la marcha nominal.
+La validación de la locomoción apoyada en el suelo sigue pendiente.

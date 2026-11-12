@@ -1,0 +1,70 @@
+{
+ "hp_pc1": {
+  "retardo_s": 0.0,
+  "r2_p99": 1.0,
+  "patas": {
+   "1": {
+    "visible": false,
+    "pixeles": 161
+   },
+   "2": {
+    "visible": false,
+    "pixeles": 0
+   },
+   "3": {
+    "visible": false,
+    "pixeles": 0
+   },
+   "4": {
+    "visible": false,
+    "pixeles": 0
+   }
+  },
+  "no_explicado": {
+   "mediana": 2520.0371164218113,
+   "por_ciclo": [
+    2030.578927016207,
+    2008.4667304472941,
+    2224.1825013831526,
+    2815.8917314604696,
+    4042.2576182701396,
+    3410.3759367192865
+   ],
+   "ciclos_anomalos": []
+  }
+ },
+ "hp_pc2": {
+  "retardo_s": 0.4,
+  "r2_p99": 0.864,
+  "patas": {
+   "1": {
+    "visible": false,
+    "pixeles": 57
+   },
+   "2": {
+    "visible": false,
+    "pixeles": 0
+   },
+   "3": {
+    "visible": false,
+    "pixeles": 0
+   },
+   "4": {
+    "visible": false,
+    "pixeles": 0
+   }
+  },
+  "no_explicado": {
+   "mediana": 3078.9315225264504,
+   "por_ciclo": [
+    4818.938252266282,
+    4563.971615795646,
+    2939.6726291986206,
+    2774.0801413038043,
+    3218.19041585428,
+    2699.967510784828
+   ],
+   "ciclos_anomalos": []
+  }
+ }
+}

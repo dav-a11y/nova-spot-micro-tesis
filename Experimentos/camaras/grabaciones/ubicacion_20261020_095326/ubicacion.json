@@ -1,0 +1,110 @@
+{
+  "hp_pc1": {
+    "patas": {
+      "1": {
+        "visible": true,
+        "area_pct": 6.58,
+        "x": 0.61,
+        "y": 0.56
+      },
+      "2": {
+        "visible": true,
+        "area_pct": 6.12,
+        "x": 0.52,
+        "y": 0.55
+      },
+      "3": {
+        "visible": true,
+        "area_pct": 8.58,
+        "x": 0.53,
+        "y": 0.46
+      },
+      "4": {
+        "visible": true,
+        "area_pct": 8.73,
+        "x": 0.48,
+        "y": 0.48
+      }
+    },
+    "conclusion": "ve las patas [1, 2, 3, 4]; la más cercana es la 4; lado centro (de frente o de atrás), extremo centro (de lado); de izquierda a derecha en la imagen: P4 → P2 → P3 → P1",
+    "retardo_s": 0.18
+  },
+  "logitech": {
+    "patas": {
+      "1": {
+        "visible": true,
+        "area_pct": 1.03,
+        "x": 0.38,
+        "y": 0.11
+      },
+      "2": {
+        "visible": false,
+        "area_pct": 0.29,
+        "x": 0.57,
+        "y": 0.02
+      },
+      "3": {
+        "visible": true,
+        "area_pct": 2.53,
+        "x": 0.22,
+        "y": 0.15
+      },
+      "4": {
+        "visible": true,
+        "area_pct": 4.06,
+        "x": 0.3,
+        "y": 0.2
+      }
+    },
+    "conclusion": "ve las patas [1, 3, 4]; la más cercana es la 4; lado centro (de frente o de atrás), extremo trasero; de izquierda a derecha en la imagen: P3 → P4 → P1",
+    "retardo_s": 0.12
+  },
+  "celular": {
+    "patas": {
+      "1": {
+        "visible": false
+      },
+      "2": {
+        "visible": false
+      },
+      "3": {
+        "visible": false
+      },
+      "4": {
+        "visible": false
+      }
+    },
+    "conclusion": "no ve ninguna pata moverse",
+    "retardo_s": 0.12
+  },
+  "hp_pc2": {
+    "patas": {
+      "1": {
+        "visible": true,
+        "area_pct": 6.54,
+        "x": 0.46,
+        "y": 0.55
+      },
+      "2": {
+        "visible": true,
+        "area_pct": 0.76,
+        "x": 0.55,
+        "y": 0.61
+      },
+      "3": {
+        "visible": true,
+        "area_pct": 6.67,
+        "x": 0.48,
+        "y": 0.43
+      },
+      "4": {
+        "visible": true,
+        "area_pct": 5.85,
+        "x": 0.57,
+        "y": 0.47
+      }
+    },
+    "conclusion": "ve las patas [1, 2, 3, 4]; la más cercana es la 3; lado derecho, extremo trasero; de izquierda a derecha en la imagen: P1 → P3 → P2 → P4",
+    "retardo_s": 0.06
+  }
+}

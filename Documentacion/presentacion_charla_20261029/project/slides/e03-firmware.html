@@ -1,0 +1,18 @@
+<section id="e03-firmware" data-transition="fade" style="background:#F6F5F0;color:#2A3442;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:row;align-items:center;gap:32px"><p style="font-family:'Source Serif 4', Georgia, serif;font-size:96px;font-weight:600;line-height:1;color:#2F5D8C">03</p><div style="display:flex;flex-direction:column;gap:4px"><p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4521C">Octubre de 2026</p><h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#15233B">Firmware y bucle de control</h2></div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:48px">
+<ul style="font-size:30px;line-height:1.55">
+<li>Firmware de la interfaz de E/S con 6 modos (@, +, $, ^, b, x)</li>
+<li>Protecciones: topes por servo, 3° por orden, apagado con «x»</li>
+<li>Bucle de 30 ms: fase, sensores, red, saturación, envío y registro</li>
+<li>Periodo real: 33 ms; 0 pasos tardíos con 2 núcleos reservados</li>
+<li>Servicio que apaga los servos al apagar el PC</li>
+</ul>
+<div style="background:#FFFFFF;padding:40px 48px;border-radius:16px;display:flex;flex-direction:column;gap:28px;justify-content:center">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:42px;color:#15233B">Δt = 30 ms  →  f = 33 Hz</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:42px;color:#15233B">|qordₜ − qordₜ₋₁| ≤ 3°</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:42px;color:#15233B">qmín,ⱼ ≤ qordⱼ ≤ qmáx,ⱼ</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6A7383">Nova Spot Micro · Paso 3 de 13</p>
+</section>

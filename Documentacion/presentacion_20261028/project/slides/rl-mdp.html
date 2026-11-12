@@ -1,0 +1,23 @@
+<section id="rl-mdp" data-transition="fade" style="background:#15233B;color:#F6F5F0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:34px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F0A46E">Aprendizaje por refuerzo</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#F6F5F0">El problema como proceso de decisión de Markov</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:40px">
+<div style="background:#22324F;padding:36px 44px;border-radius:16px;display:flex;flex-direction:column;gap:18px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:40px">MDP = ( 𝒮, 𝒜, P, r, γ )</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:36px">aₜ ~ π<span style="color:#F0A46E">θ</span>( a | sₜ ) ,   sₜ₊₁ ~ P( · | sₜ, aₜ )</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:36px">J(θ) = 𝔼τ [ Σₜ γᵗ rₜ ]</p>
+</div>
+<div style="background:#22324F;padding:36px 44px;border-radius:16px;display:flex;flex-direction:column;gap:18px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:34px">V(s) = 𝔼π [ Σₖ γᵏ rₜ₊ₖ | sₜ = s ]</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:34px">Q(s, a): igual, fijando la primera acción</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:36px">A(s, a) = Q(s, a) − V(s)</p>
+</div>
+</div>
+<ul style="font-size:27px;line-height:1.5;color:#C9D3E0">
+<li>Estado s: lo que mide el robot; acción a: la corrección; recompensa r: la nota de cada paso</li>
+<li>γ = 0,99: horizonte ≈ 1/(1 − γ) = 100 pasos ≈ 3 s, algo más que un ciclo de gateo</li>
+<li>Ventaja A &gt; 0: la acción fue mejor que el promedio de la política en ese estado</li>
+</ul>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#9FB0C6">Nova Spot Micro · Fundamentos · Sutton y Barto (2018)</p>
+<aside>El aprendizaje por refuerzo funciona como entrenar a una mascota: en cada momento el robot ve cómo está, hace algo y recibe una nota (premio o castigo). Probando millones de veces aprende a hacer lo que da más premio en total. En el robot, cada 30 ms: la red mira los sensores (estado), decide una corrección (acción), el simulador mueve el robot (estado siguiente) y da una nota (recompensa).<br><br>MDP = (S, A, P, r, γ): Proceso de Decisión de Markov, el nombre técnico, con 5 ingredientes. S estados: los 22 números. A acciones: las 12 correcciones. P transición: las reglas del mundo, la física de MuJoCo. r recompensa: la nota de cada paso (diapositiva 30). γ descuento: cuánto importa el futuro, 0,99. «De Markov»: para decidir basta con el estado actual.<br><br>at ~ πθ(a|st): la acción se sortea de la política. π es la red neuronal (la regla de qué hacer), θ sus pesos (unos 12 000 números que se ajustan), la barra «|» significa «dado que», «~» significa «se sortea de». Ejemplo: la red dice «corrige la tibia 2 en +1,5 grados, más o menos 0,5»; se sortea y sale +1,8.<br><br>st+1 ~ P(·|st, at): el estado siguiente sale de las reglas del mundo: el simulador toma el robot, aplica la corrección, calcula la física y da cómo quedó 30 ms después.<br><br>J(θ) = E[Σ γ^t rt]: lo que la red quiere maximizar, su puntaje total. Σ rt suma todas las notas del intento; γ^t hace que las notas lejanas valgan menos; E es el promedio sobre muchos intentos. Aprender = cambiar θ para que J sea lo más alto posible. Con γ = 0,99: ahora vale 1; dentro de 10 pasos 0,90; de 100 pasos (3 s) 0,37; de 500 pasos 0,007. Por eso el horizonte es de 1/(1 - γ) = 100 pasos, unos 3 s. Ejemplo de 3 pasos con notas 1,0, 0,9 y 1,1: J = 1,0 + 0,99 x 0,9 + 0,99² x 1,1 = 2,97.<br><br>V(s): valor del estado, el puntaje que se espera desde ese estado siguiendo la política de siempre. «¿Qué tan buena es esta situación?» Robot bien parado: V alto. Muy inclinado: V bajo.<br><br>Q(s, a): igual pero fijando la primera acción: «¿qué tan buena es la situación si hago esta acción en particular?»<br><br>A(s, a) = Q - V, la ventaja: si una acción fue mejor o peor que lo habitual. A mayor que 0: mejor, hacerla más seguido. Menor que 0: peor, hacerla menos. Ejemplo: V = 50; probó subir más la tibia 2 y consiguió 55 (Q = 55): ventaja +5, buena idea. Si hubiera conseguido 45: -5.<br><br>Sutton y Barto (2018) es el libro de referencia. En una frase: la red busca los pesos que den el mayor puntaje total, y para saber qué cambiar usa la ventaja.</aside>
+</section>

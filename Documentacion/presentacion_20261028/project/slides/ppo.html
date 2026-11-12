@@ -1,0 +1,25 @@
+<section id="ppo" data-transition="fade" style="background:#15233B;color:#F6F5F0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:30px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F0A46E">Aprendizaje por refuerzo</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#F6F5F0">PPO: optimización de política proximal</h2>
+<div style="background:#22324F;padding:32px 48px;border-radius:16px;display:flex;flex-direction:column;gap:18px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:38px">ρₜ(θ) = πθ( aₜ | sₜ ) / πθant( aₜ | sₜ )</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:38px">Lᶜᴸᴵᴾ(θ) = 𝔼ₜ [ mín( ρₜ Âₜ ,  clip(ρₜ, 1 − ε, 1 + ε) Âₜ ) ]</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:38px">ℒ(θ, φ) = − Lᶜᴸᴵᴾ + c₁ 𝔼ₜ[ (Vφ(sₜ) − R̂ₜ)² ] − c₂ 𝔼ₜ[ ℋ(πθ) ]</p>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:24px">
+<div style="background:#22324F;padding:26px 30px;border-radius:16px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:44px;font-weight:600;color:#F0A46E">ε = 0,2</p>
+<p style="font-size:25px;color:#C9D3E0">La política no cambia más de un 20 % por actualización</p>
+</div>
+<div style="background:#22324F;padding:26px 30px;border-radius:16px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:44px;font-weight:600;color:#F0A46E">c₁ = 0,5</p>
+<p style="font-size:25px;color:#C9D3E0">Peso del error del crítico</p>
+</div>
+<div style="background:#22324F;padding:26px 30px;border-radius:16px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:44px;font-weight:600;color:#F0A46E">c₂ = 0</p>
+<p style="font-size:25px;color:#C9D3E0">Sin bono de entropía: σ ya explora y las correcciones deben ser pequeñas</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#9FB0C6">Nova Spot Micro · Fundamentos · Basado en política, actor-crítico, on-policy, sin modelo · Schulman et al. (2017)</p>
+<aside>PPO = Proximal Policy Optimization. Proximal = cercana: la red nueva no se aleja demasiado de la anterior en cada paso de aprendizaje. Problema que resuelve: si la red da un paso de aprendizaje demasiado grande, puede pasarse y olvidar lo que sabía (una caminata que funcionaba empieza a caerse), como girar el volante de golpe. PPO pone un freno.<br><br>Cociente ρt = π nueva(at|st)/π anterior(at|st): compara qué tan probable es una acción con la red nueva y con la anterior. ρ = 1: igual. 1,3: un 30 % más. 0,7: un 30 % menos. Mide cuánto cambió la red.<br><br>Objetivo recortado, L CLIP = E[mín(ρt·Ât, clip(ρt, 1-ε, 1+ε)·Ât)], lo que la red quiere hacer lo más grande posible. ρ·Â es el objetivo normal (subir ρ si la acción fue buena, bajarlo si fue mala). clip recorta ρ entre 0,8 y 1,2 (ε = 0,2): solo cuenta un cambio de hasta 20 %. mín se queda con el menor: el objetivo no premia pasarse del 20 %.<br>Ejemplo 1, acción buena (Â = +2), la red nueva quiere ρ = 1,5: sin freno 3; recortado 1,2 x 2 = 2,4; mínimo 2,4: subir de 1,2 a 1,5 no da premio extra.<br>Ejemplo 2, acción mala (Â = -2), la red nueva quiere ρ = 0,5: sin freno -1; recortado 0,8 x (-2) = -1,6; mínimo -1,6: bajar de 0,8 a 0,5 tampoco da premio extra.<br>En palabras: haz más probable lo bueno y menos lo malo, pero cambia como máximo un 20 % cada vez.<br><br>Pérdida total, L = -L CLIP + c1·E[(V(st) - R̂t)²] - c2·E[H(π)], la fórmula única que se minimiza:<br>1. -L CLIP: mejorar al actor (el menos convierte maximizar en minimizar).<br>2. c1·(V - R̂)²: el error del crítico al cuadrado (predijo 100 y salió 103: error² = 9). c1 = 0,5 es su peso.<br>3. -c2·H: premio por explorar (entropía, qué tan abierta es la campana). c2 = 0: no se usa, porque la red ya explora con σ y queremos correcciones decididas.<br><br>Tarjetas: ε = 0,2 (límite del freno), c1 = 0,5, c2 = 0.<br>Freno KL (diapositiva 33): si tras algunas pasadas la red cambió demasiado en total (divergencia KL mayor que 0,03), se detiene esa ronda. KL mide qué tan distintas son la red nueva y la anterior.<br><br>Línea del pie: basado en política (aprende qué hacer, no una tabla de valores); actor-crítico (las dos redes); on-policy (aprende solo con datos de la red actual y luego los tira); sin modelo (no aprende la física, solo qué hacer). Schulman et al. (2017) propuso PPO.<br>En una frase: PPO hace más probables las acciones buenas y menos las malas, pero nunca más de un 20 % por vez, para aprender estable sin olvidar.</aside>
+</section>

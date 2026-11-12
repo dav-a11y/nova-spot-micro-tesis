@@ -1,0 +1,80 @@
+{
+  "seed": "semilla_307",
+  "timesteps": 100000,
+  "continuado_desde": "ppo_v14_trote/semilla_19/policy.zip",
+  "ciclos_episodio": 12,
+  "ppo": {
+    "lr": 0.0001,
+    "target_kl": 0.03,
+    "n_steps": 2048
+  },
+  "eval_seeds": [
+    801,
+    802,
+    803,
+    804,
+    805
+  ],
+  "control_dt": 0.03,
+  "marcha": {
+    "tipo": "trote",
+    "femur_deg": 12.0,
+    "tibia_deg": 12.0,
+    "fase_s": 0.5,
+    "ciclo_paso_s": 2.4,
+    "ciclo_trote_s": 1.0,
+    "apertura_deg": 5.0
+  },
+  "pesos": {
+    "avance": 20.0,
+    "actitud": 30.0,
+    "lateral": 20.0,
+    "giro": 10.0,
+    "giro_ciclo": 5.0,
+    "suavidad": 0.1,
+    "coxas": 1.0
+  },
+  "hardware_transfer": false,
+  "observacion": [
+    "front_left_femur_joint",
+    "front_left_tibia_joint",
+    "front_right_femur_joint",
+    "front_right_tibia_joint",
+    "rear_left_femur_joint",
+    "rear_left_tibia_joint",
+    "rear_right_femur_joint",
+    "rear_right_tibia_joint",
+    "sin_fase",
+    "cos_fase",
+    "residual_previo x12"
+  ],
+  "sin_residual": [
+    "front_left_coxa_joint",
+    "front_right_coxa_joint",
+    "rear_left_coxa_joint",
+    "rear_right_coxa_joint"
+  ],
+  "aleatorizar_actuador": true,
+  "limite_cambio_grados": 3.0000000000000004,
+  "nota": "Simulación ajustada al robot real del 16-oct; no transferida al robot.",
+  "origen": "ppo_v15_trote/semilla_307/intermedias/policy_100000_steps.zip",
+  "evaluacion_3min": {
+    "avance_m": 6.031,
+    "deriva_m": 0.0778,
+    "roll_rms_deg": 1.7691,
+    "pitch_rms_deg": 0.8987,
+    "inclinacion_max_deg": 2.6657,
+    "coxas_rms_deg": 1.0195,
+    "suavidad": 0.0435
+  },
+  "evaluacion_marcha_dañada_27oct": {
+    "avance_m": 6.133840024094592,
+    "deriva_m": 0.08241688147568005,
+    "roll_rms_deg": 1.4859935726244924,
+    "pitch_rms_deg": 1.0841896164061673,
+    "inclinacion_max_deg": 3.4422398685542674,
+    "coxas_rms_deg": 0.7552572672599851,
+    "suavidad": 3.8305956212374612,
+    "caidas": 0
+  }
+}

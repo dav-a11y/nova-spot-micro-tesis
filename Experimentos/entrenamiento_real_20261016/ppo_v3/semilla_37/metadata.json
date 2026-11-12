@@ -1,0 +1,265 @@
+{
+  "seed": 37,
+  "timesteps": 150528,
+  "eval_seeds": [
+    801,
+    802,
+    803,
+    804,
+    805
+  ],
+  "control_dt": 0.03,
+  "actuador": {
+    "sesiones": [
+      131,
+      135,
+      136
+    ],
+    "retardo_s": 0.087,
+    "ganancia": 1.008,
+    "articulaciones": {
+      "front_left_femur_joint": {
+        "nombre": "Femur 2",
+        "r": 0.995,
+        "retardo_s": 0.087,
+        "ganancia": 1.008,
+        "fiable": true,
+        "muestras": 1298,
+        "rango_servo_alcanzado": [
+          84.9,
+          120.4
+        ]
+      },
+      "rear_left_femur_joint": {
+        "nombre": "Femur 4",
+        "r": 0.996,
+        "retardo_s": 0.087,
+        "ganancia": 1.011,
+        "fiable": true,
+        "muestras": 1298,
+        "rango_servo_alcanzado": [
+          83.3,
+          116.6
+        ]
+      },
+      "front_left_tibia_joint": {
+        "nombre": "Tibia 2",
+        "r": 0.99,
+        "retardo_s": 0.087,
+        "ganancia": 1.0,
+        "fiable": true,
+        "muestras": 1298,
+        "rango_servo_alcanzado": [
+          61.2,
+          82.9
+        ]
+      },
+      "rear_right_tibia_joint": {
+        "nombre": "Tibia 3",
+        "r": -0.104,
+        "retardo_s": 0.4,
+        "ganancia": 1.0,
+        "fiable": false,
+        "muestras": 1298,
+        "nota": "sensor C11 inservible; se asume nominal"
+      },
+      "rear_left_tibia_joint": {
+        "nombre": "Tibia 4",
+        "r": -0.008,
+        "retardo_s": 0.065,
+        "ganancia": 1.0,
+        "fiable": true,
+        "muestras": 1298,
+        "nota": "corregido 16-oct: en identificacion aislada sigue la orden (ganancia 1.0); el 0.04 de v1 era un error"
+      }
+    },
+    "tibia1_sin_pwm": true,
+    "coxas_fijas_grados": {
+      "coxa1": 150,
+      "coxa2": 45,
+      "coxa3": 55,
+      "coxa4": 150
+    },
+    "periodo_control_s": 0.029,
+    "fuente_v2": [
+      "ronda1_11.csv",
+      "ronda1_37.csv",
+      "ronda1_71.csv",
+      "ronda1_nominal.csv"
+    ],
+    "zona_muerta_grados": 0.75,
+    "fuente_v3": "identificacion_sistema.json (escalones y senoides por articulacion, 16-oct)",
+    "identificacion": {
+      "femur2": {
+        "canal": "C5",
+        "cuentas_por_grado": -2.47,
+        "r2_escala": 0.999,
+        "ruido_cuentas": 0.5,
+        "mesetas_grados": {
+          "escalon_+1": 0.5,
+          "escalon_-1": -1.1,
+          "escalon_+2": 1.7,
+          "escalon_-2": -1.9,
+          "escalon_+6": 5.8,
+          "escalon_-6": -5.6,
+          "escalon_+12": 12.2,
+          "escalon_-12": -12.1
+        },
+        "subida_10_90_ms_escalon12": 132,
+        "senoides": {
+          "0.5Hz": {
+            "ganancia": 1.0,
+            "retardo_ms": 80
+          },
+          "1.0Hz": {
+            "ganancia": 0.97,
+            "retardo_ms": 84
+          },
+          "2.0Hz": {
+            "ganancia": 0.87,
+            "retardo_ms": 85
+          }
+        },
+        "acoplamiento_otros_canales": {}
+      },
+      "femur4": {
+        "canal": "C6",
+        "cuentas_por_grado": -2.48,
+        "r2_escala": 1.0,
+        "ruido_cuentas": 0.0,
+        "mesetas_grados": {
+          "escalon_+1": 0.2,
+          "escalon_-1": -1.0,
+          "escalon_+2": 1.9,
+          "escalon_-2": -1.8,
+          "escalon_+6": 5.9,
+          "escalon_-6": -5.8,
+          "escalon_+12": 11.9,
+          "escalon_-12": -12.2
+        },
+        "subida_10_90_ms_escalon12": 163,
+        "senoides": {
+          "0.5Hz": {
+            "ganancia": 1.0,
+            "retardo_ms": 78
+          },
+          "1.0Hz": {
+            "ganancia": 0.96,
+            "retardo_ms": 77
+          },
+          "2.0Hz": {
+            "ganancia": 0.89,
+            "retardo_ms": 77
+          }
+        },
+        "acoplamiento_otros_canales": {}
+      },
+      "tibia2": {
+        "canal": "C9",
+        "cuentas_por_grado": -2.47,
+        "r2_escala": 0.999,
+        "ruido_cuentas": 0.2,
+        "mesetas_grados": {
+          "escalon_+1": 0.3,
+          "escalon_-1": -0.9,
+          "escalon_+2": 1.5,
+          "escalon_-2": -2.1,
+          "escalon_+6": 5.6,
+          "escalon_-6": -5.8,
+          "escalon_+12": 12.1,
+          "escalon_-12": -12.2
+        },
+        "subida_10_90_ms_escalon12": 165,
+        "senoides": {
+          "0.5Hz": {
+            "ganancia": 1.02,
+            "retardo_ms": 73
+          },
+          "1.0Hz": {
+            "ganancia": 0.98,
+            "retardo_ms": 77
+          },
+          "2.0Hz": {
+            "ganancia": 0.92,
+            "retardo_ms": 76
+          }
+        },
+        "acoplamiento_otros_canales": {}
+      },
+      "tibia3": {
+        "canal": "C11",
+        "cuentas_por_grado": 0.73,
+        "r2_escala": 0.008,
+        "ruido_cuentas": 0.5,
+        "mesetas_grados": {
+          "escalon_+1": -55.9,
+          "escalon_-1": -49.1,
+          "escalon_+2": -57.3,
+          "escalon_-2": -46.4,
+          "escalon_+6": 182.7,
+          "escalon_-6": -32.7,
+          "escalon_+12": -88.6,
+          "escalon_-12": -10.9
+        },
+        "subida_10_90_ms_escalon12": 0,
+        "senoides": {
+          "0.5Hz": {
+            "ganancia": 2.96,
+            "retardo_ms": 1504
+          },
+          "1.0Hz": {
+            "ganancia": 2.38,
+            "retardo_ms": 863
+          },
+          "2.0Hz": {
+            "ganancia": 10.18,
+            "retardo_ms": 6
+          }
+        },
+        "acoplamiento_otros_canales": {}
+      },
+      "tibia4": {
+        "canal": "C10",
+        "cuentas_por_grado": -2.45,
+        "r2_escala": 1.0,
+        "ruido_cuentas": 0.5,
+        "mesetas_grados": {
+          "escalon_+1": 0.2,
+          "escalon_-1": -0.6,
+          "escalon_+2": 1.9,
+          "escalon_-2": -1.8,
+          "escalon_+6": 6.0,
+          "escalon_-6": -5.9,
+          "escalon_+12": 12.1,
+          "escalon_-12": -12.0
+        },
+        "subida_10_90_ms_escalon12": 99,
+        "senoides": {
+          "0.5Hz": {
+            "ganancia": 1.04,
+            "retardo_ms": 63
+          },
+          "1.0Hz": {
+            "ganancia": 0.98,
+            "retardo_ms": 67
+          },
+          "2.0Hz": {
+            "ganancia": 0.74,
+            "retardo_ms": 63
+          }
+        },
+        "acoplamiento_otros_canales": {}
+      }
+    }
+  },
+  "hardware_transfer": false,
+  "observacion": [
+    "front_left_femur_joint",
+    "rear_left_femur_joint",
+    "front_left_tibia_joint",
+    "sin_fase",
+    "cos_fase",
+    "residual_previo x12"
+  ],
+  "nota": "Simulación ajustada al robot real del 16-oct; no transferida al robot."
+}

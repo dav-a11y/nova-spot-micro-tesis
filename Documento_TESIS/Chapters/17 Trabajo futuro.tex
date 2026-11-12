@@ -1,0 +1,101 @@
+\chapter{Proyección futura de la plataforma}
+
+Los resultados de esta tesis dejan una plataforma de simulación, un generador
+cinemático de marchas, una arquitectura ROS~2 y una base de control sobre la
+cual pueden plantearse desarrollos posteriores. Este capítulo no enumera
+tareas de cierre de los objetivos presentes; describe líneas de evolución que
+ampliarían las capacidades del robot cuadrúpedo Nova Spot Micro después de la
+tesis.
+
+\section{Plataforma física instrumentada}
+
+Una primera línea consiste en consolidar la plataforma como banco experimental
+instrumentado. La realimentación articular de esta tesis (potenciómetros y
+encoders) ya permite medir seguimiento, retardo, holgura y repetibilidad, pero
+la tibia 1 sigue sin sensor, la tibia 3 sin transmitir el suyo, el potenciómetro de la
+coxa 2 no sigue a la coxa, el de la tibia 4 dejó de seguir a su servo y varios encoders tienen imanes débiles.
+Completar la cobertura con un sensor fiable por articulación y migrar el bucle de
+control a la Raspberry~Pi, con un convertidor ADS1115 para los potenciómetros y
+una fuente adecuada, cerraría la arquitectura embebida prevista. La
+prueba de la IMU, ya admitida en el firmware, y la incorporación de sensores de contacto en los pies y medición
+de tensión y corriente permitiría observar la orientación corporal, el apoyo y
+el esfuerzo eléctrico durante la locomoción. Con esta instrumentación, la
+plataforma podría utilizarse para campañas sistemáticas de identificación y
+para contrastar el comportamiento simulado con el comportamiento físico.
+
+\section{Energía, autonomía y gestión de potencia}
+
+Actualmente, la alimentación externa regulada permite realizar pruebas de banco
+con control de las condiciones eléctricas. Como desarrollo posterior, la
+plataforma podría incorporar un sistema de energía embarcado compuesto por
+batería, convertidores regulados, fusibles, interruptor de emergencia, monitor
+de tensión y medición de corriente. Esto habilitaría un análisis energético de
+cada marcha: potencia instantánea, energía por ciclo, consumo por articulación,
+temperatura de los actuadores y autonomía estimada para distintas velocidades,
+cargas útiles y superficies.
+
+Con dichos datos sería posible seleccionar la química, capacidad y tasa de
+descarga de una batería sin sobredimensionar el robot ni comprometer los picos
+de corriente de los actuadores. También se podrían implementar detección de
+batería baja, apagado seguro, distribución de potencia por grupos de servos y
+estrategias de locomoción que ajusten velocidad o amplitud cuando la energía
+disponible sea limitada. Esta línea convertiría la plataforma de un montaje de
+laboratorio alimentado por fuente a un sistema móvil con autonomía cuantificable.
+
+\section{Mejoras mecánicas y electrónicas}
+
+El prototipo puede evolucionar mediante soportes más rígidos para sensores,
+protección de cableado, conectores bloqueables, distribución ordenada de tierra
+y potencia, y módulos reemplazables por pata. También sería pertinente estudiar
+la reducción de holguras, el rediseño de los acoples entre servo y articulación,
+la mejora de las superficies de apoyo y la incorporación de una carga útil
+ligera. Estas modificaciones facilitarían mantenimiento, repetibilidad y
+experimentos comparables sin alterar la arquitectura cinemática de base.
+
+\section{Control de locomoción y repertorio de marchas}
+
+El generador cinemático actual, con gateo, paso, trote, carrera y galope, puede
+extenderse hacia transiciones suaves entre marchas, cambios de dirección, giro sobre el
+sitio, retroceso y regulación de velocidad. Las cinco marchas se
+ejecutaron con el robot suspendido; su ensayo sobre el suelo, sobre todo el de las más
+rápidas, junto con estrategias de recuperación ante pequeñas perturbaciones, requiere
+antes una alimentación capaz de sostener sus picos de corriente. Estas
+extensiones deberían conservar límites articulares, velocidad acotada,
+supervisión independiente y criterios de parada, de modo que el aumento de
+movilidad no comprometa la seguridad de la plataforma.
+
+\section{Control adaptativo y aprendizaje por refuerzo}
+
+La plataforma permitiría investigar controladores que combinen una marcha
+cinemática interpretable con correcciones aprendidas a partir de los sensores
+que realmente estén disponibles. Por ejemplo, se podrían entrenar políticas
+residuales con posición y velocidad articular, y ampliarlas gradualmente con
+orientación, contacto y estimadores de estado. La aleatorización de parámetros,
+la adaptación de dominio y la comparación contra una referencia nominal
+permitirían estudiar qué correcciones mejoran el desempeño sin reemplazar las
+capas deterministas de seguridad. Esta línea es adecuada para evaluar
+transferencia simulación--real de manera incremental y trazable. El siguiente
+paso natural del ciclo de mejora de esta tesis es llevarlo al robot apoyado,
+con una IMU que permita medir avance e inclinación, y sustituir el modelo
+analítico del actuador por uno aprendido de los propios datos del robot.
+
+\section{Percepción, navegación y autonomía}
+
+Una etapa posterior podría añadir percepción del entorno mediante cámara,
+sensor de profundidad o LiDAR. Sobre esa información, el cuadrúpedo podría
+incorporar localización, planificación de rutas, selección de zonas de apoyo y
+evitación de obstáculos. La locomoción desarrollada en esta tesis funcionaría
+entonces como nivel de ejecución articular dentro de una arquitectura de mayor
+nivel que reciba objetivos de navegación, en lugar de limitarse a caminar sobre
+una superficie plana y controlada.
+
+\section{Validación científica y uso como banco de investigación}
+
+Finalmente, la plataforma puede emplearse para estudiar la relación entre
+geometría, control, consumo, estabilidad y repetibilidad. Esto incluye crear
+conjuntos de datos abiertos de trayectorias, telemetría y ensayos; comparar
+simuladores; estudiar sensibilidad a la fricción, carga útil y tipo de suelo;
+y evaluar de forma estadística distintas estrategias de control. Así, el Nova
+Spot Micro puede evolucionar de un prototipo de locomoción a un banco de
+investigación reutilizable para proyectos posteriores de robótica móvil y
+aprendizaje aplicado.

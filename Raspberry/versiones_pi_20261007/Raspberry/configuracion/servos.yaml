@@ -1,0 +1,45 @@
+# Canales PCA9685 confirmados por imagen del operador (2026-10-07).
+# Servos de rotación continua: PWM controla sentido/velocidad y AS5600 da
+# posición. La interfaz actual de trayectoria angular no es compatible.
+# Mantener deshabilitado hasta implementar y calibrar el lazo con AS5600.
+actuator_type: continuous_rotation
+hardware_ready: false
+i2c_bus: 1
+pca9685_address: 0x40
+pwm_frequency_hz: 50
+oe_bcm_gpio: 17
+watchdog_timeout_s: 0.5
+require_measured_motion_limits: true
+
+# Deben identificarse por servo. La interfaz PWM no puede imponer torque en un
+# MG996R; torque_limite_nm queda como dato para supervisión/modelo. El límite de
+# velocidad sí se aplicará mediante interpolación antes de habilitar hardware.
+motion_limits:
+  front_left_coxa_joint:  {max_velocity_rad_s: null, torque_limit_nm: null}
+  front_left_femur_joint: {max_velocity_rad_s: null, torque_limit_nm: null}
+  front_left_tibia_joint: {max_velocity_rad_s: null, torque_limit_nm: null}
+  front_right_coxa_joint:  {max_velocity_rad_s: null, torque_limit_nm: null}
+  front_right_femur_joint: {max_velocity_rad_s: null, torque_limit_nm: null}
+  front_right_tibia_joint: {max_velocity_rad_s: null, torque_limit_nm: null}
+  rear_left_coxa_joint:  {max_velocity_rad_s: null, torque_limit_nm: null}
+  rear_left_femur_joint: {max_velocity_rad_s: null, torque_limit_nm: null}
+  rear_left_tibia_joint: {max_velocity_rad_s: null, torque_limit_nm: null}
+  rear_right_coxa_joint:  {max_velocity_rad_s: null, torque_limit_nm: null}
+  rear_right_femur_joint: {max_velocity_rad_s: null, torque_limit_nm: null}
+  rear_right_tibia_joint: {max_velocity_rad_s: null, torque_limit_nm: null}
+
+# Campos heredados de la interfaz posicional; no utilizarlos con estos
+# actuadores continuos ni tratarlos como calibración de velocidad.
+servos:
+  front_right_coxa_joint:  {channel: 0, center_us: 1500, min_us: 1000, max_us: 2000, direction: -1, calibrated: false}
+  front_left_coxa_joint:   {channel: 1, center_us: 1500, min_us: 1000, max_us: 2000, direction: 1, calibrated: false}
+  rear_right_coxa_joint:   {channel: 2, center_us: 1500, min_us: 1000, max_us: 2000, direction: 1, calibrated: false}
+  rear_left_coxa_joint:    {channel: 3, center_us: 1500, min_us: 1000, max_us: 2000, direction: 1, calibrated: false}
+  front_right_femur_joint: {channel: 4, center_us: 1500, min_us: 1000, max_us: 2000, direction: -1, calibrated: false}
+  front_left_femur_joint:  {channel: 5, center_us: 1500, min_us: 1000, max_us: 2000, direction: 1, calibrated: false}
+  rear_right_femur_joint:  {channel: 6, center_us: 1500, min_us: 1000, max_us: 2000, direction: 1, calibrated: false}
+  rear_left_femur_joint:   {channel: 7, center_us: 1500, min_us: 1000, max_us: 2000, direction: 1, calibrated: false}
+  front_right_tibia_joint: {channel: 8, center_us: 1500, min_us: 1000, max_us: 2000, direction: -1, calibrated: false}
+  front_left_tibia_joint:  {channel: 9, center_us: 1500, min_us: 1000, max_us: 2000, direction: 1, calibrated: false}
+  rear_right_tibia_joint:  {channel: 10, center_us: 1500, min_us: 1000, max_us: 2000, direction: 1, calibrated: false}
+  rear_left_tibia_joint:   {channel: 11, center_us: 1500, min_us: 1000, max_us: 2000, direction: 1, calibrated: false}

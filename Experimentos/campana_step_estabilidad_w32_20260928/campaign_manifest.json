@@ -1,0 +1,45 @@
+{
+  "started_at": "2026-09-29T02:55:23.193014+00:00",
+  "purpose": "development_only_stability_weight_sweep_single_arm",
+  "gait": "step",
+  "training_seeds": [
+    11,
+    23,
+    37,
+    53,
+    71
+  ],
+  "timesteps_requested": 200000,
+  "attitude_weight": 32.0,
+  "baseline_attitude_weight": 8.0,
+  "episode_cycles_training": 5,
+  "training_domain_randomization": true,
+  "development_evaluation_seeds": [
+    601,
+    602,
+    603,
+    604,
+    605
+  ],
+  "evaluation_episodes": 5,
+  "evaluation_cycles": 20,
+  "evaluation_domain_randomization": false,
+  "reserved_final_evaluation_seeds": [
+    101,
+    202,
+    303,
+    404,
+    505
+  ],
+  "provisional_targets": {
+    "roll_pitch_rms_deg_max": 5.0,
+    "roll_pitch_abs_max_deg": 15.0,
+    "body_height_m": [
+      0.16,
+      0.32
+    ],
+    "source": "Documentacion/FICHA_APROBACION_PROTOCOLO.md",
+    "approval_status": "unsigned_provisional"
+  },
+  "hardware_transfer": false
+}

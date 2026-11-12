@@ -1,0 +1,114 @@
+{
+  "seed": 127,
+  "timesteps": 3000320,
+  "continuado_desde": null,
+  "ciclos_episodio": 6,
+  "ppo": {
+    "lr": 0.0003,
+    "target_kl": null,
+    "n_steps": 1024
+  },
+  "eval_seeds": [
+    801,
+    802,
+    803,
+    804,
+    805
+  ],
+  "control_dt": 0.02,
+  "marcha": {
+    "tipo": "gateo",
+    "femur_deg": 15.0,
+    "tibia_deg": 14.0,
+    "fase_s": 0.5,
+    "ciclo_paso_s": 2.4,
+    "ciclo_trote_s": 1.4,
+    "apertura_deg": 8.0
+  },
+  "pesos": {
+    "avance": 18.0,
+    "actitud": 8.0,
+    "lateral": 0.0,
+    "giro": 0.0,
+    "giro_ciclo": 0.0,
+    "suavidad": 0.3,
+    "coxas": 1.0
+  },
+  "actuador": {
+    "sesiones": [
+      131,
+      135,
+      136
+    ],
+    "retardo_s": 0.1,
+    "ganancia": 0.92,
+    "articulaciones": {
+      "front_left_femur_joint": {
+        "nombre": "Femur 2",
+        "r": -0.812,
+        "retardo_s": 0.1,
+        "ganancia": 0.884,
+        "fiable": true,
+        "muestras": 1298
+      },
+      "rear_left_femur_joint": {
+        "nombre": "Femur 4",
+        "r": -0.84,
+        "retardo_s": 0.1,
+        "ganancia": 0.92,
+        "fiable": true,
+        "muestras": 1298
+      },
+      "front_left_tibia_joint": {
+        "nombre": "Tibia 2",
+        "r": -0.879,
+        "retardo_s": 0.1,
+        "ganancia": 0.978,
+        "fiable": true,
+        "muestras": 1298
+      },
+      "rear_right_tibia_joint": {
+        "nombre": "Tibia 3",
+        "r": -0.104,
+        "retardo_s": 0.4,
+        "ganancia": 0.725,
+        "fiable": false,
+        "muestras": 1298
+      },
+      "rear_left_tibia_joint": {
+        "nombre": "Tibia 4",
+        "r": -0.008,
+        "retardo_s": 0.2,
+        "ganancia": 0.04,
+        "fiable": false,
+        "muestras": 1298
+      }
+    },
+    "tibia1_sin_pwm": true,
+    "coxas_fijas_grados": {
+      "coxa1": 150,
+      "coxa2": 45,
+      "coxa3": 55,
+      "coxa4": 150
+    }
+  },
+  "hardware_transfer": false,
+  "observacion": [
+    "front_left_femur_joint",
+    "rear_left_femur_joint",
+    "front_left_tibia_joint",
+    "sin_fase",
+    "cos_fase",
+    "residual_previo x12"
+  ],
+  "sin_residual": [
+    "front_left_coxa_joint",
+    "front_right_coxa_joint",
+    "front_right_tibia_joint",
+    "rear_left_coxa_joint",
+    "rear_right_coxa_joint"
+  ],
+  "aleatorizar_actuador": false,
+  "limite_cambio_grados": 3.0000000000000004,
+  "nota": "Simulación ajustada al robot real del 16-oct; no transferida al robot."
+}

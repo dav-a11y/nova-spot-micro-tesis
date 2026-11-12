@@ -1,0 +1,63 @@
+{
+  "nota": "Cámaras locales adicionales (20-oct). La principal (HP de este PC, /dev/video1) y la del portátil 2 (pc2-camara /dev/video0) se configuran en grabar_caminata.py. 'previo' son ajustes v4l2-ctl antes de grabar.",
+  "camaras": [
+    {
+      "nombre": "logitech",
+      "dispositivo": "/dev/video3",
+      "entrada": [
+        "-input_format",
+        "yuyv422",
+        "-video_size",
+        "640x480",
+        "-framerate",
+        "30"
+      ],
+      "salida": [
+        "-c:v",
+        "mjpeg",
+        "-q:v",
+        "4"
+      ],
+      "previo": [
+        "exposure_dynamic_framerate=0"
+      ]
+    },
+    {
+      "nombre": "celular",
+      "dispositivo": "/dev/video0",
+      "entrada": [
+        "-framerate",
+        "30"
+      ],
+      "salida": [
+        "-vf",
+        "transpose=1,scale=720:1280",
+        "-c:v",
+        "mjpeg",
+        "-q:v",
+        "5"
+      ],
+      "previo": []
+    },
+    {
+      "nombre": "tablet",
+      "dispositivo": "/dev/video10",
+      "entrada": [
+        "-input_format",
+        "yuv420p",
+        "-video_size",
+        "1280x720",
+        "-framerate",
+        "30"
+      ],
+      "salida": [
+        "-c:v",
+        "mjpeg",
+        "-q:v",
+        "5"
+      ],
+      "previo": [],
+      "nota": "Galaxy Tab S10 FE (SM-X520), DroidCam OBS por USB/ADB; entrada de DroidCam en v4l2loopback /dev/video10. Requiere que el cliente droidcam-cli esté activo"
+    }
+  ]
+}

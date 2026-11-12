@@ -1,0 +1,34 @@
+<section id="ciclo-mejora" data-transition="fade" style="background:#F6F5F0;color:#2A3442;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4521C">Robot físico</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#15233B">Ciclo de mejora: el robot decide y el modelo aprende</h2>
+<div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:24px">
+<div style="background:#FFFFFF;padding:28px 30px;border:1px solid #DCD8CE;border-radius:16px;display:flex;flex-direction:column;gap:10px">
+<p style="font-size:44px;font-weight:600;color:#B4521C">1</p>
+<p style="font-size:26px;line-height:1.4">Probar base y candidatas en el robot: 2 repeticiones de 3 min</p>
+</div>
+<div style="background:#FFFFFF;padding:28px 30px;border:1px solid #DCD8CE;border-radius:16px;display:flex;flex-direction:column;gap:10px">
+<p style="font-size:44px;font-weight:600;color:#B4521C">2</p>
+<p style="font-size:26px;line-height:1.4">Puntuar con sensores: error RMS de seguimiento + desviación de coxas</p>
+</div>
+<div style="background:#FFFFFF;padding:28px 30px;border:1px solid #DCD8CE;border-radius:16px;display:flex;flex-direction:column;gap:10px">
+<p style="font-size:44px;font-weight:600;color:#B4521C">3</p>
+<p style="font-size:26px;line-height:1.4">Reidentificar el actuador con esas caminatas</p>
+</div>
+<div style="background:#FFFFFF;padding:28px 30px;border:1px solid #DCD8CE;border-radius:16px;display:flex;flex-direction:column;gap:10px">
+<p style="font-size:44px;font-weight:600;color:#B4521C">4</p>
+<p style="font-size:26px;line-height:1.4">Reentrenar la ganadora 10⁶ pasos con el modelo nuevo</p>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:28px">
+<div style="background:#15233B;padding:30px 36px;border-radius:16px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:64px;font-weight:600;color:#F0A46E">−15 a −19 %</p>
+<p style="font-size:26px;color:#C9D3E0">Error de seguimiento de la PPO de gateo frente a la base (2 vueltas)</p>
+</div>
+<div style="background:#15233B;padding:30px 36px;border-radius:16px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:64px;font-weight:600;color:#F0A46E">−19 %</p>
+<p style="font-size:26px;color:#C9D3E0">Error de seguimiento de la PPO de trote frente a la base (1 vuelta)</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6A7383">Nova Spot Micro · Robot físico · ciclo_mejora.py, 21-oct-2026 · Robot suspendido: mide seguimiento, no avance</p>
+<aside>La selección se decide con el robot real y las diferencias medidas vuelven al entrenamiento. Limitación: con el robot suspendido la puntuación mide el seguimiento de las órdenes y la estabilidad de las coxas, no el avance ni la inclinación sobre el suelo. Además, por el error de semillas ya corregido, cada vuelta usó en la práctica una sola semilla.</aside>
+</section>

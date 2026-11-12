@@ -1,0 +1,1 @@
+sospechosa: hecha el 20-oct 08:51, minutos antes del bloqueo del bus I2C; encoder T2 caído toda la caminata y error de patas 2,4° (frente a 0,95° en r1). Repetir cuando el bus esté arreglado.

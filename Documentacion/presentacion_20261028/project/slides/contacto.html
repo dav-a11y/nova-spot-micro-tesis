@@ -1,0 +1,25 @@
+<section id="contacto" data-transition="fade" style="background:#EAEEF2;color:#2A3442;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4521C">Modelo matemático</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#15233B">Actuador nominal, contacto y margen de estabilidad estática</h2>
+<div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:28px">
+<div style="background:#FFFFFF;padding:32px 36px;border-radius:16px;display:flex;flex-direction:column;gap:14px">
+<h3 style="font-size:30px;font-weight:600;color:#2F5D8C">Envolvente par–velocidad</h3>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:32px;color:#15233B">|τmáx| = τstall(V) · máx(0, 1 − |ω| / ω₀(V))</p>
+<p style="font-size:25px;line-height:1.4">MG996R: 9,4 kgf·cm a 4,8 V y 11 kgf·cm a 6,0 V. Velocidades nominales: 0,94 rad/s (gateo), lejos del límite de 6,98 rad/s.</p>
+</div>
+<div style="background:#FFFFFF;padding:32px 36px;border-radius:16px;display:flex;flex-direction:column;gap:14px">
+<h3 style="font-size:30px;font-weight:600;color:#2F5D8C">Contacto unilateral</h3>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:32px;color:#15233B">φᵢ ≥ 0 ,  λn,ᵢ ≥ 0 ,  φᵢ·λn,ᵢ = 0</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:32px;color:#15233B">√(λx² + λy²) ≤ μ·λz</p>
+<p style="font-size:25px;line-height:1.4">Distancia φ y fuerza normal λ complementarias; fricción de Coulomb (cono).</p>
+</div>
+<div style="background:#FFFFFF;padding:32px 36px;border-radius:16px;display:flex;flex-direction:column;gap:14px">
+<h3 style="font-size:30px;font-weight:600;color:#2F5D8C">Margen estático</h3>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;color:#15233B">dⱼ = [ex,ⱼ(cy − py,ⱼ) − ey,ⱼ(cx − px,ⱼ)] / ‖eⱼ‖</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:32px;color:#15233B">ms = minⱼ dⱼ</p>
+<p style="font-size:25px;line-height:1.4">ms &gt; 0: el centro de masa cae dentro del polígono de apoyo. Postura nominal con 4 apoyos: ms = 0,0731 m.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6A7383">Nova Spot Micro · Modelo matemático · Margen estático: prueba de evaluación del OE4</p>
+<aside>Tres cajas: ¿cuánta fuerza puede dar el motor? (envolvente), ¿cómo toca el pie el suelo? (contacto), ¿el robot se vuelca? (margen estático).<br><br>Envolvente, |τmáx| = τstall(V)·máx(0, 1 - |ω|/ω0(V)): un servo tiene más fuerza quieto que girando rápido, como empujar una caja quieta frente a intentar moverla muy rápido. τmáx: par máximo en ese momento. τstall: par con el servo quieto; MG996R 9,4 kgf·cm a 4,8 V y 11 kgf·cm a 6 V (11 kg colgados a 1 cm del eje). ω: velocidad de giro. ω0: velocidad máxima, sin fuerza; 60 grados en 0,15 s a 6 V = 6,98 rad/s. (V): depende del voltaje. máx(0, ...) evita que salga negativa. La fuerza baja en línea recta: a mitad de velocidad, mitad de fuerza. En gateo las patas giran como máximo a 0,94 rad/s: a esa velocidad quedan 11 x (1 - 0,94/6,98) = 9,5 kgf·cm. La marcha no exige demasiado al motor.<br><br>Contacto unilateral: el suelo solo empuja hacia arriba, nunca jala. φ ≥ 0, λn ≥ 0, φ·λn = 0: φ es la distancia del pie al suelo y λn la fuerza del suelo hacia arriba. φ ≥ 0: el pie no atraviesa el suelo. λn ≥ 0: el suelo empuja, nunca jala. φ·λn = 0: una de las dos es cero; o el pie está en el aire (φ mayor que 0 y λn = 0) o apoyado (φ = 0 y λn mayor que 0).<br>Fricción √(λx² + λy²) ≤ μ·λz: λx y λy son fuerzas de lado, λz hacia arriba, μ qué tan agarrador es el suelo. El pie aguanta fuerza de lado sin resbalar solo hasta μ·λz, y ese límite crece mientras más apoyado esté. Si se empuja más, resbala.<br><br>Margen estático: si el robot quieto está en equilibrio. Une los pies apoyados: con 4 pies, un cuadrilátero (polígono de apoyo). Baja una vertical desde el centro de masa. Si cae dentro del polígono, se sostiene; fuera, se vuelca. Como una mesa con peso fuera de las patas.<br>dj = [ex,j(cy - py,j) - ey,j(cx - px,j)]/‖ej‖: distancia del centro de masa a cada lado. (cx, cy) dónde cae el centro de masa; (px, py) la esquina donde empieza el lado j; ej el lado, ‖ej‖ su largo. Positiva: adentro de ese borde; negativa: afuera. Es un producto cruz dividido por el largo, la forma estándar de medir distancia de un punto a una recta.<br>ms = mín dj: la menor distancia, qué tan cerca está del borde más peligroso. Mayor que 0 estable, 0 a punto de volcarse, menor que 0 se vuelca. Resultado: con 4 pies, ms = 0,073 m: 7,3 cm al borde más cercano.<br>Al caminar, si levanta una pata quedan 3 y el polígono es un triángulo más chico: el margen baja. Por eso el gateo mueve una sola pata a la vez. Con menos de 3 apoyos no se puede calcular. Es una de las tres pruebas del objetivo 4.</aside>
+</section>

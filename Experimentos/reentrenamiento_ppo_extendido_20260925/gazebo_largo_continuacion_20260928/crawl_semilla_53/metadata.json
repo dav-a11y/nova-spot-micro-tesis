@@ -1,0 +1,24 @@
+{
+  "simulator": "gazebo",
+  "gait": "crawl",
+  "seed": 53,
+  "timesteps": 31568,
+  "resume_policy": "Experimentos/reentrenamiento_ppo_extendido_20260925/gazebo_largo/crawl_semilla_53/checkpoints/crawl_semilla_53_18432_steps.zip",
+  "checkpoint_freq": 2048,
+  "dimensions_m": {
+    "hip_spacing_x": 0.18,
+    "hip_spacing_y": 0.12,
+    "body_length": 0.23,
+    "body_width": 0.12,
+    "body_height": 0.075,
+    "coxa": 0.0381,
+    "femur": 0.10795,
+    "tibia": 0.13589
+  },
+  "observation_dim": 27,
+  "action_dim": 12,
+  "residual_limit_rad": 0.08,
+  "max_action_step_rad": 0.02,
+  "external_action_applied_to_nominal": true,
+  "hardware_transfer": false
+}

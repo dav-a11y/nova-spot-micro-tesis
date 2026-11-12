@@ -1,0 +1,2 @@
+nominal {'retorno': -100.156, 'avance_m': 0.772, 'deriva_lateral_m': 0.0936, 'inclinacion_max_rad': 0.0796} caidas 0
+ppo {'retorno': -118.988, 'avance_m': 0.4536, 'deriva_lateral_m': 0.0344, 'inclinacion_max_rad': 0.0466} caidas 0

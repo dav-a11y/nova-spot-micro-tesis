@@ -1,0 +1,175 @@
+{
+  "femur2": {
+    "canal": "C5",
+    "rango_orden": [
+      60.0,
+      140.0
+    ],
+    "cuentas_por_grado": -2.522,
+    "offset": 571.1,
+    "error_lineal_rms_grados": 0.62,
+    "error_lineal_max_grados": 1.94,
+    "en_orden": 140.0,
+    "histeresis_media_grados": 0.89,
+    "histeresis_max_grados": 1.98,
+    "pendiente_por_tramo": [
+      [
+        60,
+        75,
+        -2.52
+      ],
+      [
+        75,
+        90,
+        -2.46
+      ],
+      [
+        90,
+        105,
+        -2.61
+      ],
+      [
+        105,
+        120,
+        -2.55
+      ],
+      [
+        120,
+        135,
+        -2.58
+      ],
+      [
+        135,
+        150,
+        -1.3
+      ]
+    ],
+    "ruido_meseta_cuentas": 0.64
+  },
+  "femur4": {
+    "canal": "C6",
+    "rango_orden": [
+      60.0,
+      140.0
+    ],
+    "cuentas_por_grado": -2.508,
+    "offset": 569.4,
+    "error_lineal_rms_grados": 0.68,
+    "error_lineal_max_grados": 1.68,
+    "en_orden": 139.0,
+    "histeresis_media_grados": 0.98,
+    "histeresis_max_grados": 2.39,
+    "pendiente_por_tramo": [
+      [
+        60,
+        75,
+        -2.55
+      ],
+      [
+        75,
+        90,
+        -2.62
+      ],
+      [
+        90,
+        105,
+        -2.49
+      ],
+      [
+        105,
+        120,
+        -2.56
+      ],
+      [
+        120,
+        135,
+        -2.54
+      ],
+      [
+        135,
+        150,
+        -1.9
+      ]
+    ],
+    "ruido_meseta_cuentas": 0.49
+  },
+  "tibia2": {
+    "canal": "C9",
+    "rango_orden": [
+      40.0,
+      88.0
+    ],
+    "cuentas_por_grado": -2.589,
+    "offset": 576.3,
+    "error_lineal_rms_grados": 0.44,
+    "error_lineal_max_grados": 0.8,
+    "en_orden": 43.0,
+    "histeresis_media_grados": 0.64,
+    "histeresis_max_grados": 0.77,
+    "pendiente_por_tramo": [
+      [
+        40,
+        55,
+        -2.47
+      ],
+      [
+        55,
+        70,
+        -2.58
+      ],
+      [
+        70,
+        85,
+        -2.56
+      ]
+    ],
+    "ruido_meseta_cuentas": 0.45
+  },
+  "tibia4": {
+    "canal": "C10",
+    "rango_orden": [
+      30.0,
+      110.0
+    ],
+    "cuentas_por_grado": -2.522,
+    "offset": 566.6,
+    "error_lineal_rms_grados": 1.1,
+    "error_lineal_max_grados": 3.91,
+    "en_orden": 110.0,
+    "histeresis_media_grados": 1.51,
+    "histeresis_max_grados": 3.7,
+    "pendiente_por_tramo": [
+      [
+        30,
+        45,
+        -2.67
+      ],
+      [
+        45,
+        60,
+        -2.65
+      ],
+      [
+        60,
+        75,
+        -2.65
+      ],
+      [
+        75,
+        90,
+        -2.52
+      ],
+      [
+        90,
+        105,
+        -2.44
+      ],
+      [
+        105,
+        120,
+        -0.7
+      ]
+    ],
+    "ruido_meseta_cuentas": 0.53
+  }
+}

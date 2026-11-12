@@ -1,0 +1,1 @@
+cable Ethernet desconectado al final de la caminata; video remoto no recuperado

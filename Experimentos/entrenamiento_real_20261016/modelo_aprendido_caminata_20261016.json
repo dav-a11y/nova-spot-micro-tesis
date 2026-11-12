@@ -1,0 +1,9 @@
+{
+  "fuente": "sesiones 91 (0,8 s/fase) y 92 (0,5 s/fase), orden b, robot suspendido; selectores MUX en D8-D11",
+  "Femur 2": {"pca": 5, "mux": "C5", "cuentas_por_grado": -2.49, "retardo_ms": 100, "seguimiento": "completo a 0,5 y 0,8 s/fase (r=-0.998)"},
+  "Femur 4": {"pca": 7, "mux": "C6", "cuentas_por_grado": -2.50, "retardo_ms": 100, "seguimiento": "completo a 0,5 y 0,8 s/fase (r=-0.998)"},
+  "Femur 1": {"pca": 4, "mux": null, "nota": "C4 copia a C5 (r=0.993, desfase +132): probable cruce de cables, no es su sensor"},
+  "Femur 3": {"pca": 6, "mux": null, "nota": "sin canal propio identificado"},
+  "Tibias 1-4": {"nota": "C8-C11 sin respuesta al levantar 14 grados (esperado ~26 cuentas, medido 0-8): sensor desconectado o la tibia no se movio"},
+  "decision": "la fase de caminata se acorto de 0,8 s a 0,5 s (PAUSA_PASO_CAMINATA_MS=25)"
+}

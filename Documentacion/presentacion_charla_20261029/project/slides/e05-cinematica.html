@@ -1,0 +1,22 @@
+<section id="e05-cinematica" data-transition="fade" style="background:#EAEEF2;color:#2A3442;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:row;align-items:center;gap:32px"><p style="font-family:'Source Serif 4', Georgia, serif;font-size:96px;font-weight:600;line-height:1;color:#2F5D8C">05</p><div style="display:flex;flex-direction:column;gap:4px"><p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4521C">Agosto – septiembre de 2026 · Modelo matemático (1/2)</p><h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#15233B">Cinemática de una pata</h2></div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+<div style="background:#FFFFFF;padding:32px 40px;border-radius:16px;display:flex;flex-direction:column;gap:14px">
+<h3 style="font-size:30px;font-weight:600;color:#2F5D8C">Directa</h3>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:34px;color:#15233B">q = [ rBᵀ  ηBᵀ  qJᵀ ]ᵀ ∈ ℝ¹⁸</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:34px;color:#15233B">x = − lf·sin qf − lt·sin Q</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:34px;color:#15233B">zp = − lf·cos qf − lt·cos Q</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:34px;color:#15233B">y = cos a·sᵢ·lc − sin a·zp</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:34px;color:#15233B">z = sin a·sᵢ·lc + cos a·zp</p>
+</div>
+<div style="background:#FFFFFF;padding:32px 40px;border-radius:16px;display:flex;flex-direction:column;gap:14px">
+<h3 style="font-size:30px;font-weight:600;color:#2F5D8C">Inversa</h3>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:34px;color:#15233B">zp = −√( y² + z² − lc² )</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:34px;color:#15233B">qc = sᵢ·[ atan2(z, y) − atan2(zp, sᵢ·lc) ]</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:34px;color:#15233B">D = ( r² − lf² − lt² ) / ( 2·lf·lt )</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:34px;color:#15233B">qt = −arccos D</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:34px;color:#15233B">qf = atan2(b, d) − atan2(lt·sin qt, lf + lt·cos qt)</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6A7383">Nova Spot Micro · Paso 5 de 13 · a = sᵢ·qc, Q = qf + qt, d = −zp, b = −x, r² = b² + d²</p>
+</section>

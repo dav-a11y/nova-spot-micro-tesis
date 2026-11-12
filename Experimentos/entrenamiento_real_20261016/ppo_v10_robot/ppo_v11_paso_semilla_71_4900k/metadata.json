@@ -1,0 +1,56 @@
+{
+  "seed": "semilla_71",
+  "timesteps": 4900000,
+  "eval_seeds": [
+    801,
+    802,
+    803,
+    804,
+    805
+  ],
+  "control_dt": 0.03,
+  "marcha": {
+    "tipo": "paso",
+    "femur_deg": 15.0,
+    "tibia_deg": 10.0,
+    "fase_s": 0.5,
+    "ciclo_paso_s": 2.0
+  },
+  "pesos": {
+    "avance": 10.0,
+    "actitud": 30.0,
+    "lateral": 20.0,
+    "giro": 10.0
+  },
+  "hardware_transfer": false,
+  "observacion": [
+    "front_left_femur_joint",
+    "front_left_tibia_joint",
+    "front_right_femur_joint",
+    "front_right_tibia_joint",
+    "rear_left_femur_joint",
+    "rear_left_tibia_joint",
+    "rear_right_femur_joint",
+    "rear_right_tibia_joint",
+    "sin_fase",
+    "cos_fase",
+    "residual_previo x12"
+  ],
+  "sin_residual": [
+    "front_left_coxa_joint",
+    "front_right_coxa_joint",
+    "rear_left_coxa_joint",
+    "rear_right_coxa_joint"
+  ],
+  "nota": "Simulación ajustada al robot real del 16-oct; no transferida al robot.",
+  "origen": "ppo_v11_paso/semilla_71/intermedias/policy_4900000_steps.zip",
+  "evaluacion_3min": {
+    "avance_m": 8.38,
+    "deriva_m": 0.0866,
+    "roll_rms_deg": 1.932,
+    "pitch_rms_deg": 1.0332,
+    "inclinacion_max_deg": 2.9646,
+    "coxas_rms_deg": 0.432,
+    "suavidad": 0.0343
+  }
+}

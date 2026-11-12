@@ -1,0 +1,12 @@
+Gráficas de convergencia del entrenamiento PPO, por marcha (5-nov-2026).
+Cada imagen: recompensa y castigo frente a pasos y a épocas, épocas frente a pasos y castigos por término.
+Línea discontinua = punto de convergencia (la media móvil de 100 episodios entra y ya no sale de ±2 % del
+recorrido alrededor del valor final). Sin línea = no convergió (el punto cae en el último 20 % del entrenamiento).
+
+v31_modelo_anterior: desde cero con el modelo de servos del 21-oct (actuadores_ciclo2.json), 3 M de pasos (galope 5 M).
+  Gateo 0,89 M · paso 0,95 M · carrera 1,23 M · trote 2,06 M · galope no converge.
+v33_modelo_ajustado: desde cero con el modelo de servos ajustado por marcha (5-nov), mismos pasos, otra semilla (9900).
+  Trote 1,28 M · carrera 0,35 M (degenerada: termina cayéndose en el 100 % de los episodios) · paso, gateo y galope no
+  convergen con este criterio. Paso sigue subiendo a los 3 M; gateo y galope se ven planos desde ~1,5 M y ~2 M, pero
+  siguen variando más del 2 %.
+Una semilla por marcha y campaña.

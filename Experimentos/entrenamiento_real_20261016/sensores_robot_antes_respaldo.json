@@ -1,0 +1,36 @@
+{
+  "nota": "Sensor de cada articulación para la observación de la PPO. k = unidades del sensor por grado de servo (cuentas/° en potenciómetros, °encoder/° en AS5600). F2, F4 y T2 del barrido de rango del 16-oct y del 19-oct; el resto se identifica con identificar_sensores_v6.py.",
+  "front_left_femur_joint": {
+    "campo": "C5",
+    "k": -2.5107
+  },
+  "rear_left_femur_joint": {
+    "campo": "C6",
+    "k": -2.5379
+  },
+  "front_left_tibia_joint": {
+    "campo": "ENC_T2",
+    "k": -0.5861
+  },
+  "front_right_femur_joint": {
+    "campo": "C8",
+    "k": -2.4722
+  },
+  "rear_right_femur_joint": {
+    "campo": "C9",
+    "k": -2.5226
+  },
+  "front_right_tibia_joint": {
+    "campo": "ENC_T1",
+    "k": -0.8646
+  },
+  "compensar_con": "C0",
+  "rear_right_tibia_joint": {
+    "campo": "C11",
+    "k": -2.2682
+  },
+  "rear_left_tibia_joint": {
+    "campo": "C10",
+    "k": -2.3695
+  }
+}

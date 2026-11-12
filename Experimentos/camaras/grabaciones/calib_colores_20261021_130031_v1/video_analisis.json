@@ -1,0 +1,182 @@
+{
+ "marcha": null,
+ "grupos": "patas",
+ "hp_pc1": {
+  "retardo_s": 0.0,
+  "r2_p99": 1.0,
+  "patas": {
+   "1": {
+    "visible": true,
+    "pixeles": 314,
+    "r_medio": 0.9117951291473184,
+    "r_minimo": 0.9093215676126015,
+    "amplitud_media": 4.714617929107121,
+    "cv_amplitud_pct": 9.43452442943885,
+    "tendencia_amplitud_pct_por_ciclo": 0.0,
+    "ciclos_r_bajo": [],
+    "por_ciclo": [
+     {
+      "r": 0.9142686906820353,
+      "amplitud": 5.159419709477781
+     },
+     {
+      "r": 0.9093215676126015,
+      "amplitud": 4.26981614873646
+     }
+    ]
+   },
+   "2": {
+    "visible": false,
+    "pixeles": 0
+   },
+   "3": {
+    "visible": false,
+    "pixeles": 0
+   },
+   "4": {
+    "visible": false,
+    "pixeles": 0
+   }
+  },
+  "no_explicado": {
+   "mediana": 1698.5925568252526,
+   "por_ciclo": [
+    1698.5925568252526,
+    1396.6959013970825,
+    1846.5575187382535,
+    1995.9367193268743,
+    2078.5660130510714,
+    1805.7063028884434,
+    1585.7985443570988,
+    1613.7288650627675,
+    1428.5486584192338
+   ],
+   "ciclos_anomalos": []
+  }
+ },
+ "general": {
+  "error": "solo 0 fotogramas"
+ },
+ "logitech": {
+  "retardo_s": 0.0,
+  "r2_p99": 1.0,
+  "patas": {
+   "1": {
+    "visible": true,
+    "pixeles": 721,
+    "r_medio": 0.9062228419145442,
+    "r_minimo": 0.9059019150800157,
+    "amplitud_media": 7.069331650856914,
+    "cv_amplitud_pct": 8.171013767491107,
+    "tendencia_amplitud_pct_por_ciclo": 0.0,
+    "ciclos_r_bajo": [],
+    "por_ciclo": [
+     {
+      "r": 0.9065437687490726,
+      "amplitud": 7.646967713399749
+     },
+     {
+      "r": 0.9059019150800157,
+      "amplitud": 6.491695588314079
+     }
+    ]
+   },
+   "2": {
+    "visible": false,
+    "pixeles": 0
+   },
+   "3": {
+    "visible": false,
+    "pixeles": 0
+   },
+   "4": {
+    "visible": false,
+    "pixeles": 0
+   }
+  },
+  "no_explicado": {
+   "mediana": 917.2931491933434,
+   "por_ciclo": [
+    1585.4431341879001,
+    807.0844653556475,
+    990.412035745286,
+    979.8658956134983,
+    1527.420861672325,
+    917.2931491933434,
+    863.714878509617,
+    708.0623233966436,
+    719.9432002298216
+   ],
+   "ciclos_anomalos": []
+  }
+ },
+ "windows": {
+  "retardo_s": 0.0,
+  "r2_p99": 0.611,
+  "patas": {
+   "1": {
+    "visible": true,
+    "pixeles": 104,
+    "r_medio": 0.9574249181347203,
+    "r_minimo": 0.9554162536397222,
+    "amplitud_media": 9.952990817526448,
+    "cv_amplitud_pct": 8.077044396311555,
+    "tendencia_amplitud_pct_por_ciclo": 0.0,
+    "ciclos_r_bajo": [],
+    "por_ciclo": [
+     {
+      "r": 0.9594335826297185,
+      "amplitud": 10.756898304699643
+     },
+     {
+      "r": 0.9554162536397222,
+      "amplitud": 9.149083330353255
+     }
+    ]
+   },
+   "2": {
+    "visible": false,
+    "pixeles": 0
+   },
+   "3": {
+    "visible": false,
+    "pixeles": 0
+   },
+   "4": {
+    "visible": true,
+    "pixeles": 31,
+    "r_medio": 0.9074834047579265,
+    "r_minimo": 0.8899794142956153,
+    "amplitud_media": 48.37969348649448,
+    "cv_amplitud_pct": 1.0298384391347155,
+    "tendencia_amplitud_pct_por_ciclo": 0.0,
+    "ciclos_r_bajo": [],
+    "por_ciclo": [
+     {
+      "r": 0.9249873952202378,
+      "amplitud": 47.88146080622471
+     },
+     {
+      "r": 0.8899794142956153,
+      "amplitud": 48.877926166764254
+     }
+    ]
+   }
+  },
+  "no_explicado": {
+   "mediana": 1532.858012550392,
+   "por_ciclo": [
+    1659.136427268221,
+    1322.2198109746373,
+    1742.4667962245896,
+    2684.858623637842,
+    2398.5191856809406,
+    1532.858012550392,
+    1129.6109623499694,
+    1278.4933882695768,
+    1120.3917844535315
+   ],
+   "ciclos_anomalos": []
+  }
+ }
+}

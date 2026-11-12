@@ -1,0 +1,162 @@
+{
+  "femur2": {
+    "canal": "C5",
+    "cuentas_por_grado": -2.47,
+    "r2_escala": 0.999,
+    "ruido_cuentas": 0.5,
+    "mesetas_grados": {
+      "escalon_+1": 0.5,
+      "escalon_-1": -1.1,
+      "escalon_+2": 1.7,
+      "escalon_-2": -1.9,
+      "escalon_+6": 5.8,
+      "escalon_-6": -5.6,
+      "escalon_+12": 12.2,
+      "escalon_-12": -12.1
+    },
+    "subida_10_90_ms_escalon12": 132,
+    "senoides": {
+      "0.5Hz": {
+        "ganancia": 1.0,
+        "retardo_ms": 80
+      },
+      "1.0Hz": {
+        "ganancia": 0.97,
+        "retardo_ms": 84
+      },
+      "2.0Hz": {
+        "ganancia": 0.87,
+        "retardo_ms": 85
+      }
+    },
+    "acoplamiento_otros_canales": {}
+  },
+  "femur4": {
+    "canal": "C6",
+    "cuentas_por_grado": -2.48,
+    "r2_escala": 1.0,
+    "ruido_cuentas": 0.0,
+    "mesetas_grados": {
+      "escalon_+1": 0.2,
+      "escalon_-1": -1.0,
+      "escalon_+2": 1.9,
+      "escalon_-2": -1.8,
+      "escalon_+6": 5.9,
+      "escalon_-6": -5.8,
+      "escalon_+12": 11.9,
+      "escalon_-12": -12.2
+    },
+    "subida_10_90_ms_escalon12": 163,
+    "senoides": {
+      "0.5Hz": {
+        "ganancia": 1.0,
+        "retardo_ms": 78
+      },
+      "1.0Hz": {
+        "ganancia": 0.96,
+        "retardo_ms": 77
+      },
+      "2.0Hz": {
+        "ganancia": 0.89,
+        "retardo_ms": 77
+      }
+    },
+    "acoplamiento_otros_canales": {}
+  },
+  "tibia2": {
+    "canal": "C9",
+    "cuentas_por_grado": -2.47,
+    "r2_escala": 0.999,
+    "ruido_cuentas": 0.2,
+    "mesetas_grados": {
+      "escalon_+1": 0.3,
+      "escalon_-1": -0.9,
+      "escalon_+2": 1.5,
+      "escalon_-2": -2.1,
+      "escalon_+6": 5.6,
+      "escalon_-6": -5.8,
+      "escalon_+12": 12.1,
+      "escalon_-12": -12.2
+    },
+    "subida_10_90_ms_escalon12": 165,
+    "senoides": {
+      "0.5Hz": {
+        "ganancia": 1.02,
+        "retardo_ms": 73
+      },
+      "1.0Hz": {
+        "ganancia": 0.98,
+        "retardo_ms": 77
+      },
+      "2.0Hz": {
+        "ganancia": 0.92,
+        "retardo_ms": 76
+      }
+    },
+    "acoplamiento_otros_canales": {}
+  },
+  "tibia3": {
+    "canal": "C11",
+    "cuentas_por_grado": 0.73,
+    "r2_escala": 0.008,
+    "ruido_cuentas": 0.5,
+    "mesetas_grados": {
+      "escalon_+1": -55.9,
+      "escalon_-1": -49.1,
+      "escalon_+2": -57.3,
+      "escalon_-2": -46.4,
+      "escalon_+6": 182.7,
+      "escalon_-6": -32.7,
+      "escalon_+12": -88.6,
+      "escalon_-12": -10.9
+    },
+    "subida_10_90_ms_escalon12": 0,
+    "senoides": {
+      "0.5Hz": {
+        "ganancia": 2.96,
+        "retardo_ms": 1504
+      },
+      "1.0Hz": {
+        "ganancia": 2.38,
+        "retardo_ms": 863
+      },
+      "2.0Hz": {
+        "ganancia": 10.18,
+        "retardo_ms": 6
+      }
+    },
+    "acoplamiento_otros_canales": {}
+  },
+  "tibia4": {
+    "canal": "C10",
+    "cuentas_por_grado": -2.45,
+    "r2_escala": 1.0,
+    "ruido_cuentas": 0.5,
+    "mesetas_grados": {
+      "escalon_+1": 0.2,
+      "escalon_-1": -0.6,
+      "escalon_+2": 1.9,
+      "escalon_-2": -1.8,
+      "escalon_+6": 6.0,
+      "escalon_-6": -5.9,
+      "escalon_+12": 12.1,
+      "escalon_-12": -12.0
+    },
+    "subida_10_90_ms_escalon12": 99,
+    "senoides": {
+      "0.5Hz": {
+        "ganancia": 1.04,
+        "retardo_ms": 63
+      },
+      "1.0Hz": {
+        "ganancia": 0.98,
+        "retardo_ms": 67
+      },
+      "2.0Hz": {
+        "ganancia": 0.74,
+        "retardo_ms": 63
+      }
+    },
+    "acoplamiento_otros_canales": {}
+  }
+}

@@ -1,0 +1,31 @@
+== ppo_v22_paso (20:04)
+base: avance 7.592 m, deriva 0.391 m, roll 1.31°, pitch 0.92°, coxas 0.99°
+100.0 % viable | ppo_v22_paso/semilla_3013/intermedias/policy_100000_steps.zip | avance 1.24 (nominal 1.25) m, deriva 0.04 (nominal 0.12) m, caídas 0/20 (nominal 0), incl.máx 2.21°
+  5.0 % viable | ppo_v22_paso/semilla_3007/intermedias/policy_2500000_steps.zip | avance 1.10 (nominal 1.25) m, deriva 0.03 (nominal 0.12) m, caídas 0/20 (nominal 0), incl.máx 3.02°
+100.0 % viable | ppo_v22_paso/semilla_3001/policy.zip | avance 1.20 (nominal 1.25) m, deriva 0.05 (nominal 0.12) m, caídas 0/20 (nominal 0), incl.máx 2.93°
+  0.0 % viable | ppo_v22_paso/semilla_3007/intermedias/policy_2700000_steps.zip | avance 1.09 (nominal 1.25) m, deriva 0.03 (nominal 0.12) m, caídas 0/20 (nominal 0), incl.máx 3.0°
+ 10.0 % viable | ppo_v22_paso/semilla_3013/intermedias/policy_600000_steps.zip | avance 1.11 (nominal 1.25) m, deriva 0.06 (nominal 0.12) m, caídas 0/20 (nominal 0), incl.máx 3.06°
+== ppo_v22_gateo (21:00)
+base: avance 7.529 m, deriva 0.036 m, roll 1.47°, pitch 0.96°, coxas 0.98°
+Elegida: /home/pavilion/Documentos/Cuadrupedo/Experimentos/entrenamiento_real_20261016/ppo_v10_robot/ppo_v22_gateo_semilla_3101_2700k
+100.0 % viable | ppo_v22_gateo/semilla_3101/intermedias/policy_2700000_steps.zip | avance 1.04 (nominal 0.99) m, deriva 0.03 (nominal 0.05) m, caídas 0/20 (nominal 0), incl.máx 3.15°
+100.0 % viable | ppo_v22_gateo/semilla_3101/intermedias/policy_2600000_steps.zip | avance 1.04 (nominal 0.99) m, deriva 0.03 (nominal 0.05) m, caídas 0/20 (nominal 0), incl.máx 3.28°
+100.0 % viable | ppo_v22_gateo/semilla_3101/intermedias/policy_2900000_steps.zip | avance 1.06 (nominal 0.99) m, deriva 0.06 (nominal 0.05) m, caídas 0/20 (nominal 0), incl.máx 3.03°
+100.0 % viable | ppo_v22_gateo/semilla_3101/intermedias/policy_2500000_steps.zip | avance 1.03 (nominal 0.99) m, deriva 0.02 (nominal 0.05) m, caídas 0/20 (nominal 0), incl.máx 3.68°
+100.0 % viable | ppo_v22_gateo/semilla_3119/intermedias/policy_1300000_steps.zip | avance 1.09 (nominal 0.99) m, deriva 0.09 (nominal 0.05) m, caídas 0/20 (nominal 0), incl.máx 4.37°
+== ppo_v22_trote (21:19)
+base: avance 5.965 m, deriva 0.224 m, roll 1.77°, pitch 0.91°, coxas 1.07°
+100.0 % viable | ppo_v22_trote/semilla_3221/intermedias/policy_100000_steps.zip | avance 1.78 (nominal 1.90) m, deriva 0.04 (nominal 0.09) m, caídas 0/20 (nominal 0), incl.máx 3.55°
+  0.0 % viable | ppo_v22_trote/semilla_3221/intermedias/policy_200000_steps.zip | avance 1.60 (nominal 1.90) m, deriva 0.04 (nominal 0.09) m, caídas 0/20 (nominal 0), incl.máx 4.02°
+  0.0 % viable | ppo_v22_trote/semilla_3221/intermedias/policy_300000_steps.zip | avance 1.33 (nominal 1.90) m, deriva 0.06 (nominal 0.09) m, caídas 0/20 (nominal 0), incl.máx 2.9°
+100.0 % viable | ppo_v22_trote/semilla_3203/intermedias/policy_200000_steps.zip | avance 1.86 (nominal 1.90) m, deriva 0.04 (nominal 0.09) m, caídas 0/20 (nominal 0), incl.máx 3.08°
+100.0 % viable | ppo_v22_trote/semilla_3217/intermedias/policy_600000_steps.zip | avance 1.79 (nominal 1.90) m, deriva 0.12 (nominal 0.09) m, caídas 0/20 (nominal 0), incl.máx 4.44°
+== ppo_v22_carrera (21:23)
+base: avance 4.387 m, deriva 0.111 m, roll 1.77°, pitch 1.01°, coxas 1.13°
+Elegida: /home/pavilion/Documentos/Cuadrupedo/Experimentos/entrenamiento_real_20261016/ppo_v10_robot/ppo_v22_carrera_semilla_3313_100k
+100.0 % viable | ppo_v22_carrera/semilla_3313/intermedias/policy_100000_steps.zip | avance 1.80 (nominal 1.76) m, deriva 0.08 (nominal 0.08) m, caídas 0/20 (nominal 0), incl.máx 2.66°
+100.0 % viable | ppo_v22_carrera/semilla_3307/intermedias/policy_1700000_steps.zip | avance 1.87 (nominal 1.76) m, deriva 0.07 (nominal 0.08) m, caídas 0/20 (nominal 0), incl.máx 3.02°
+100.0 % viable | ppo_v22_carrera/semilla_3307/intermedias/policy_1900000_steps.zip | avance 1.85 (nominal 1.76) m, deriva 0.08 (nominal 0.08) m, caídas 0/20 (nominal 0), incl.máx 2.92°
+100.0 % viable | ppo_v22_carrera/semilla_3307/intermedias/policy_2200000_steps.zip | avance 1.81 (nominal 1.76) m, deriva 0.08 (nominal 0.08) m, caídas 0/20 (nominal 0), incl.máx 2.92°
+100.0 % viable | ppo_v22_carrera/semilla_3307/intermedias/policy_1200000_steps.zip | avance 1.93 (nominal 1.76) m, deriva 0.08 (nominal 0.08) m, caídas 0/20 (nominal 0), incl.máx 2.94°
+FIN 21:23

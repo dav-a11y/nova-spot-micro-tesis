@@ -1,0 +1,221 @@
+\chapter{Metodología ejecutada}
+
+El proyecto se desarrolló como una investigación aplicada, cuantitativa y
+experimental, acompañada por actividades de desarrollo tecnológico. Se empleó
+una ruta combinada de diseño de prototipo, modelado y simulación, y preparación
+de una comparación de aprendizaje por refuerzo. Cada etapa produjo artefactos
+verificables: código versionado, configuraciones, pruebas, bolsas de datos,
+tablas, gráficas, decisiones técnicas e informes.
+
+\section{Correspondencia con los cuatro objetivos}
+
+OE1 organiza la implementación de hardware y software; OE2, el modelado
+cinemático y dinámico; OE3, la estrategia aprendida de coordinación; y OE4,
+la evaluación mediante tres pruebas. La marcha convencional y la comparación
+con y sin correcciones son procedimientos de apoyo dentro de esta estructura.
+
+La Prueba de Margen de Estabilidad Estática debe relacionar la proyección del
+centro de masa con el polígono de apoyo y conservar su evolución durante la
+marcha. La Prueba de Seguimiento de Posición Articular contrasta referencias
+con posiciones observadas, mediante errores por articulación. La Prueba de
+Repetibilidad del Patrón de Marcha compara ensayos independientes de una misma
+configuración. Hay herramientas y evidencia parcial en simulación; la aprobación
+de criterios y la validación integral permanecen pendientes. Las pruebas
+provocadas del supervisor verifican su reacción y no sustituyen estas tres pruebas.
+
+\section{Plan metodológico del anteproyecto}
+
+El anteproyecto definió una arquitectura de control de dos niveles: una marcha
+nominal generada por una máquina de estados finitos, con trayectorias de los
+pies y referencias articulares, y una política de aprendizaje por refuerzo que
+solo produce correcciones pequeñas y acotadas sobre esas referencias, sin
+controlar el PWM y subordinada a un supervisor independiente. El desarrollo se
+organizó en ocho fases secuenciales con retroalimentación, de modo que cada
+etapa superara sus verificaciones antes de avanzar a pruebas de mayor riesgo
+para el hardware (figura~\ref{fig:metodologia_fases}).
+
+\begin{figure}[H]
+\centering
+\resizebox{0.96\textwidth}{!}{%
+\begin{tikzpicture}[
+    node distance=0.65cm,
+    block/.style={rectangle, draw, fill=blue!20, text width=10em,
+        text centered, rounded corners, minimum height=3.5em},
+    arrow/.style={-latex, thick}
+]
+\node (f1) [block] {1. Caracterización de la plataforma};
+\node (f2) [block, right=of f1] {2. Modelado y simulación};
+\node (f3) [block, right=of f2] {3. Electrónica y seguridad};
+\node (f4) [block, right=of f3] {4. Marcha nominal};
+\node (f5) [block, below=of f4] {5. Aprendizaje por refuerzo};
+\node (f6) [block, left=of f5] {6. Transferencia al robot};
+\node (f7) [block, left=of f6] {7. Validación comparativa};
+\node (f8) [block, left=of f7] {8. Análisis y documentación};
+\draw[arrow] (f1) -- (f2);
+\draw[arrow] (f2) -- (f3);
+\draw[arrow] (f3) -- (f4);
+\draw[arrow] (f4) -- (f5);
+\draw[arrow] (f5) -- (f6);
+\draw[arrow] (f6) -- (f7);
+\draw[arrow] (f7) -- (f8);
+\draw[-latex, dashed] (f7.north) .. controls +(up:1.2cm) and +(down:1.2cm) .. (f4.south);
+\draw[-latex, dashed] (f6.north) .. controls +(up:1.0cm) and +(down:1.0cm) .. (f3.south);
+\end{tikzpicture}%
+}
+\caption{Fases de desarrollo y ciclos de retroalimentación planteados en el
+anteproyecto. Fuente: elaboración propia.}
+\label{fig:metodologia_fases}
+\end{figure}
+
+La tabla~\ref{tab:fases-plan-ejecucion} resume lo que cada fase preveía y cómo
+se ejecutó. La transferencia progresiva prevista (sin servos, servo individual,
+pata suspendida, cuatro patas suspendidas, postura con soporte, transferencia de
+peso, un paso, ciclo completo y marcha continua) se cumplió hasta las cuatro
+patas con el robot suspendido; los pasos con apoyo quedaron pendientes. La
+validación preveía al menos diez ciclos válidos por marcha y condición, con
+margen de estabilidad estática, inclinación, desplazamiento, desviación lateral,
+longitud y tiempo de paso, repetibilidad y fallos; con el robot suspendido solo
+fueron medibles el seguimiento articular y la repetibilidad. El anteproyecto ya
+advertía que el seguimiento articular exigía medir la posición real, porque el
+PCA9685 no realimenta; esa fue la razón para instrumentar las articulaciones con
+potenciómetros y encoders.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Fases del anteproyecto frente a la ejecución.}
+\label{tab:fases-plan-ejecucion}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.2\textwidth}>{\raggedright\arraybackslash}p{0.33\textwidth}>{\raggedright\arraybackslash}p{0.37\textwidth}}
+\toprule
+\textbf{Fase} & \textbf{Resultado esperado} & \textbf{Ejecución} \\
+\midrule
+1. Caracterización & Ficha técnica, parámetros geométricos e inerciales, inventario y riesgos & Geometría medida y aplicada al modelo; masas parciales; inercias no identificadas. \\
+2. Modelado y simulación & Modelo validado y simulación de pie con referencias articulares & Cinemática, jacobianos y dinámica nominal; URDF/SDF con ROS~2 y Gazebo, MJCF en MuJoCo. \\
+3. Electrónica y seguridad & Diagramas, presupuesto energético, calibración y protocolos de encendido y emergencia & Calibración articular y esquema propuesto; fuente, fusible y parada de emergencia pendientes. \\
+4. Marcha nominal & Postura, paso y gateo sin aprendizaje como referencia & Gateo y paso en simulación y en el robot suspendido; trote añadido en la fase física. \\
+5. Aprendizaje por refuerzo & MDP, protocolo reproducible y política correctiva validada en simulación & PPO residual con aleatorización de dominio, semillas registradas y actuador identificado (capítulo~\ref{cap:ppo-fisico}). \\
+6. Transferencia & Marcha nominal y corregida ejecutadas con seguridad en el robot & Ejecutadas con el robot suspendido; topes del firmware y apagado de salidas. \\
+7. Validación comparativa & Comparación estadística con y sin capa aprendida & Repetibilidad y ciclo de mejora en suspensión; menos de diez repeticiones por condición. \\
+8. Análisis y documentación & Informe reproducible y documentación técnica & Este documento, repositorio y anexos de reproducción. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Trazabilidad y control de versiones}
+
+El código y la documentación se mantuvieron en un repositorio Git. Para cada
+ensayo se registraron la fecha, la configuración de marcha, la versión del
+código, los tópicos almacenados y los hashes SHA-256 de los archivos críticos.
+Las tentativas con nodos duplicados, ausencia de marcadores o pérdida de fases
+se conservaron como evidencia inválida y no se mezclaron con los resultados
+aceptados.
+
+\section{Modelado y verificación de software}
+
+Se implementaron la cinemática directa e inversa de cada pata, transformaciones
+homogéneas, jacobianos y componentes de un modelo dinámico nominal. La geometría
+se integró en descripciones URDF/SDF para Gazebo y MJCF para MuJoCo. La
+verificación incluyó alcanzabilidad, límites articulares, continuidad de las
+referencias, compilación de los paquetes ROS~2 y pruebas automatizadas.
+
+El modelo se trató como nominal computable y no como gemelo digital, debido a
+que las masas, geometría definitiva, fricción, holgura y parámetros de los
+actuadores físicos todavía no se han identificado por completo.
+
+Como preparación para esa identificación se implementó una fuente única de
+perfiles que genera pares URDF/SDF--MJCF auditables. Los perfiles varían masa,
+inercia, amortiguamiento, fricción articular y del suelo, holgura, retardos,
+tensión y corriente. El límite del MG996R combina la envolvente de catálogo
+par--velocidad con una cota de corriente; una capa ROS común aplica retardo,
+zona muerta y límite de cambio de referencia en ambos simuladores. Estos
+perfiles aumentan fidelidad y comparabilidad, pero sus valores continúan siendo
+hipótesis hasta contrastarlos con el robot físico.
+
+\section{Protocolo de caracterización física}
+
+Se preparó un protocolo trazable para contrastar el modelo con el ejemplar
+construido. El procedimiento separó dos actividades por seguridad. La primera,
+sin energizar el robot, comprendió inventario fotográfico, inspección mecánica,
+confirmación del cableado, tres repeticiones por dimensión y tres repeticiones
+de cada masa disponible. Las longitudes de los eslabones se definieron entre
+ejes de rotación para evitar depender de los bordes externos de las piezas.
+
+La segunda actividad quedó condicionada a la aprobación de la alimentación y
+la parada física por OE. Esta medirá individualmente el centro PWM, los límites
+mecánicos conservadores, el sentido y la velocidad de cada uno de los doce
+servos. No se permitirá copiar valores entre articulaciones ni habilitar el
+hardware mientras existan campos sin medir.
+
+Para una magnitud $x$ se definieron la media y la diferencia respecto del
+modelo nominal $x_0$ como
+\begin{equation}
+  \bar{x}=\frac{x_1+x_2+x_3}{3}, \qquad \Delta x=\bar{x}-x_0.
+\end{equation}
+Si el intervalo entre la mayor y la menor repetición supera dos veces la
+resolución del instrumento, la medición debe repetirse. El protocolo, las
+fichas y los CSV se dejaron versionados antes de capturar datos. En esta etapa
+se preparó el método, pero no se reportaron valores físicos como resultados.
+
+\section{Diseño y evaluación de las marchas nominales}
+
+Se generaron trayectorias de los pies en espacio cartesiano y se transformaron
+a referencias articulares mediante la cinemática inversa propia. El gateo usó
+24 referencias por ciclo, paso de 0,018~m, elevación de 0,014~m y 0,18~s por
+referencia. La marcha paso usó 32 referencias, paso de 0,016~m, elevación de
+0,008~m y la misma duración por referencia.
+
+Cada ensayo comenzó con una orden explícita de marcha y terminó con una orden
+\texttt{stand}. Los ciclos se delimitaron mediante las referencias y fases
+registradas, no únicamente dividiendo el tiempo total por una duración nominal.
+El primer ciclo se conservó como transitorio. Las métricas incluyeron avance,
+velocidad, excursión lateral, altura, inclinación y continuidad articular.
+
+\section{Contacto, IMU y estabilidad}
+
+Se incorporaron cuatro sensores de contacto de Gazebo a 100~Hz. El monitor
+consolidó el estado observado y el comparador lo contrastó con el plan publicado
+por el controlador. Posteriormente se separó el estado crudo, derivado de los
+mensajes y un timeout de 0,10~s, del estado filtrado. La pérdida debía persistir
+0,12~s y el recontacto 0,03~s antes de modificar el estado estable.
+
+También se integró una IMU simulada de 100~Hz. Un monitor calculó el polígono de
+soporte mediante las posiciones nominales de los pies en contacto y publicó un
+margen estático firmado. Debido a que el centro de masa y la geometría física
+no están identificados, esta magnitud se reportó explícitamente como nominal.
+
+\section{Seguridad}
+
+El supervisor verificó altura, inclinación, finitud, límites y discontinuidades
+de las referencias articulares. Nueve escenarios ROS~2 aislados provocaron
+altura baja y alta, roll, pitch, pérdida de contacto, margen negativo, datos
+vencidos, exceso de límite articular y discontinuidad. Cada criterio exigió el
+motivo esperado, la activación enclavada y la orden \texttt{stand}. No se
+implementó un rearme automático; contacto, margen y timeout permanecieron
+deshabilitados por defecto hasta medir falsos positivos en campañas largas.
+
+\section{Preparación experimental final}
+
+La comparación prevista incluye, para gateo y marcha paso, cinco ensayos de 20
+ciclos con control nominal y cinco con la misma marcha más corrección aprendida.
+El ensayo es la unidad independiente; los ciclos no se tratarán como réplicas.
+Las semillas de entrenamiento se fijaron en 11, 23, 37, 53 y 71, y los
+escenarios de evaluación emparejada en 101, 202, 303, 404 y 505.
+
+Esta comparación, prevista sobre el suelo, no se ejecutó aún. En su lugar se
+realizó una comparación con el robot suspendido, descrita en el
+capítulo~\ref{cap:plataforma-fisica}: varias repeticiones de 3~min por
+condición, en orden alternado, con comprobación de salud tras cada caminata. Las
+semillas de entrenamiento se ampliaron más allá de las cinco congeladas
+(capítulo~\ref{cap:ppo-fisico}), y la selección final de las políticas se
+hizo con los datos del robot.
+
+\section{Fase experimental en el robot físico}
+
+La fase física siguió una progresión de menor a mayor riesgo: pruebas por canal
+del PCA9685; identificación de cada articulación y de sus sensores; marcha
+nominal en lazo abierto con el robot suspendido; identificación del actuador con
+esas caminatas; entrenamiento de políticas con el actuador identificado;
+ejecución de las políticas en el robot suspendido; y, por último, un ciclo de
+mejora que alterna pruebas en el robot, actualización del modelo y
+reentrenamiento. En cada paso, los datos del robot (sensores y cámaras) se usaron
+para detectar diferencias con la simulación antes de avanzar al siguiente.

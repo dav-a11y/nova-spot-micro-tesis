@@ -1,0 +1,57 @@
+{
+  "started_at": "2026-09-29T03:16:38.591675+00:00",
+  "purpose": "development_only_stability_and_heading_objective",
+  "gait": "step",
+  "training_seeds": [
+    11,
+    23,
+    37,
+    53,
+    71
+  ],
+  "timesteps_requested": 200000,
+  "episode_cycles_training": 5,
+  "ramp_duration_s": 1.0,
+  "ramp_is_transitory": true,
+  "control_dt_s": 0.02,
+  "gait_samples": 32,
+  "steps_per_sample": 9,
+  "cycle_duration_s": 5.76,
+  "nominal_interpolation": "linear_at_control_rate",
+  "training_domain_randomization": true,
+  "environment": {
+    "attitude_weight": 32.0,
+    "stability_observation": true,
+    "lateral_weight": 8.0,
+    "yaw_weight": 8.0
+  },
+  "development_evaluation_seeds": [
+    701,
+    702,
+    703,
+    704,
+    705
+  ],
+  "evaluation_episodes": 5,
+  "evaluation_cycles": 20,
+  "ramp_duration_s_evaluation": 1.0,
+  "evaluation_domain_randomization": false,
+  "reserved_final_evaluation_seeds": [
+    101,
+    202,
+    303,
+    404,
+    505
+  ],
+  "provisional_targets": {
+    "roll_pitch_rms_deg_max": 5.0,
+    "roll_pitch_abs_max_deg": 15.0,
+    "body_height_m": [
+      0.16,
+      0.32
+    ],
+    "source": "Documentacion/FICHA_APROBACION_PROTOCOLO.md",
+    "approval_status": "unsigned_provisional"
+  },
+  "hardware_transfer": false
+}

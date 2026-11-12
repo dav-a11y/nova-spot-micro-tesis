@@ -15,7 +15,7 @@ Spot Micro mediante una marcha nominal convencional y una política de
 aprendizaje por refuerzo que aplique correcciones pequeñas, acotadas y
 supervisadas.
 
-Última actualización documental: 2 de septiembre de 2026, America/Bogota.
+Última actualización documental: 14 de octubre de 2026, America/Bogota.
 
 Actualización cinemática del 2 de septiembre: se completaron las gráficas de
 workspace, proximidad a singularidades y velocidades articulares. Se corrigió
@@ -1245,3 +1245,199 @@ la toma. Los datos se guardaron en
 `Raspberry/configuracion/as5600_caracterizacion_provisional.yaml` y el detalle
 en `Raspberry/LECTURA_AS5600_TCA_2026-09-28.md`. Los extremos son referencias
 provisionales, no límites de control; faltan márgenes y validación de seguridad.
+
+### Campaña step de 80 semillas recibida desde JULI — 28 de septiembre de 2026
+
+Se transfirió por SSH verificado la campaña completa MuJoCo step desde el equipo
+JULI, sin alterar la fuente. Se comprobaron las 80 políticas, 160 filas de
+evaluación y las sumas SHA-256. Quedó guardada en
+`Experimentos/campana_distribuida_step_s23_20260928`, con el código incremental,
+en la rama local `resultados/mujoco-step-80-semillas-20260928` (commit
+`106ee5a`). No se ha subido aún a GitHub ni se aprueban políticas para hardware.
+Las carpetas PPO locales sin seguimiento se preservaron.
+
+El análisis está en
+`Experimentos/campana_distribuida_step_s23_20260928/INFORME_ANALISIS_80_SEMILLAS.md`:
+el avance medio mejora +2,903 m (78/80) y el retorno +34,18 (76/80), mientras
+la inclinación reportada empeora en 80/80 semillas (+0,03342 rad de media).
+Ninguna política domina la nominal en avance e inclinación. Faltan pruebas con
+episodios/escenarios nuevos y aleatorización ambiental antes de elegir candidatas.
+
+Se preparó una campaña de desarrollo con penalización de actitud cuatro veces
+mayor (32 frente a 8), cinco semillas del protocolo (11, 23, 37, 53 y 71),
+200.000 pasos por semilla y evaluación de 20 ciclos en semillas de desarrollo
+601–605. Las semillas finales 101, 202, 303, 404 y 505 quedan reservadas. La
+ficha de aprobación aún no está firmada; no se declarará marcha aprobada ni se
+habilitará hardware a partir de este entrenamiento.
+
+La tanda w32 completó cinco semillas, pero se rechazó como candidata por
+excursión lateral media de 6,886 m y error articular máximo medio de 0,1461 rad.
+También se corrigió un error de fase: el código antiguo recorría nueve ciclos
+por cada ciclo declarado. Las 80 semillas previas y w32 quedan etiquetadas como
+exploratorias, no comparables con la cadencia prevista. El nominal corregido
+interpola cada muestra durante nueve pasos y completa cinco ciclos en 1.440
+pasos; el salto de referencia en régimen es 0,0081 rad. Se preparó otra tanda
+desde cero con observación lateral/rumbo y penalizaciones, misma quinteta de
+entrenamiento y evaluación de desarrollo 701–705; las semillas finales siguen
+reservadas.
+
+### Evaluación step PPO con estabilidad lateral/rumbo — 28 de septiembre de 2026
+
+La campaña `Experimentos/campana_step_estabilidad_xy_w32_20260928` completó
+cinco políticas (200.000 pasos cada una) y su evaluación de cinco episodios por
+política, de 20 ciclos corregidos. La cadencia nominal es 288 pasos/ciclo a
+20 ms, precedidos por una rampa de 1 s; el episodio de 20 ciclos tiene 5.810
+pasos. No hubo terminaciones tempranas. El informe reproducible es
+`Experimentos/campana_step_estabilidad_xy_w32_20260928/INFORME_RESULTADOS.md`.
+
+Resultado negativo para selección: solo dos de cinco políticas superaron el
+avance nominal; la excursión lateral máxima media fue 0,0826 m frente a 0,0040
+m en nominal. El error articular máximo medio 0,0738 rad (RMS 0,0138 rad) es
+mayor que el nominal, pero cumple los límites de la ficha (máximo 0,15 rad,
+RMS 0,05 rad). Aunque inclinación RMS y altura permanecieron dentro
+de la guía numérica provisional, no se elige política ni se marca la marcha
+aprobada. La ficha de aprobación sigue sin firma. No se usaron las semillas
+finales 101/202/303/404/505 y no se habilitó transferencia física. Siguiente:
+validar referencia nominal, trayectoria lateral y seguimiento articular antes
+de una nueva optimización.
+
+Corrección de referencia nominal step: se detectó que los 32 waypoints de la
+configuración anterior tienen un salto articular máximo de 0,07277 rad, por
+encima de la guía de 0,05 rad. La configuración actual propuesta aumenta a 48
+waypoints y reduce el tiempo por punto a 0,12 s; conserva el ciclo de 5,76 s y
+baja el salto calculado a 0,04911 rad. Se ejecutaron pruebas y evaluación
+dinámica MuJoCo antes de iniciar la siguiente campaña PPO.
+
+### Step 48 puntos y PPO lateral/rumbo — 29 de septiembre de 2026
+
+La referencia se cambió a 48 waypoints de 0,12 s sin alterar los 5,76 s por
+ciclo. Su salto máximo bajó de 0,072772 a 0,049115 rad; pasaron las 15 pruebas
+cinemáticas. La referencia nominal completó cinco episodios MuJoCo de 20 ciclos
+sin caída, con avance 0,08415 m, excursión lateral 0,00415 m, error articular
+RMS 0,01170 rad y máximo 0,03795 rad.
+
+La campaña `Experimentos/campana_step_estabilidad_xy48_w32_l64_20260929` entrenó
+cinco políticas (200.000 pasos; actitud32/lateral64/rumbo32). En evaluación
+emparejada, PPO promedió 0,04219 m de avance y 0,06486 m de excursión lateral
+máxima, contra 0,08414 m y 0,00417 m nominal. Una sola política superó el avance
+nominal. El error articular medio máximo/RMS 0,06210/0,01297 rad cumple las
+guías de 0,15/0,05 rad, pero no compensa la trayectoria lateral. La escala
+residual 0,25 tampoco dominó nominal.
+
+La evaluación sin aleatorización repitió un estado determinista. La evaluación
+emparejada con fricción/amortiguamiento aleatorizados encontró para nominal
+0,08348–0,08467 m de avance y 0,00386–0,00417 m de excursión lateral. Las filas
+nominales agregadas coinciden entre políticas porque comparten las cinco
+condiciones emparejadas; la pose inicial aún no se perturba. Esto no prueba
+repetibilidad física. Las semillas finales 101/202/303/404/505
+permanecen reservadas. Resultado: no se selecciona PPO, no se transfiere a
+hardware y la ficha sigue sin firma. Informe completo en
+`Experimentos/campana_step_estabilidad_xy48_w32_l64_20260929/INFORME_RESULTADOS.md`.
+
+### Conexión SSH Raspberry recuperada — 29 de septiembre de 2026
+
+La Pi `cuadrupedo-pi` respondió en `10.139.240.198`; se validó hostname y
+uptime, y la huella ED25519 coincidió con la identidad ya conocida
+(`SHA256:mTERAysLSgm2Xlw36tOoV0uv5gC3vj7Xoycel2xe16M`). Se actualizó el alias
+`Host cuadrupedo-pi` en `~/.ssh/config`, de modo que puede conectarse con
+`ssh cuadrupedo-pi`. La IP `172.18.81.198` quedó obsoleta. Si DHCP cambia la
+dirección, leer `hostname -I` localmente y actualizar `HostName`; se recomienda
+reservar la IP en el router. No se enviaron órdenes a los servos.
+
+### Apagado de Raspberry pendiente de autenticación — 28 de septiembre de 2026
+
+Se verificó la identidad SSH de `cuadrupedo-pi` en `172.18.81.198` y se ejecutó
+`sync`. El apagado remoto fue rechazado porque `sudo` y systemd requieren
+autenticación interactiva. No se solicitó ni transmitió la contraseña. Para
+completarlo, el operador debe ejecutar `sudo poweroff` en la Raspberry o
+`ssh -t pavilion@172.18.81.198 'sudo poweroff'` desde su terminal e ingresar
+allí su contraseña.
+
+### Identificación pasiva posterior a prueba mínima — 29 de septiembre de 2026
+
+Se ejecutó por autorización una única prueba tibia 1/CH8 de 5 µs y retorno.
+El AS5600 `0x71`/canal 0 cambió 5,889° con el paso y quedó 16,699° apartado
+del punto inicial tras retornar a 1500 µs; luego alcanzó 170,947° con PWM
+deshabilitado. Se detuvo la prueba. Veinte barridos pasivos de los doce AS5600
+mostraron seis rutas con estado MD/ML/MH válido, pero solo cinco señales
+estables dentro de 2°; coxa 2 tuvo 27,070° de dispersión aun con imán detectado.
+La tabla está en `Raspberry/DIAGNOSTICO_AS5600_2026-09-29_POSTPRUEBA.md`.
+
+El cierre dejó OE BCM17 alto y los dieciséis canales individualmente en
+`FULL_OFF`. Se corrigió localmente `PCA9685Seguro` para fijar el apagado por
+canal y no liberar OE al cerrar. Pasaron cuatro pruebas unitarias y
+`py_compile`; luego se instaló en la Pi con respaldo del archivo anterior
+`pca9685_seguro.py.codex-backup-20260929`, SHA-256
+`a92e47aa75139f42b04cead746112818cddb6e1cdc35abdb22ef747eca8321e1`. La Pi pasó
+`compile()` y confirmó OE alto, 16/16 canales en `FULL_OFF` y servicio inactivo.
+Criterio de aceptación física no cumplido: retorno articular no repetible y
+sensores insuficientes; no se ejecutará otra orden a servos hasta resolver la
+inestabilidad. Detalle del ensayo en
+`Raspberry/DIAGNOSTICO_AS5600_2026-09-29_POSTPRUEBA.md`.
+
+Revisión adicional solicitada indicando el operador que no movió el robot:
+quince barridos sin PWM mantuvieron señales variables en tibia 3 y coxas 1/2/3;
+seis rutas tuvieron estados magnéticos débiles o sin detección. Se deben revisar
+alineación/fijación, cableado/alimentación y holgura mecánica; la causa exacta
+no está determinada. Se verificó por SSH por qué no se mueve: OE alto, 16/16
+canales `FULL_OFF`, `hardware_ready: false`, 0/12 calibrados y servicio
+inactivo. Es un bloqueo deliberado de seguridad, no una orden de marcha fallida.
+
+Se amplió la observación a 60 barridos pasivos: 12/12 rutas I²C respondieron
+60/60 veces, por lo que el bus/mapeo TCA funciona. Solo 5 sensores quedaron
+válidos y estables dentro de 2°; coxa 2 varió 34,805° aunque el imán fue
+detectado. Resultado completo en `Raspberry/DIAGNOSTICO_AS5600_2026-09-29_POSTPRUEBA.md`.
+
+Para avanzar sin hardware se abrió MuJoCo headless aislado en ROS domain 73 y se
+ejecutó gateo nominal durante 6,71 s (24 muestras; ciclo configurado 4,32 s;
+paso 18 mm; elevación 14 mm), seguido de `stop`. La simulación quedó en reposo.
+Una lectura post-stop fue x=0,004767 m, y=-0,000105 m y altura=0,234259 m; no
+constituye métrica agregada de la marcha. No hubo PWM ni enlace con la Raspberry.
+
+### Diagnóstico desde Arduino Uno y reconexión pendiente de la Raspberry — 7 de octubre de 2026
+
+El escaneo I²C realizado con Arduino Uno encontró doce AS5600 (`0x36`) en los
+canales `0–5` del TCA `0x70` y `0, 1, 3, 4, 5, 6` del TCA `0x71`. El sketch de
+doce sensores reportó FEMUR 2 en `0x71`/canal 6, con una lectura observada de
+226,14°; unas nueve iteraciones iniciales mostraron variaciones de hasta ~0,09°.
+Es evidencia preliminar, no una prueba de estabilidad de 100 muestras. Hay que
+resolver una discrepancia antes de editar el mapa de conexiones: el mapa de la
+Raspberry identifica `0x71`/canal 5 como FEMUR 2 y canal 6 como COXA 2, pero el
+sketch/identificación física comunicada para el Uno indica lo contrario.
+
+No se pudo iniciar la prueba con la Raspberry: `cuadrupedo-pi` en
+`10.139.240.198` agotó el tiempo de conexión SSH desde la red actual y mDNS no
+la descubrió. No hubo comandos remotos ni nuevas lecturas. Se conserva el último
+estado seguro registrado (OE alto, PCA9685 16/16 `FULL_OFF`, sin servos
+calibrados y servicio inactivo); no se envió PWM ni se movieron articulaciones.
+Próximo paso: conectar y encender la Pi, verificar su identidad SSH y ejecutar
+lecturas exclusivamente pasivas para comparar canales 5 y 6 y confirmar la
+etiqueta física de cada sensor antes de modificar el mapa.
+
+### Estadísticas AS5600 aportadas por postura — 7 de octubre de 2026
+
+Se registró una captura nueva, separada de la caracterización anterior: 100
+muestras por articulación en fémures adelante/atrás, coxas arriba/abajo y tibias
+adelante/atrás. El operador confirmó que las patas 1 y 2 son delanteras. El
+dataset detallado está en `Raspberry/configuracion/as5600_caracterizacion_provisional.yaml`
+(`operator_posture_samples_2026_10_07`); las tablas están en
+`Raspberry/RESUMEN_CARACTERIZACION_AS5600_2026-09-28.md`. Se mantienen unidades
+de grados absolutos del imán; no son límites PWM o mecánicos. Fémur 3 muestra la
+mayor variación comunicada (15,820° con fémur adelante); no se habilita control
+ni se infieren límites de servo a partir de estos datos.
+
+### Registro de transferencia de registros y sketch a Raspberry — 7–14 de octubre de 2026
+
+La Pi volvió a ser accesible como `cuadrupedo-pi.local` (`10.150.110.198`); se
+validó la identidad SSH conocida y se ajustó el alias local para resolver el
+nombre mDNS. Se enviaron archivos nuevos, sin sobrescritura: `Nuevo.md`, el
+resumen `Raspberry/AVANCES_2026-10-07.md`, copia fechada del YAML con las 24
+combinaciones de postura (100 muestras por combinación) y el sketch
+`Raspberry/codigo/arduino_uno_12_as5600_estabilidad_2026-10-07.ino`. Hashes de
+origen/destino coincidieron y el YAML se pudo leer en la Pi.
+
+El sketch es un lector de doce AS5600, no un controlador de servos: no genera
+PWM, y no se ejecutó en la Raspberry. Queda sin resolver el cruce de etiquetas
+FEMUR 2/COXA 2 entre canales 5 y 6 del TCA `0x71`; no modificar el mapa hasta
+confirmación física. El checkout remoto tiene un objeto Git vacío/corrupto y
+no se hizo commit allí. No hubo movimiento ni PWM durante esta transferencia.

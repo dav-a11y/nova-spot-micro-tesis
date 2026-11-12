@@ -1,0 +1,28 @@
+<section id="firmware" data-transition="fade" style="display:flex; flex-direction:column; gap:36px; padding:112px 128px 160px; background:#f6f5f0">
+  <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#b4521c">Plataforma física</p>
+  <h2 style="font-family:'Source Serif 4', Georgia, serif; font-size:64px; font-weight:600; line-height:1.1; color:#15233b">Firmware de la interfaz y bucle de control de 30 ms</h2>
+  <div style="display:grid; gap:48px; grid-template-columns:1fr 1fr">
+    <table style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:25px; color:#2a3442">
+      <tr><th style="width:18%">Orden</th><th style="width:82%">Modo del firmware</th></tr>
+      <tr><td>@</td><td>Transmisión continua: 12 ángulos por línea, responde con todas las lecturas</td></tr>
+      <tr><td>+</td><td>Igual, con coxas comandadas y corrección de su caída</td></tr>
+      <tr><td>$</td><td>Diagnóstico: 16 canales del MUX y 16 encoders</td></tr>
+      <tr><td>^</td><td>Escaneo I²C con estado del imán de cada AS5600</td></tr>
+      <tr><td>b</td><td>Gateo en lazo abierto (primera marcha física)</td></tr>
+      <tr><td>x</td><td>Apaga los 16 canales PWM</td></tr>
+    </table>
+    <div style="display:flex; flex-direction:column; gap:18px">
+      <h3 style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:32px; font-weight:600; color:#2f5d8c">Cada 30 ms el controlador:</h3>
+      <ol style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:26px; line-height:1.45; color:#2a3442">
+        <li>calcula la fase y la referencia nominal</li>
+        <li>lee los sensores de la respuesta anterior</li>
+        <li>arma la observación y evalúa la red</li>
+        <li>satura, convierte a grados de servo y envía</li>
+        <li>registra todo en CSV (orden, nominal, sensores, corrección)</li>
+      </ol>
+      <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:26px; line-height:1.4; color:#2a3442">Protecciones: topes por canal, ≤ 3° por orden, tiempo máximo en el bus I²C y apagado con «x», también automático al apagar el PC.</p>
+    </div>
+  </div>
+  <p style="position:absolute; bottom:64px; left:128px; width:1664px; font-family:'IBM Plex Sans', Arial, sans-serif; font-size:24px; color:#6a7383">Nova Spot Micro · Plataforma física · Periodo real medido: 33 ms; 0 pasos tardíos con 2 núcleos reservados</p>
+  <aside>La diapositiva 7 habla del programa que corre dentro de la Arduino. En la presentación la llamamos «interfaz de E/S» (entrada/salida), porque solo hace eso: lee los sensores y mueve los servos. No piensa ni decide nada; la red neuronal corre en el computador.<br><br>¿Qué es el firmware? Es el programa que vive dentro de la Arduino. Se carga una vez por USB y queda grabado en la placa (firmware_uno/movimiento_suspendido_11_servos.ino). La Arduino espera órdenes de una sola letra o símbolo que le manda el computador. Cada una pone a la placa en un modo distinto:<br>- @ Modo caminata: cada 30 ms recibe 12 ángulos (uno por servo), mueve los servos y responde con todo lo que leen los sensores. Se usa en todas las caminatas con la red PPO.<br>- + Igual que @, pero también deja mover las coxas y corrige si se caen. Galope, y para ajustar la coxa 2.<br>- $ Diagnóstico: devuelve los 16 potenciómetros y los 16 encoders. Revisión completa de sensores.<br>- ^ Escaneo del bus I2C: revisa canal por canal qué encoder responde y si su imán está bien. Se usó para buscar el cable que trababa el bus.<br>- b Gateo en lazo abierto: la Arduino camina sola, sin computador. Fue la primera marcha física.<br>- x Apagar: deja los 16 servos sin señal (sin fuerza). Al terminar, y automático al apagar el PC.<br><br>Qué pasa cada 30 ms (lo hace el programa del computador, ejecutar_politica_robot.py, en coordinación con la Arduino), unas 33 veces por segundo:<br>1. Calcula en qué momento del ciclo va la marcha y cuál es el ángulo base de cada servo.<br>2. Lee lo que respondió la Arduino: los ángulos que midieron los sensores.<br>3. Arma los 22 números que ve la red y le pide la corrección.<br>4. Recorta y convierte: limita la corrección, la suma a la marcha base, la pasa a grados de servo y se la envía a la Arduino.<br>5. Guarda todo en un archivo (orden, sensores, corrección) para analizarlo después.<br><br>Protecciones: topes por canal (ningún servo va más allá de un ángulo máximo y mínimo); máximo 3 grados por orden (el servo no salta de golpe); tiempo máximo en el bus I2C (si un cable se suelta, la Arduino no se queda trabada); apagado con «x», también automático al apagar el PC.<br><br>La línea de abajo: periodo real de 33 ms (se programó para 30, en la práctica tarda 33). 0 pasos tardíos con 2 núcleos reservados: antes, con el PC ocupado entrenando, algunos ciclos se atrasaban; se reservaron 2 núcleos solo para el robot y ya no se atrasa ninguno.<br><br>En resumen: la Arduino es como las manos y los ojos del robot (mueve y mide) y el computador es el cerebro (decide). El firmware son las reglas con las que la Arduino entiende qué le pide el computador.</aside>
+</section>

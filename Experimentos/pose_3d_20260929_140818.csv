@@ -1,0 +1,5 @@
+pata,descripcion,coxa_rad,femur_rad,tibia_rad,fuente
+1,Pata 1 - delantera derecha,0.03000000000000025,-0.36,-0.009999999999999787,ajuste_visual_manual_no_calibrado
+2,Pata 2 - delantera izquierda,-0.9699999999999998,0.09000000000000008,0.1,ajuste_visual_manual_no_calibrado
+3,Pata 3 - trasera derecha,-0.8500000000000001,0.07000000000000006,-0.020000000000000018,ajuste_visual_manual_no_calibrado
+4,Pata 4 - trasera izquierda,-0.71,0.3800000000000001,-0.33000000000000007,ajuste_visual_manual_no_calibrado

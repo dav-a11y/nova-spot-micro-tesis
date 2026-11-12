@@ -4,8 +4,8 @@ Actualización: 2 de septiembre de 2026.
 
 | Figura del PDF | Archivo | Datos de origen | Qué evidencia | Limitación explícita |
 |---|---|---|---|---|
-| Arquitectura funcional | `Figures` mediante TikZ en `Chapters/9 Desarrollo.tex` | Nodos y tópicos implementados | Flujo entre mando, controlador, simuladores, sensores, análisis, supervisor y registro | Es arquitectura lógica; no demuestra integración eléctrica completa |
-| Transición física segura | TikZ en `Chapters/9 Desarrollo.tex` | Estado documentado de Raspberry, PCA9685 y puertas F0--F4 | Separa bloques comprobados de calibración, OE, marcha e instrumentación pendientes | Es una secuencia de validación, no un circuito eléctrico ni autorización para energizar |
+| Arquitectura funcional | `Figures` mediante TikZ en `Chapters/11 Desarrollo.tex` | Nodos y tópicos implementados | Flujo entre mando, controlador, simuladores, sensores, análisis, supervisor y registro | Es arquitectura lógica; no demuestra integración eléctrica completa |
+| Transición física segura | TikZ en `Chapters/11 Desarrollo.tex` | Estado documentado de Raspberry, PCA9685 y puertas F0--F4 | Separa bloques comprobados de calibración, OE, marcha e instrumentación pendientes | Es una secuencia de validación, no un circuito eléctrico ni autorización para energizar |
 | Workspace y singularidades | `Figures/Resultados/workspace_singularidades.png` | 52.111 configuraciones generadas por `Experimentos/generar_graficas_cinematica.py` | Alcance por límites, ubicación de baja $\sigma_{\min}$ y distribución de $\kappa$ | No incluye autocolisión ni calibración física |
 | Velocidades articulares | `Figures/Resultados/velocidades_articulares.png` | Referencias nominales de gateo y paso | Envolventes por tipo articular y máximo entre 12 articulaciones | El límite URDF no equivale a capacidad física bajo carga |
 | Series del gateo | `Figures/Resultados/gateo_series_temporales.png` | `linea_base_cadencia_corregida_20260814_1049` | Avance y comportamiento periódico de posición, altura, roll y pitch | Un ensayo en Gazebo; no representa hardware |

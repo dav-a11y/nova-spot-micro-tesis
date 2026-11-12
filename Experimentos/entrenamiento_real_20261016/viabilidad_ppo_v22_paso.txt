@@ -1,0 +1,5 @@
+100.0 % viable | ppo_v22_paso/semilla_3013/intermedias/policy_100000_steps.zip | avance 1.24 (nominal 1.25) m, deriva 0.04 (nominal 0.12) m, caídas 0/20 (nominal 0), incl.máx 2.21°
+  5.0 % viable | ppo_v22_paso/semilla_3007/intermedias/policy_2500000_steps.zip | avance 1.10 (nominal 1.25) m, deriva 0.03 (nominal 0.12) m, caídas 0/20 (nominal 0), incl.máx 3.02°
+100.0 % viable | ppo_v22_paso/semilla_3001/policy.zip | avance 1.20 (nominal 1.25) m, deriva 0.05 (nominal 0.12) m, caídas 0/20 (nominal 0), incl.máx 2.93°
+  0.0 % viable | ppo_v22_paso/semilla_3007/intermedias/policy_2700000_steps.zip | avance 1.09 (nominal 1.25) m, deriva 0.03 (nominal 0.12) m, caídas 0/20 (nominal 0), incl.máx 3.0°
+ 10.0 % viable | ppo_v22_paso/semilla_3013/intermedias/policy_600000_steps.zip | avance 1.11 (nominal 1.25) m, deriva 0.06 (nominal 0.12) m, caídas 0/20 (nominal 0), incl.máx 3.06°

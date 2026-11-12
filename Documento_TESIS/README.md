@@ -121,3 +121,12 @@ tenían el SHA-256:
 ## Objetivos vigentes al 7 de septiembre de 2026
 
 Se adoptó literalmente el objetivo general y los cuatro específicos suministrados por el usuario. OE1: hardware/software; OE2: modelado; OE3: control aprendido; OE4: margen de estabilidad estática, seguimiento de posición articular y repetibilidad del patrón de marcha. Matriz y referencias internas sincronizadas. PDF recompilado de 72 páginas.
+
+## Unificación con el anteproyecto (22 de octubre de 2026)
+
+El contenido de `tesis_overleaf` que no estaba en este documento quedó
+integrado: el alcance y los productos esperados del anteproyecto con su estado
+(capítulo 5), el plan metodológico de ocho fases con su diagrama y su
+correspondencia con la ejecución (capítulo 10), y el cronograma Gantt y el
+presupuesto con su conciliación (capítulo 18). `tesis_overleaf` se conserva sin
+cambios como antecedente; el documento de entrega es este.

@@ -1,0 +1,10 @@
+base: avance 4.857 m, deriva 0.286 m, roll 2.13°, pitch 2.03°, coxas 1.08°
+OK semilla_37   300000 pasos  avance 5.285  deriva 0.055  roll 1.14  pitch 1.42  incl.máx 2.70  coxas 0.99  suav 0.53  punt 2.37
+OK semilla_37  1600000 pasos  avance 5.108  deriva 0.066  roll 1.54  pitch 2.26  incl.máx 4.45  coxas 0.84  suav 0.97  punt 3.93
+OK semilla_71   400000 pasos  avance 4.917  deriva 0.294  roll 0.61  pitch 0.73  incl.máx 1.36  coxas 0.92  suav 1.00  punt 3.97
+OK semilla_37   400000 pasos  avance 4.947  deriva 0.218  roll 0.90  pitch 1.21  incl.máx 2.32  coxas 0.93  suav 1.22  punt 4.22
+OK semilla_37  1200000 pasos  avance 5.413  deriva 0.117  roll 1.56  pitch 2.24  incl.máx 4.43  coxas 0.86  suav 0.94  punt 4.38
+OK semilla_37  1300000 pasos  avance 5.470  deriva 0.116  roll 1.59  pitch 2.22  incl.máx 4.44  coxas 0.86  suav 0.97  punt 4.41
+OK semilla_37  1500000 pasos  avance 5.230  deriva 0.150  roll 1.51  pitch 2.27  incl.máx 4.44  coxas 0.85  suav 0.96  punt 4.74
+OK semilla_37   200000 pasos  avance 5.526  deriva 0.298  roll 1.43  pitch 1.52  incl.máx 2.65  coxas 1.00  suav 0.17  punt 4.82
+Elegida: /home/pavilion/Documentos/Cuadrupedo/Experimentos/entrenamiento_real_20261016/ppo_v10_robot/ppo_trote_semilla_37_300k

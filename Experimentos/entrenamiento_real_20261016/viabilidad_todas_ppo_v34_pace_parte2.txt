@@ -1,0 +1,82 @@
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_1701472_steps.zip | avance 3.76 (nominal 3.40) m, deriva 0.19 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.01°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_1751472_steps.zip | avance 3.77 (nominal 3.40) m, deriva 0.22 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.33°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_1801472_steps.zip | avance 3.74 (nominal 3.40) m, deriva 0.26 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.73°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_1851472_steps.zip | avance 3.74 (nominal 3.40) m, deriva 0.27 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.75°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_1901472_steps.zip | avance 3.74 (nominal 3.40) m, deriva 0.26 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.73°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_1951472_steps.zip | avance 3.75 (nominal 3.40) m, deriva 0.26 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.71°
+ 95.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_2001472_steps.zip | avance 3.77 (nominal 3.40) m, deriva 0.23 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.17°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_2051472_steps.zip | avance 3.74 (nominal 3.40) m, deriva 0.26 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.4°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_2101472_steps.zip | avance 3.76 (nominal 3.40) m, deriva 0.20 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.52°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_2151472_steps.zip | avance 3.73 (nominal 3.40) m, deriva 0.23 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.41°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_2201472_steps.zip | avance 3.73 (nominal 3.40) m, deriva 0.22 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.39°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_2251472_steps.zip | avance 3.75 (nominal 3.40) m, deriva 0.24 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.15°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_2301472_steps.zip | avance 3.75 (nominal 3.40) m, deriva 0.22 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.35°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_2351472_steps.zip | avance 3.75 (nominal 3.40) m, deriva 0.23 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.53°
+ 95.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_2401472_steps.zip | avance 3.75 (nominal 3.40) m, deriva 0.21 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.46°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_2451472_steps.zip | avance 3.75 (nominal 3.40) m, deriva 0.21 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.19°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_2501472_steps.zip | avance 3.74 (nominal 3.40) m, deriva 0.22 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.36°
+ 95.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_2551472_steps.zip | avance 3.74 (nominal 3.40) m, deriva 0.22 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.57°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_2601472_steps.zip | avance 3.75 (nominal 3.40) m, deriva 0.22 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.18°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_2651472_steps.zip | avance 3.74 (nominal 3.40) m, deriva 0.21 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.64°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_2701472_steps.zip | avance 3.74 (nominal 3.40) m, deriva 0.22 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.23°
+ 95.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_2751472_steps.zip | avance 3.74 (nominal 3.40) m, deriva 0.23 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.5°
+ 95.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_2801472_steps.zip | avance 3.73 (nominal 3.40) m, deriva 0.23 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.83°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_2851472_steps.zip | avance 3.73 (nominal 3.40) m, deriva 0.22 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.26°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_2901472_steps.zip | avance 3.74 (nominal 3.40) m, deriva 0.22 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.4°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_2951472_steps.zip | avance 3.72 (nominal 3.40) m, deriva 0.23 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.33°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_3001472_steps.zip | avance 3.72 (nominal 3.40) m, deriva 0.23 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.48°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_3051472_steps.zip | avance 3.73 (nominal 3.40) m, deriva 0.21 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.39°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_3101472_steps.zip | avance 3.71 (nominal 3.40) m, deriva 0.20 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.56°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_3151472_steps.zip | avance 3.71 (nominal 3.40) m, deriva 0.23 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.9°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_3201472_steps.zip | avance 3.69 (nominal 3.40) m, deriva 0.21 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.73°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_3251472_steps.zip | avance 3.69 (nominal 3.40) m, deriva 0.20 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.81°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_3301472_steps.zip | avance 3.69 (nominal 3.40) m, deriva 0.20 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 9.14°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_3351472_steps.zip | avance 3.67 (nominal 3.40) m, deriva 0.25 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 9.07°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_3401472_steps.zip | avance 3.67 (nominal 3.40) m, deriva 0.25 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 9.15°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_3451472_steps.zip | avance 3.67 (nominal 3.40) m, deriva 0.26 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 9.11°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_3501472_steps.zip | avance 3.67 (nominal 3.40) m, deriva 0.26 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 9.02°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_3551472_steps.zip | avance 3.67 (nominal 3.40) m, deriva 0.25 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 9.1°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_3601472_steps.zip | avance 3.66 (nominal 3.40) m, deriva 0.25 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 9.05°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/intermedias/policy_3651472_steps.zip | avance 3.67 (nominal 3.40) m, deriva 0.26 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 9.05°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_1701472_steps.zip | avance 3.70 (nominal 3.40) m, deriva 0.23 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 9.05°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_1751472_steps.zip | avance 3.71 (nominal 3.40) m, deriva 0.25 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 9.07°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_1801472_steps.zip | avance 3.69 (nominal 3.40) m, deriva 0.23 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.99°
+ 95.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_1851472_steps.zip | avance 3.67 (nominal 3.40) m, deriva 0.27 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 9.0°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_1901472_steps.zip | avance 3.69 (nominal 3.40) m, deriva 0.24 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.84°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_1951472_steps.zip | avance 3.68 (nominal 3.40) m, deriva 0.23 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.96°
+ 95.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_2001472_steps.zip | avance 3.74 (nominal 3.40) m, deriva 0.26 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.75°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_2051472_steps.zip | avance 3.74 (nominal 3.40) m, deriva 0.26 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.8°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_2101472_steps.zip | avance 3.74 (nominal 3.40) m, deriva 0.27 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.76°
+ 95.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_2151472_steps.zip | avance 3.75 (nominal 3.40) m, deriva 0.24 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.79°
+ 95.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_2201472_steps.zip | avance 3.79 (nominal 3.40) m, deriva 0.25 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.5°
+ 95.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_2251472_steps.zip | avance 3.78 (nominal 3.40) m, deriva 0.21 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.21°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_2301472_steps.zip | avance 3.77 (nominal 3.40) m, deriva 0.19 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.35°
+ 95.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_2351472_steps.zip | avance 3.75 (nominal 3.40) m, deriva 0.24 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.6°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_2401472_steps.zip | avance 3.74 (nominal 3.40) m, deriva 0.26 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.44°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_2451472_steps.zip | avance 3.72 (nominal 3.40) m, deriva 0.25 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.43°
+ 95.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_2501472_steps.zip | avance 3.73 (nominal 3.40) m, deriva 0.22 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.62°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_2551472_steps.zip | avance 3.76 (nominal 3.40) m, deriva 0.21 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 7.86°
+ 95.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_2601472_steps.zip | avance 3.76 (nominal 3.40) m, deriva 0.20 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 7.79°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_2651472_steps.zip | avance 3.73 (nominal 3.40) m, deriva 0.22 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.59°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_2701472_steps.zip | avance 3.73 (nominal 3.40) m, deriva 0.25 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.67°
+ 95.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_2751472_steps.zip | avance 3.73 (nominal 3.40) m, deriva 0.24 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.73°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_2801472_steps.zip | avance 3.73 (nominal 3.40) m, deriva 0.26 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.75°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_2851472_steps.zip | avance 3.73 (nominal 3.40) m, deriva 0.26 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.76°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_2901472_steps.zip | avance 3.71 (nominal 3.40) m, deriva 0.24 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.89°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_2951472_steps.zip | avance 3.71 (nominal 3.40) m, deriva 0.24 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.91°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_3001472_steps.zip | avance 3.69 (nominal 3.40) m, deriva 0.23 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 9.05°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_3051472_steps.zip | avance 3.69 (nominal 3.40) m, deriva 0.23 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 9.05°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_3101472_steps.zip | avance 3.71 (nominal 3.40) m, deriva 0.24 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.89°
+ 95.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_3151472_steps.zip | avance 3.73 (nominal 3.40) m, deriva 0.23 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.69°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_3201472_steps.zip | avance 3.73 (nominal 3.40) m, deriva 0.25 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.88°
+ 95.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_3251472_steps.zip | avance 3.75 (nominal 3.40) m, deriva 0.24 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.63°
+ 95.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_3301472_steps.zip | avance 3.74 (nominal 3.40) m, deriva 0.26 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.64°
+ 95.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_3351472_steps.zip | avance 3.75 (nominal 3.40) m, deriva 0.23 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.59°
+ 95.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_3401472_steps.zip | avance 3.75 (nominal 3.40) m, deriva 0.23 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.51°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_3451472_steps.zip | avance 3.75 (nominal 3.40) m, deriva 0.22 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.35°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_3501472_steps.zip | avance 3.74 (nominal 3.40) m, deriva 0.21 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.2°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_3551472_steps.zip | avance 3.75 (nominal 3.40) m, deriva 0.20 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.39°
+ 95.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_3601472_steps.zip | avance 3.74 (nominal 3.40) m, deriva 0.23 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.13°
+ 95.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/intermedias/policy_3651472_steps.zip | avance 3.74 (nominal 3.40) m, deriva 0.23 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.47°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9517/policy.zip | avance 3.67 (nominal 3.40) m, deriva 0.25 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 9.05°
+100.0 % viable | ppo_v34_pace_desde_trote_parte2/semilla_9521/policy.zip | avance 3.74 (nominal 3.40) m, deriva 0.21 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 8.63°

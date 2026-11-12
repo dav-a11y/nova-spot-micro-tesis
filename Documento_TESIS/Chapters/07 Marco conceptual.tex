@@ -1,0 +1,83 @@
+\chapter{Marco conceptual}
+
+La presente tesis se estructura en torno a cinco conceptos articuladores:
+plataforma cuadrúpeda Nova Spot Micro, modelo
+cinemático-dinámico, sistema de control de locomoción, aprendizaje por refuerzo
+correctivo y evaluación de la caminata. Estos conceptos no se seleccionan por
+afinidad temática, sino porque aparecen en el planteamiento del problema, son
+necesarios para cumplir los objetivos o se usan directamente en el análisis de
+resultados. En conjunto, permiten interpretar el proyecto como un proceso que va
+desde una plataforma física inactiva hasta una caminata planificada,
+supervisada y evaluable.
+
+La plataforma cuadrúpeda Nova Spot Micro constituye el punto de partida material
+de la investigación. El planteamiento del problema muestra que el robot
+permanece inactivo por limitaciones de accionamiento, sensorización, potencia,
+documentación técnica, modelado y control. En esta tesis, la plataforma no se
+entiende solo como el robot disponible en el laboratorio, sino como el sistema
+físico que impone restricciones a todo el desarrollo: tipo de actuadores,
+necesidad de calibración, seguridad eléctrica, comunicación y capacidad de
+medición. Por eso, cualquier estrategia de locomoción debe relacionarse con las
+condiciones reales del Nova Spot Micro y no únicamente con resultados ideales de
+simulación.
+
+El modelo cinemático-dinámico articula la plataforma física con el diseño de
+movimiento. Su inclusión se sustenta en el problema identificado: la ausencia de
+un modelo matemático que describa la cinemática y dinámica del robot limita la
+generación de trayectorias coherentes. La cinemática permite analizar si las
+posturas, el paso y el gateo son geométricamente alcanzables por las doce
+articulaciones; la dinámica permite interpretar cómo masa, inercia, gravedad,
+fricción, contacto y saturación influyen en la respuesta del sistema. La
+posición adoptada en esta tesis es tratar dicho modelo como una base nominal
+para simulación y análisis, no como un gemelo digital identificado, porque sus
+parámetros aún requieren contraste físico.
+
+El sistema de control de locomoción conecta el modelo con la ejecución de
+movimiento. En el problema se afirma que no existe una estrategia que permita
+generar patrones de marcha estructurados; por ello, el control no se reduce a
+enviar señales a los actuadores, sino que integra referencias de postura, paso,
+gateo, límites articulares, supervisión y condiciones de seguridad. La
+interpretación adoptada es conservar una marcha nominal como referencia
+principal, porque permite saber qué pata debe oscilar, cuáles deben permanecer
+en apoyo y qué trayectoria debe seguir cada articulación. Esta decisión hace que
+la locomoción sea trazable y comparable antes de incorporar una corrección
+aprendida.
+
+El aprendizaje por refuerzo correctivo se relaciona con el proyecto porque la
+pregunta problema plantea evaluar una estrategia aprendida como capa correctiva
+de una marcha nominal. Este concepto amplía el sistema de control, pero no lo
+sustituye. La política aprendida se interpreta como un mecanismo para proponer
+ajustes pequeños sobre referencias ya planificadas, mientras el supervisor y los
+límites del sistema conservan autoridad sobre la seguridad. Esta lectura es
+importante para la investigación porque evita presentar el aprendizaje por
+refuerzo como una solución autónoma sin restricciones y permite compararlo de
+forma justa contra la marcha nominal.
+
+La evaluación de la caminata cierra la relación entre problema, objetivos y
+análisis. El proyecto no busca demostrar únicamente que el robot se desplaza,
+sino establecer si la locomoción puede considerarse estable, continua y
+repetible bajo condiciones controladas. Por esta razón, la evaluación se
+organiza mediante tres pruebas: margen de estabilidad estática, seguimiento de
+posición articular y repetibilidad del patrón de marcha. Estas pruebas conectan
+el modelo, el control y el aprendizaje con resultados verificables; además,
+permiten aceptar, rechazar o limitar las afirmaciones sobre el funcionamiento
+del robot.
+
+\begin{table}[H]
+\centering
+\caption{Conceptos articuladores del marco conceptual}
+\label{tab:marco-conceptual-relacion}
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{p{0.22\textwidth}p{0.23\textwidth}p{0.22\textwidth}p{0.23\textwidth}}
+\toprule
+Concepto & Presencia en el problema & Relación con los objetivos & Uso en el análisis \\
+\midrule
+Plataforma cuadrúpeda Nova Spot Micro & Es el sistema físico disponible, pero inactivo por limitaciones de accionamiento, sensado, potencia y documentación. & Delimita la implementación de hardware y software necesaria para ejecutar movimiento. & Condiciona alcance, calibración, seguridad, transferencia y restricciones reales. \\
+Modelo cinemático-dinámico & El problema identifica la ausencia de un modelo matemático de la plataforma. & Sustenta el modelado para simulación y posterior diseño. & Permite analizar alcanzabilidad, continuidad, contacto, estabilidad y diferencias entre simulación y robot físico. \\
+Sistema de control de locomoción & No existe una estrategia que genere patrones de marcha estructurados. & Integra paso, gateo, marcha nominal, aprendizaje y supervisor. & Permite estudiar si el movimiento se produce de manera coordinada y limitada. \\
+Aprendizaje por refuerzo correctivo & La pregunta problema lo plantea como capa correctiva sobre una marcha nominal. & Sustenta la estrategia de control aprendida del objetivo general. & Se compara contra la marcha nominal bajo las mismas condiciones experimentales. \\
+Evaluación de la caminata & El problema exige validar estabilidad y marcha, no solo producir movimiento. & Corresponde a margen estático, seguimiento articular y repetibilidad. & Define los criterios para aceptar, rechazar o limitar los resultados obtenidos. \\
+\bottomrule
+\end{tabular}
+\end{table}

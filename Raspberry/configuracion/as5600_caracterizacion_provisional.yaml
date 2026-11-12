@@ -1,7 +1,11 @@
-# Caracterización manual provisional de encoders AS5600.
-# No usar estos datos para habilitar PWM, marcha o corrección PPO.
-# Los valores son grados absolutos del imán, no radianes del modelo cinemático.
+# Dataset final de la caracterización manual AS5600 (20 muestras por condición).
+# Finalizado solo para registrar grados absolutos del imán y sus rangos.
+# No es una calibración articular ni habilita PWM, marcha o corrección PPO.
 date: 2026-09-28
+characterization_status: finalized_raw_magnet_angle_dataset
+operator_reference_status: fixed_final_reference_ranges
+joint_angle_calibration_status: pending
+control_authorization: false
 conditions:
   measurements: extremo_horario_seguro_manual
   counterclockwise_measurements: extremo_antihorario_seguro_manual
@@ -250,3 +254,237 @@ counterclockwise_measurements:
     span_deg: 0.088
     stable: true
     use_restriction: "Extremo antihorario visual provisional; no es límite de control."
+
+# Intervalos fijos y finales aportados por el operador el 2026-09-29.
+# Conservan grados absolutos del imán; NO son límites mecánicos ni ángulos
+# articulares calibrados. Los datos medidos arriba se preservan sin cambios.
+operator_fixed_reference_ranges_deg:
+  front_right_coxa_joint:
+    leg: 1
+    clockwise: [308.782, 310.782]
+    counterclockwise: [111.373, 113.373]
+  front_right_femur_joint:
+    leg: 1
+    clockwise: [231.831, 233.831]
+    counterclockwise: [131.460, 133.460]
+  front_right_tibia_joint:
+    leg: 1
+    clockwise: [83.672, 83.672]
+    counterclockwise: [203.379, 203.379]
+  front_left_coxa_joint:
+    leg: 2
+    clockwise: [114.604, 116.604]
+    counterclockwise: [145.162, 147.162]
+  front_left_femur_joint:
+    leg: 2
+    clockwise: [299.795, 299.795]
+    counterclockwise: [288.809, 288.809]
+  front_left_tibia_joint:
+    leg: 2
+    clockwise: [83.232, 83.232]
+    counterclockwise: [248.811, 250.811]
+  rear_right_coxa_joint:
+    leg: 3
+    clockwise: [35.290, 37.290]
+    counterclockwise: [182.863, 184.863]
+  rear_right_femur_joint:
+    leg: 3
+    clockwise: [46.039, 48.039]
+    counterclockwise: [97.126, 99.126]
+  rear_right_tibia_joint:
+    leg: 3
+    clockwise: [299.968, 301.968]
+    counterclockwise: [36.446, 38.446]
+  rear_left_coxa_joint:
+    leg: 4
+    clockwise: [216.562, 216.562]
+    counterclockwise: [191.484, 193.484]
+  rear_left_femur_joint:
+    leg: 4
+    clockwise: [291.797, 291.797]
+    counterclockwise: [66.006, 66.006]
+  rear_left_tibia_joint:
+    leg: 4
+    clockwise: [74.472, 76.472]
+    counterclockwise: [303.047, 303.047]
+
+# Captura adicional aportada por el operador el 2026-10-07: 100 lecturas por
+# articulación/postura. "Adelante/atrás/arriba/abajo" son nombres de postura
+# comunicados por el operador. Son ángulos RAW absolutos del imán, NO límites
+# de PWM, topes mecánicos ni ángulos articulares calibrados. Se conservan las
+# estadísticas y etiquetas de estado tal como fueron reportadas.
+operator_posture_samples_2026_10_07:
+  samples_per_condition: 100
+  legs_1_and_2: "delanteras (según operador)"
+  units: degrees_absolute_magnet_angle
+  control_authorization: false
+  conditions:
+    femurs_backward:
+      front_right_femur_joint:
+        leg: 1
+        min_deg: 246.182
+        max_deg: 246.357
+        mean_deg: 246.288
+        span_deg: 0.176
+        reported_status: "SE MANTIENE MUY ESTABLE"
+      front_left_femur_joint:
+        leg: 2
+        min_deg: 152.666
+        max_deg: 153.105
+        mean_deg: 152.767
+        span_deg: 0.439
+        reported_status: "SE MANTIENE ESTABLE"
+      rear_right_femur_joint:
+        leg: 3
+        min_deg: 182.373
+        max_deg: 184.043
+        mean_deg: 183.020
+        span_deg: 1.670
+        reported_status: "EL VALOR ESTA VARIANDO MUCHO"
+      rear_left_femur_joint:
+        leg: 4
+        min_deg: 69.434
+        max_deg: 69.697
+        mean_deg: 69.500
+        span_deg: 0.264
+    femurs_forward:
+      front_right_femur_joint:
+        leg: 1
+        min_deg: 117.861
+        max_deg: 117.949
+        mean_deg: 117.916
+        span_deg: 0.088
+        reported_status: "SE MANTIENE MUY ESTABLE"
+      front_left_femur_joint:
+        leg: 2
+        min_deg: 148.359
+        max_deg: 148.447
+        mean_deg: 148.441
+        span_deg: 0.088
+        reported_status: "SE MANTIENE MUY ESTABLE"
+      rear_right_femur_joint:
+        leg: 3
+        min_deg: 23.730
+        max_deg: 39.551
+        mean_deg: 30.772
+        span_deg: 15.820
+        reported_status: "EL VALOR ESTA VARIANDO MUCHO"
+      rear_left_femur_joint:
+        leg: 4
+        min_deg: 103.184
+        max_deg: 103.887
+        mean_deg: 103.638
+        span_deg: 0.703
+        reported_status: "EL VALOR VARIA"
+    coxas_up:
+      front_right_coxa_joint:
+        leg: 1
+        min_deg: 138.867
+        max_deg: 138.867
+        mean_deg: 138.867
+        span_deg: 0.000
+        reported_status: "SE MANTIENE MUY ESTABLE"
+      front_left_coxa_joint:
+        leg: 2
+        min_deg: 146.953
+        max_deg: 147.041
+        mean_deg: 147.026
+        span_deg: 0.088
+        reported_status: "SE MANTIENE MUY ESTABLE"
+      rear_right_coxa_joint:
+        leg: 3
+        min_deg: 174.287
+        max_deg: 175.078
+        mean_deg: 174.381
+        span_deg: 0.791
+        reported_status: "EL VALOR VARIA MODERADAMENTE"
+      rear_left_coxa_joint:
+        leg: 4
+        min_deg: 135.791
+        max_deg: 135.791
+        mean_deg: 135.791
+        span_deg: 0.000
+    coxas_down:
+      front_right_coxa_joint:
+        leg: 1
+        min_deg: 127.969
+        max_deg: 128.057
+        mean_deg: 128.036
+        span_deg: 0.088
+        reported_status: "SE MANTIENE MUY ESTABLE"
+      front_left_coxa_joint:
+        leg: 2
+        min_deg: 164.883
+        max_deg: 164.883
+        mean_deg: 164.883
+        span_deg: 0.000
+        reported_status: "SE MANTIENE MUY ESTABLE"
+      rear_right_coxa_joint:
+        leg: 3
+        min_deg: 185.273
+        max_deg: 186.064
+        mean_deg: 185.992
+        span_deg: 0.791
+        reported_status: "EL VALOR VARIA MODERADAMENTE"
+      rear_left_coxa_joint:
+        leg: 4
+        min_deg: 167.080
+        max_deg: 167.168
+        mean_deg: 167.081
+        span_deg: 0.088
+    tibias_forward:
+      front_right_tibia_joint:
+        leg: 1
+        min_deg: 240.557
+        max_deg: 240.557
+        mean_deg: 240.557
+        span_deg: 0.000
+        reported_status: "SE MANTIENE MUY ESTABLE"
+      front_left_tibia_joint:
+        leg: 2
+        min_deg: 77.959
+        max_deg: 78.047
+        mean_deg: 78.012
+        span_deg: 0.088
+        reported_status: "SE MANTIENE MUY ESTABLE"
+      rear_right_tibia_joint:
+        leg: 3
+        min_deg: 239.941
+        max_deg: 240.029
+        mean_deg: 239.955
+        span_deg: 0.088
+        reported_status: "SE MANTIENE MUY ESTABLE"
+      rear_left_tibia_joint:
+        leg: 4
+        min_deg: 73.740
+        max_deg: 73.828
+        mean_deg: 73.813
+        span_deg: 0.088
+    tibias_backward:
+      front_right_tibia_joint:
+        leg: 1
+        min_deg: 75.410
+        max_deg: 75.498
+        mean_deg: 75.497
+        span_deg: 0.088
+        reported_status: "SE MANTIENE MUY ESTABLE"
+      front_left_tibia_joint:
+        leg: 2
+        min_deg: 233.965
+        max_deg: 233.965
+        mean_deg: 233.965
+        span_deg: 0.000
+        reported_status: "SE MANTIENE MUY ESTABLE"
+      rear_right_tibia_joint:
+        leg: 3
+        min_deg: 256.465
+        max_deg: 256.553
+        mean_deg: 256.468
+        span_deg: 0.088
+        reported_status: "SE MANTIENE MUY ESTABLE"
+      rear_left_tibia_joint:
+        leg: 4
+        min_deg: 301.904
+        max_deg: 301.904
+        mean_deg: 301.904
+        span_deg: 0.000

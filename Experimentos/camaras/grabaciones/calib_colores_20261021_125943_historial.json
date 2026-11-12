@@ -1,0 +1,170 @@
+[
+  {
+    "vuelta": 1,
+    "grabacion": "calib_colores_20261021_125123_v1",
+    "patas": [
+      {
+        "pata": 1,
+        "femur_real": -4.4371110303163706,
+        "tibia_real": -7.872712395796536,
+        "error_femur": -11.662888969683632,
+        "error_tibia": 39.972712395796535,
+        "femur_offset": -7.2,
+        "tibia_offset": 15.0
+      },
+      {
+        "pata": 2,
+        "femur_real": 9.5277586160684,
+        "tibia_real": 3.545596550231596,
+        "error_femur": -25.6277586160684,
+        "error_tibia": 28.554403449768404,
+        "femur_offset": -18.0,
+        "tibia_offset": 15.0
+      },
+      {
+        "pata": 3,
+        "femur_real": -17.316906119748293,
+        "tibia_real": 20.120274194856762,
+        "error_femur": -14.783093880251709,
+        "error_tibia": -4.020274194856761,
+        "femur_offset": -11.3,
+        "tibia_offset": 7.5
+      },
+      {
+        "pata": 4,
+        "femur_real": null,
+        "tibia_real": -14.875320313842314,
+        "error_femur": null,
+        "error_tibia": 30.975320313842317,
+        "femur_offset": 3.0,
+        "tibia_offset": 15.0
+      }
+    ]
+  },
+  {
+    "vuelta": 2,
+    "grabacion": "calib_colores_20261021_125326_v2",
+    "patas": [
+      {
+        "pata": 1,
+        "femur_real": -11.13427886334021,
+        "tibia_real": -0.5865994786641713,
+        "error_femur": -4.965721136659791,
+        "error_tibia": 32.68659947866417,
+        "femur_offset": -10.7,
+        "tibia_offset": 30.0
+      },
+      {
+        "pata": 2,
+        "femur_real": 55.06288801971926,
+        "tibia_real": -20.32825165472672,
+        "error_femur": -71.16288801971926,
+        "error_tibia": 52.42825165472672,
+        "femur_offset": -30.0,
+        "tibia_offset": 30.0
+      },
+      {
+        "pata": 3,
+        "femur_real": -22.54086452425198,
+        "tibia_real": 20.553802936061683,
+        "error_femur": -9.559135475748022,
+        "error_tibia": -4.453802936061681,
+        "femur_offset": -18.0,
+        "tibia_offset": 11.1
+      },
+      {
+        "pata": 4,
+        "femur_real": null,
+        "tibia_real": -25.072601053708173,
+        "error_femur": null,
+        "error_tibia": 41.17260105370818,
+        "femur_offset": 3.0,
+        "tibia_offset": 30.0
+      }
+    ]
+  },
+  {
+    "vuelta": 3,
+    "grabacion": "calib_colores_20261021_125530_v3",
+    "patas": [
+      {
+        "pata": 1,
+        "femur_real": -11.378837559113533,
+        "tibia_real": 11.166261116664419,
+        "error_femur": -4.721162440886468,
+        "error_tibia": 20.933738883335582,
+        "femur_offset": -14.0,
+        "tibia_offset": 45.0
+      },
+      {
+        "pata": 2,
+        "femur_real": -18.68607850928853,
+        "tibia_real": -43.369857942054274,
+        "error_femur": 2.58607850928853,
+        "error_tibia": 75.46985794205428,
+        "femur_offset": -28.2,
+        "tibia_offset": 45.0
+      },
+      {
+        "pata": 3,
+        "femur_real": -24.406600375399943,
+        "tibia_real": 20.60120354349259,
+        "error_femur": -7.693399624600058,
+        "error_tibia": -4.50120354349259,
+        "femur_offset": -23.4,
+        "tibia_offset": 13.3
+      },
+      {
+        "pata": 4,
+        "femur_real": null,
+        "tibia_real": -36.44559978558157,
+        "error_femur": null,
+        "error_tibia": 52.54559978558157,
+        "femur_offset": 3.0,
+        "tibia_offset": 45.0
+      }
+    ]
+  },
+  {
+    "vuelta": 4,
+    "grabacion": "calib_colores_20261021_125738_v4",
+    "patas": [
+      {
+        "pata": 1,
+        "femur_real": -13.9326570071005,
+        "tibia_real": 23.97641244756259,
+        "error_femur": -2.167342992899501,
+        "error_tibia": 8.12358755243741,
+        "femur_offset": -15.5,
+        "tibia_offset": 52.2
+      },
+      {
+        "pata": 2,
+        "femur_real": -21.67346799411947,
+        "tibia_real": -55.77305430198452,
+        "error_femur": 5.5734679941194685,
+        "error_tibia": 87.87305430198452,
+        "femur_offset": -24.3,
+        "tibia_offset": 60.0
+      },
+      {
+        "pata": 3,
+        "femur_real": -27.44328800089059,
+        "tibia_real": 19.103324039789953,
+        "error_femur": -4.656711999109412,
+        "error_tibia": -3.003324039789952,
+        "femur_offset": -26.7,
+        "tibia_offset": 14.5
+      },
+      {
+        "pata": 4,
+        "femur_real": null,
+        "tibia_real": -50.80276699419436,
+        "error_femur": null,
+        "error_tibia": 66.90276699419437,
+        "femur_offset": 3.0,
+        "tibia_offset": 60.0
+      }
+    ]
+  }
+]

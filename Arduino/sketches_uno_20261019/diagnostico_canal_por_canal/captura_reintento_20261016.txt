@@ -1,0 +1,38 @@
+
+===== BUS PR7 | escritura=FALLO | control leido=0x11 | nuevos: ninguno
+
+FIN
+
+Reposo: SDA(A4)=1 SCL(A5)=1
+
+===== BUS PRINCIPAL (todos los canales cerrados) =====
+  0x40
+  0x70
+
+===== TCA 0x70 =====
+Canal 0 | escritura=OK | control leido=0x04 | nuevos: ninguno
+Canal 1 | escritura=OK | control leido=0xE2 | nuevos: ninguno
+Canal 2 | escritura=OK | control leido=0xE8 | nuevos: ninguno
+Canal 3 | escritura=OK | control leido=0x00 | nuevos: ninguno
+Canal 4 | escritura=OK | control leido=0x00 | nuevos: ninguno
+Canal 5 | escritura=OK | control leido=0x00 | nuevos: ninguno
+Canal 6 | escritura=OK | control leido=0x00 | nuevos: ninguno
+Canal 7 | escritura=FALLO | control leido=0x11 | nuevos: ninguno
+
+FIN
+
+===== BUS PRINCIPAL (todos los canales cerrados) =====
+  0x40
+  0x70
+
+===== TCA 0x70 =====
+Canal 0 | escritura=OK | control leido=0x04 | nuevos: ninguno
+Canal 1 | escritura=OK | control leido=0xE2 | nuevos: ninguno
+Canal 2 | escritura=OK | control leido=0xE8 | nuevos: ninguno
+Canal 3 | escritura=OK | control leido=0x00 | nuevos: ninguno
+Canal 4 | escritura=OK | control leido=0x00 | nuevos: ninguno
+Canal 5 | escritura=OK | control leido=0x00 | nuevos: ninguno
+Canal 6 | escritura=OK | control leido=0x00 | nuevos: ninguno
+Canal 7 | escritura=FALLO | control leido=0x11 | nuevos: ninguno
+
+FIN

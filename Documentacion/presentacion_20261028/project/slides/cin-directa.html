@@ -1,0 +1,21 @@
+<section id="cin-directa" data-transition="fade" style="background:#EAEEF2;color:#2A3442;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4521C">Modelo matemático</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#15233B">Cinemática directa de una pata</h2>
+<div style="display:grid;grid-template-columns:1fr 640px;gap:48px">
+<div style="background:#FFFFFF;padding:40px 48px;border-radius:16px;display:flex;flex-direction:column;gap:18px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:32px;color:#4A5568">Con  a = sᵢ·qc   y   Q = qf + qt :</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:42px;color:#15233B">x = − lf·sin qf − lt·sin Q</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:42px;color:#15233B">zp = − lf·cos qf − lt·cos Q</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:42px;color:#15233B">y = cos(a)·sᵢ·lc − sin(a)·zp</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:42px;color:#15233B">z = sin(a)·sᵢ·lc + cos(a)·zp</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:20px">
+<h3 style="font-size:32px;font-weight:600;color:#2F5D8C">Ejemplo verificado</h3>
+<p style="font-size:26px;line-height:1.45">Postura nominal [qc, qf, qt] = [0,10; 0,42; −0,84] rad, con [lc, lf, lt] = [0,090; 0,105; 0,132] m:</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:34px;color:#15233B"><b>p</b>FL = [0,0110; 0,1112; −0,2063] m</p>
+<p style="font-size:26px;line-height:1.45">Es el punto neutro de las trayectorias cartesianas. Implementado en <i>forward_leg</i>.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6A7383">Nova Spot Micro · Modelo matemático · lc, lf, lt: longitudes de coxa, fémur y tibia</p>
+<aside>Qué hace: le das los 3 ángulos de la pata y te dice dónde queda el pie, medido desde la cadera. Ángulos a posición.<br><br>Paso 1, cómo se forman las ecuaciones (vista de lado): imagina la pata colgando con dos palitos, el fémur (largo lf) y la tibia (largo lt). Si un palito de largo L está inclinado un ángulo θ respecto a la vertical, su punta se corre L·sin θ hacia el lado y baja L·cos θ (triángulo rectángulo: el palito es la hipotenusa). El pie es la suma de los dos palitos. La tibia está montada sobre el fémur, así que su inclinación total es la suma: Q = qf + qt. Entonces:<br>x = -lf·sin qf - lt·sin Q (lo que se corre el pie adelante o atrás)<br>zp = -lf·cos qf - lt·cos Q (lo que baja el pie)<br>Los signos menos son por la convención: el pie queda abajo (z negativo) y un ángulo positivo de fémur lleva el pie hacia atrás.<br><br>Qué es zp: la altura del pie dentro del plano de la pata, antes de tener en cuenta la coxa (la p es de plano). Es un valor intermedio.<br><br>Paso 2, girar con la coxa: la coxa gira toda la pata hacia afuera o adentro, como abrir una puerta, y la pata sale corrida hacia el lado una distancia lc. Es la fórmula de rotación de un punto:<br>y = cos(a)·si·lc - sin(a)·zp<br>z = sin(a)·si·lc + cos(a)·zp<br>con a = si·qc el ángulo de la coxa con su signo.<br><br>Postura nominal: la postura de pie, lista para caminar: qc = 0,10, qf = 0,42, qt = -0,84 rad (unos 6, 24 y -48 grados).<br><br>Ejemplo (pata delantera izquierda, lc 0,090, lf 0,105, lt 0,132 m):<br>Q = 0,42 - 0,84 = -0,42<br>x = -0,105·sin 0,42 - 0,132·sin(-0,42) = -0,0428 + 0,0538 = 0,0110 m<br>zp = -0,105·cos 0,42 - 0,132·cos(-0,42) = -0,0959 - 0,1205 = -0,2164 m<br>a = 0,10 (pata izquierda, si = +1)<br>y = cos 0,10·0,090 - sin 0,10·(-0,2164) = 0,0896 + 0,0216 = 0,1112 m<br>z = sin 0,10·0,090 + cos 0,10·(-0,2164) = 0,0090 - 0,2153 = -0,2063 m<br>El pie queda 1,1 cm adelante, 11,1 cm a la izquierda y 20,6 cm abajo de la cadera: casi debajo, un poco hacia afuera.<br><br>Punto neutro de las trayectorias: ese punto (0,011; 0,111; -0,206) m es el centro alrededor del cual se mueve el pie al caminar. La marcha lo lleva adelante, lo levanta, lo baja y lo trae atrás alrededor de ese punto, como el centro de un columpio. forward_leg es el nombre de la función del programa.</aside>
+</section>

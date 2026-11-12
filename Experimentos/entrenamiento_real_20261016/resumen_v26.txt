@@ -1,0 +1,21 @@
+== ppo_v26_gateo (16:10)
+base: avance 7.880 m, deriva 1.202 m, roll 1.98°, pitch 1.53°, coxas 0.99°
+  0.0 % viable | ppo_v26_gateo/semilla_6001/intermedias/policy_2850000_steps.zip | avance 0.87 (nominal 1.03) m, deriva 0.02 (nominal 0.14) m, caídas 0/20 (nominal 0), incl.máx 4.72°
+  0.0 % viable | ppo_v26_gateo/semilla_6003/intermedias/policy_2800000_steps.zip | avance 0.89 (nominal 1.03) m, deriva 0.04 (nominal 0.14) m, caídas 0/20 (nominal 0), incl.máx 4.83°
+  0.0 % viable | ppo_v26_gateo/semilla_6003/intermedias/policy_3100000_steps.zip | avance 0.87 (nominal 1.03) m, deriva 0.02 (nominal 0.14) m, caídas 0/20 (nominal 0), incl.máx 4.24°
+  0.0 % viable | ppo_v26_gateo/semilla_6001/intermedias/policy_2950000_steps.zip | avance 0.85 (nominal 1.03) m, deriva 0.01 (nominal 0.14) m, caídas 0/20 (nominal 0), incl.máx 4.41°
+  0.0 % viable | ppo_v26_gateo/semilla_6009/intermedias/policy_2800000_steps.zip | avance 0.89 (nominal 1.03) m, deriva 0.03 (nominal 0.14) m, caídas 0/20 (nominal 0), incl.máx 4.79°
+  0.0 % viable | ppo_v26_gateo/semilla_6001/intermedias/policy_2800000_steps.zip | avance 0.89 (nominal 1.03) m, deriva 0.05 (nominal 0.14) m, caídas 0/20 (nominal 0), incl.máx 4.95°
+  0.0 % viable | ppo_v26_gateo/semilla_6001/intermedias/policy_3000000_steps.zip | avance 0.85 (nominal 1.03) m, deriva 0.02 (nominal 0.14) m, caídas 0/20 (nominal 0), incl.máx 4.3°
+  0.0 % viable | ppo_v26_gateo/semilla_6007/intermedias/policy_2850000_steps.zip | avance 0.88 (nominal 1.03) m, deriva 0.02 (nominal 0.14) m, caídas 0/20 (nominal 0), incl.máx 4.73°
+== ppo_v26_galope (16:11)
+base: avance 4.904 m, deriva 0.089 m, roll 1.15°, pitch 3.20°, coxas 1.42°
+ 50.0 % viable | ppo_v26_galope/semilla_6409/intermedias/policy_200000_steps.zip | avance 1.73 (nominal 2.03) m, deriva 0.31 (nominal 0.29) m, caídas 0/20 (nominal 0), incl.máx 7.11°
+ 85.0 % viable | ppo_v26_galope/semilla_6403/intermedias/policy_150000_steps.zip | avance 2.03 (nominal 2.03) m, deriva 0.28 (nominal 0.29) m, caídas 0/20 (nominal 0), incl.máx 10.11°
+ 35.0 % viable | ppo_v26_galope/semilla_6407/intermedias/policy_250000_steps.zip | avance 1.58 (nominal 2.03) m, deriva 0.45 (nominal 0.29) m, caídas 0/20 (nominal 0), incl.máx 7.0°
+ 15.0 % viable | ppo_v26_galope/semilla_6403/intermedias/policy_250000_steps.zip | avance 1.57 (nominal 2.03) m, deriva 0.55 (nominal 0.29) m, caídas 0/20 (nominal 0), incl.máx 8.32°
+ 10.0 % viable | ppo_v26_galope/semilla_6401/intermedias/policy_200000_steps.zip | avance 1.33 (nominal 2.03) m, deriva 0.31 (nominal 0.29) m, caídas 0/20 (nominal 0), incl.máx 6.99°
+ 10.0 % viable | ppo_v26_galope/semilla_6401/intermedias/policy_300000_steps.zip | avance 1.31 (nominal 2.03) m, deriva 0.36 (nominal 0.29) m, caídas 0/20 (nominal 0), incl.máx 6.99°
+  0.0 % viable | ppo_v26_galope/semilla_6401/intermedias/policy_500000_steps.zip | avance 0.39 (nominal 2.03) m, deriva 0.09 (nominal 0.29) m, caídas 0/20 (nominal 0), incl.máx 6.93°
+  0.0 % viable | ppo_v26_galope/semilla_6401/intermedias/policy_550000_steps.zip | avance 0.54 (nominal 2.03) m, deriva 0.09 (nominal 0.29) m, caídas 0/20 (nominal 0), incl.máx 6.72°
+FIN 16:11

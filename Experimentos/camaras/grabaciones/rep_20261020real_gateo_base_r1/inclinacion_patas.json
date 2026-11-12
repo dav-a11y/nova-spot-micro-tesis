@@ -1,0 +1,12 @@
+{
+  "derecho": {
+    "inclinacion_delantera": 33.7,
+    "inclinacion_trasera": 12.4,
+    "convergencia_grados": -21.3
+  },
+  "izquierdo": {
+    "inclinacion_delantera": -2.3,
+    "inclinacion_trasera": 2.5,
+    "convergencia_grados": 4.9
+  }
+}

@@ -62,22 +62,39 @@ def _quat_roll_pitch(quat):
     return float(roll), float(pitch)
 
 
+def _quat_yaw(quat):
+    w, x, y, z = np.asarray(quat, dtype=float)
+    return float(np.arctan2(2.0 * (w * z + x * y),
+                            1.0 - 2.0 * (y * y + z * z)))
+
+
 class NovaMujocoResidualEnv(gym.Env):
     """MuJoCo environment for residual correction of a nominal gait."""
 
     metadata = {"render_modes": []}
 
     def __init__(self, model_path, gait="crawl", episode_cycles=5,
-                 control_dt=0.02, seed=11, domain_randomization=True):
+                 control_dt=0.02, seed=11, domain_randomization=True,
+                 attitude_weight=8.0, stability_observation=False,
+                 lateral_weight=8.0, yaw_weight=8.0):
         super().__init__()
         self.model_path = str(model_path)
         self.gait = gait
-        self.samples = 24 if gait == "crawl" else 32
+        self.samples = 24 if gait == "crawl" else 48
+        self.sample_duration = 0.18 if gait == "crawl" else 0.12
         self.episode_cycles = int(episode_cycles)
         self.control_dt = float(control_dt)
         self.sim_substeps = max(1, round(self.control_dt / 0.002))
+        self.steps_per_sample = max(1, round(self.sample_duration / self.control_dt))
+        self.cycle_steps = self.samples * self.steps_per_sample
+        self.ramp_steps = max(1, round(1.0 / self.control_dt))
         self.rng = np.random.default_rng(seed)
         self.domain_randomization = bool(domain_randomization)
+        self.attitude_weight = float(attitude_weight)
+        self.stability_observation = bool(stability_observation)
+        self.lateral_weight = float(lateral_weight)
+        self.yaw_weight = float(yaw_weight)
+        self.contact_obs_slice = slice(12, 16) if self.stability_observation else slice(9, 13)
         self.model = mujoco.MjModel.from_xml_path(self.model_path)
         self.data = mujoco.MjData(self.model)
         self.base_body = mujoco.mj_name2id(
@@ -103,15 +120,15 @@ class NovaMujocoResidualEnv(gym.Env):
                 preload_shift_scale=2.0), dtype=float)
         elif gait == "step":
             self.nominal = np.asarray(cartesian_step_walk(
-                STAND, samples=32, step_length=0.016, step_height=0.008,
+                STAND, samples=48, step_length=0.016, step_height=0.008,
                 weight_shift=0.004), dtype=float)
         else:
             raise ValueError("gait debe ser crawl o step")
-        self.max_steps = self.episode_cycles * self.samples * int(
-            round(0.18 / self.control_dt))
+        self.max_steps = self.ramp_steps + self.episode_cycles * self.cycle_steps
         self.action_space = spaces.Box(-1.0, 1.0, shape=(12,), dtype=np.float32)
+        observation_dim = 30 if self.stability_observation else 27
         self.observation_space = spaces.Box(
-            low=-np.inf, high=np.inf, shape=(27,), dtype=np.float32)
+            low=-np.inf, high=np.inf, shape=(observation_dim,), dtype=np.float32)
         self.previous_residual = np.zeros(12, dtype=float)
         self.last_x = 0.0
         self.step_count = 0
@@ -152,6 +169,11 @@ class NovaMujocoResidualEnv(gym.Env):
             self.data.qvel[:] = 0.0
             self.data.ctrl[:] = 0.0
         mujoco.mj_forward(self.model, self.data)
+        # The XML keyframe has the stand pose in qpos but zeroes in ctrl. Hold
+        # the measured starting pose before beginning the commanded ramp.
+        self.data.ctrl[:] = self.data.qpos[self.qpos_ids]
+        self.previous_q = self.data.qpos[self.qpos_ids].copy()
+        self.previous_ctrl = self.data.ctrl.copy()
 
     def _observation(self):
         roll, pitch = _quat_roll_pitch(self.data.xquat[self.base_body])
@@ -162,9 +184,18 @@ class NovaMujocoResidualEnv(gym.Env):
             float(self.data.sensordata[self.sensor_slices[name]].max() > 1e-5)
             for name in CONTACTS
         ])
+        body_state = [roll, pitch, height - 0.235]
+        if self.stability_observation:
+            yaw_error = float(np.arctan2(
+                np.sin(_quat_yaw(self.data.xquat[self.base_body]) - self.initial_yaw),
+                np.cos(_quat_yaw(self.data.xquat[self.base_body]) - self.initial_yaw)))
+            lateral_error = float(
+                self.data.xpos[self.base_body, 1] - self.initial_y)
+            body_state.extend((lateral_error, np.sin(yaw_error), np.cos(yaw_error)))
         q = self.data.qpos[self.qpos_ids]
-        phase = (self.nominal_index % self.samples) / self.samples
-        obs = np.r_[[roll, pitch, height - 0.235], accel, gyro,
+        phase = (max(0, self.step_count - self.ramp_steps) % self.cycle_steps
+                 / self.cycle_steps)
+        obs = np.r_[body_state, accel, gyro,
                     contacts, q, np.sin(2.0 * np.pi * phase),
                     np.cos(2.0 * np.pi * phase)]
         return np.asarray(obs, dtype=np.float32)
@@ -173,12 +204,19 @@ class NovaMujocoResidualEnv(gym.Env):
         obs = self._observation()
         roll, pitch, height_error = map(float, obs[:3])
         dx = float(self.data.xpos[self.base_body, 0] - before_x)
-        q_error = self.data.qpos[self.qpos_ids] - self.nominal[self.nominal_index]
-        contact_bonus = float(np.sum(obs[9:13])) * 0.003
-        return float(
-            1.0 + 18.0 * dx - 8.0 * roll**2 - 8.0 * pitch**2
+        q_error = self.data.qpos[self.qpos_ids] - self.current_nominal
+        contact_bonus = float(np.sum(obs[self.contact_obs_slice])) * 0.003
+        reward = float(
+            1.0 + 18.0 * dx - self.attitude_weight * roll**2
+            - self.attitude_weight * pitch**2
             - 25.0 * height_error**2 - 0.25 * np.dot(q_error, q_error)
             - 0.04 * np.dot(residual, residual) + contact_bonus)
+        if self.stability_observation:
+            yaw_error = float(np.arctan2(obs[4], obs[5]))
+            lateral_error = float(obs[3])
+            reward -= self.lateral_weight * lateral_error**2
+            reward -= self.yaw_weight * yaw_error**2
+        return reward
 
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
@@ -186,10 +224,14 @@ class NovaMujocoResidualEnv(gym.Env):
             self.rng = np.random.default_rng(seed)
         self._randomize_domain()
         self._reset_state()
+        self.initial_y = float(self.data.xpos[self.base_body, 1])
+        self.initial_yaw = _quat_yaw(self.data.xquat[self.base_body])
+        self.initial_ctrl = self.data.ctrl.copy()
         self.previous_residual[:] = 0.0
         self.last_x = float(self.data.xpos[self.base_body, 0])
         self.step_count = 0
         self.nominal_index = 0
+        self.current_nominal = self.nominal[0].copy()
         return self._observation(), {
             "geometry": {
                 "hip_spacing_x_m": HIP_SPACING_X,
@@ -209,7 +251,21 @@ class NovaMujocoResidualEnv(gym.Env):
         delta = np.clip(target - self.previous_residual, -0.02, 0.02)
         residual = self.previous_residual + delta
         self.previous_residual = residual
-        nominal = self.nominal[self.nominal_index]
+        ramp_active = self.step_count < self.ramp_steps
+        if ramp_active:
+            ramp_fraction = (self.step_count + 1) / self.ramp_steps
+            self.nominal_index = 0
+            nominal = (self.initial_ctrl + ramp_fraction
+                       * (self.nominal[0] - self.initial_ctrl))
+        else:
+            sample_phase = ((self.step_count - self.ramp_steps)
+                            % self.cycle_steps) / self.steps_per_sample
+            self.nominal_index = int(np.floor(sample_phase)) % self.samples
+            fraction = sample_phase - np.floor(sample_phase)
+            next_index = (self.nominal_index + 1) % self.samples
+            nominal = ((1.0 - fraction) * self.nominal[self.nominal_index]
+                       + fraction * self.nominal[next_index])
+        self.current_nominal = nominal
         before_x = float(self.data.xpos[self.base_body, 0])
         self.data.ctrl[:] = np.clip(
             nominal + residual, self.model.actuator_ctrlrange[:, 0],
@@ -218,10 +274,16 @@ class NovaMujocoResidualEnv(gym.Env):
             mujoco.mj_step(self.model, self.data)
         reward = self._reward(residual, before_x)
         self.step_count += 1
-        self.nominal_index = (self.nominal_index + 1) % self.samples
         obs = self._observation()
         roll, pitch = map(float, obs[:2])
         height = float(self.data.xpos[self.base_body, 2])
+        q_now = self.data.qpos[self.qpos_ids].copy()
+        command = self.data.ctrl.copy()
+        joint_step = float(np.max(np.abs(q_now - self.previous_q)))
+        tracking_error = float(np.max(np.abs(q_now - command)))
+        command_step = float(np.max(np.abs(command - self.previous_ctrl)))
+        self.previous_q = q_now
+        self.previous_ctrl = command
         terminated = bool(
             not np.isfinite(obs).all() or height < 0.12 or height > 0.40
             or abs(roll) > 0.60 or abs(pitch) > 0.60)
@@ -230,6 +292,15 @@ class NovaMujocoResidualEnv(gym.Env):
         return obs, reward, terminated, truncated, {
             "roll": roll, "pitch": pitch, "height": height,
             "x": self.last_x, "residual_norm": float(np.linalg.norm(residual)),
+            "joint_step_rad": joint_step,
+            "joint_tracking_error_rad": tracking_error,
+            "command_step_rad": command_step,
+            "lateral_error_m": float(self.data.xpos[self.base_body, 1]
+                                      - self.initial_y),
+            "yaw_error_rad": float(np.arctan2(
+                np.sin(_quat_yaw(self.data.xquat[self.base_body]) - self.initial_yaw),
+                np.cos(_quat_yaw(self.data.xquat[self.base_body]) - self.initial_yaw))),
+            "ramp_active": ramp_active,
         }
 
 
@@ -267,6 +338,12 @@ def main():
     parser.add_argument("--timesteps", type=int, default=20000)
     parser.add_argument("--seed", type=int, default=11)
     parser.add_argument("--episode-cycles", type=int, default=5)
+    parser.add_argument("--attitude-weight", type=float, default=8.0,
+                        help="peso común de penalización de roll y pitch")
+    parser.add_argument("--stability-observation", action="store_true",
+                        help="añade deriva lateral y rumbo a la observación (30D)")
+    parser.add_argument("--lateral-weight", type=float, default=8.0)
+    parser.add_argument("--yaw-weight", type=float, default=8.0)
     parser.add_argument("--output", type=Path, default=ROOT /
                         "Experimentos/entrenamiento_ppo_mujoco_20260924")
     parser.add_argument("--no-domain-randomization", action="store_true")
@@ -276,7 +353,10 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     env = NovaMujocoResidualEnv(
         model_path, gait=args.gait, episode_cycles=args.episode_cycles,
-        seed=args.seed, domain_randomization=not args.no_domain_randomization)
+        seed=args.seed, domain_randomization=not args.no_domain_randomization,
+        attitude_weight=args.attitude_weight,
+        stability_observation=args.stability_observation,
+        lateral_weight=args.lateral_weight, yaw_weight=args.yaw_weight)
     algorithm = PPO(
         "MlpPolicy", env, seed=args.seed, verbose=1, n_steps=1024,
         batch_size=256, learning_rate=3e-4, gamma=0.99, gae_lambda=0.95,
@@ -292,6 +372,14 @@ def main():
         "gait": args.gait,
         "seed": args.seed,
         "timesteps": args.timesteps,
+        "episode_cycles": args.episode_cycles,
+        "ramp_duration_s": env.ramp_steps * env.control_dt,
+        "control_dt_s": env.control_dt,
+        "gait_samples": env.samples,
+        "sample_duration_s": env.sample_duration,
+        "steps_per_sample": env.steps_per_sample,
+        "cycle_duration_s": env.cycle_steps * env.control_dt,
+        "nominal_interpolation": "linear_at_control_rate",
         "dimensions_m": {
             "hip_spacing_x": HIP_SPACING_X, "hip_spacing_y": HIP_SPACING_Y,
             "body_length": BODY_LENGTH, "body_width": BODY_WIDTH,
@@ -299,10 +387,14 @@ def main():
             "femur": FEMUR_LENGTH, "tibia": TIBIA_LENGTH,
         },
         "domain_randomization": not args.no_domain_randomization,
-        "observation_dim": 27,
+        "observation_dim": env.observation_space.shape[0],
         "action_dim": 12,
         "residual_limit_rad": 0.08,
         "max_action_step_rad": 0.02,
+        "attitude_weight": args.attitude_weight,
+        "stability_observation": args.stability_observation,
+        "lateral_weight": args.lateral_weight,
+        "yaw_weight": args.yaw_weight,
         "hardware_transfer": False,
     }
     (output / "metadata.json").write_text(

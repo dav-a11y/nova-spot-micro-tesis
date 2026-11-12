@@ -1,0 +1,6 @@
+marcha,semilla,episodios,caidas,pasos_total,epocas_total,recompensa_inicio,recompensa_final,recompensa_convergio,recompensa_conv_pasos,recompensa_conv_epocas,castigo_inicio,castigo_final,castigo_convergio,castigo_conv_pasos,castigo_conv_epocas,premio_inicio,premio_final,ruido_inicio,ruido_final
+paso,9900,6913,40,3000030,14640,-2084.4,-769.1,False,3000030,14638,2508.1,1216.2,False,3000030,14638,423.6,447.1,691.6,221.1
+trote,9900,7468,964,2999909,14640,-9308.0,-286.2,True,1281916,6249,9557.4,725.3,True,1282774,6253,249.3,439.1,12553.2,39.5
+carrera,9900,62746,62746,3000294,14640,-2839.5,-55.0,True,354381,1720,2923.7,101.2,True,354101,1719,84.3,46.2,4893.9,5.8
+gateo,9900,5348,0,3000228,14640,-2173.5,-279.0,False,2842026,13867,2765.3,872.3,False,2842026,13867,591.8,593.3,436.7,128.9
+galope,9900,14632,1231,5001079,24410,-31509.1,-3188.4,False,4537336,22144,31735.8,3568.5,False,4538050,22148,226.7,380.1,21544.2,1543.0

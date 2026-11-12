@@ -1,0 +1,431 @@
+{
+  "seed": "semilla_3013",
+  "timesteps": 100000,
+  "continuado_desde": null,
+  "ciclos_episodio": 6,
+  "ppo": {
+    "lr": 0.0001,
+    "target_kl": 0.03,
+    "n_steps": 2048
+  },
+  "eval_seeds": [
+    801,
+    802,
+    803,
+    804,
+    805
+  ],
+  "control_dt": 0.03,
+  "marcha": {
+    "tipo": "paso",
+    "femur_deg": 15.0,
+    "tibia_deg": 10.0,
+    "fase_s": 0.5,
+    "ciclo_paso_s": 2.0,
+    "ciclo_trote_s": 1.4,
+    "apertura_deg": 8.0,
+    "coxa_deg": 0.0
+  },
+  "pesos": {
+    "avance": 20.0,
+    "actitud": 30.0,
+    "lateral": 20.0,
+    "giro": 10.0,
+    "giro_ciclo": 5.0,
+    "suavidad": 0.3,
+    "coxas": 1.0
+  },
+  "actuador": {
+    "sesiones": [
+      "identificacion_v6_r2_20261019.csv"
+    ],
+    "retardo_s": 0.099,
+    "ganancia": 1.0,
+    "articulaciones": {
+      "front_left_femur_joint": {
+        "nombre": "front_left_femur_joint",
+        "r": -0.993,
+        "retardo_s": 0.099,
+        "ganancia": 1.0,
+        "fiable": true,
+        "muestras": 528,
+        "rango_servo_alcanzado": [
+          84.9,
+          120.4
+        ],
+        "cuentas_por_grado": 2.522,
+        "histeresis_grados": 0.58,
+        "no_linealidad_rms_grados": 0.62,
+        "saturacion_servo_max": 135,
+        "sensor": "C5"
+      },
+      "rear_left_femur_joint": {
+        "nombre": "rear_left_femur_joint",
+        "r": -0.994,
+        "retardo_s": 0.099,
+        "ganancia": 1.0,
+        "fiable": true,
+        "muestras": 528,
+        "rango_servo_alcanzado": [
+          83.3,
+          116.6
+        ],
+        "cuentas_por_grado": 2.508,
+        "histeresis_grados": 0.78,
+        "no_linealidad_rms_grados": 0.68,
+        "saturacion_servo_max": 135,
+        "sensor": "C6"
+      },
+      "front_left_tibia_joint": {
+        "nombre": "front_left_tibia_joint",
+        "r": -0.984,
+        "retardo_s": 0.066,
+        "ganancia": 1.0,
+        "fiable": true,
+        "muestras": 528,
+        "rango_servo_alcanzado": [
+          61.2,
+          82.9
+        ],
+        "cuentas_por_grado": 2.589,
+        "histeresis_grados": 1.12,
+        "no_linealidad_rms_grados": 0.44,
+        "sensor": "ENC_T2"
+      },
+      "rear_right_tibia_joint": {
+        "nombre": "rear_right_tibia_joint",
+        "r": -0.968,
+        "retardo_s": 0.087,
+        "ganancia": 0.9,
+        "fiable": true,
+        "muestras": 528,
+        "nota": "sensor C11 inservible; se asume nominal",
+        "sensor": "C11"
+      },
+      "rear_left_tibia_joint": {
+        "nombre": "rear_left_tibia_joint",
+        "r": -0.967,
+        "retardo_s": 0.099,
+        "ganancia": 1.0,
+        "fiable": true,
+        "muestras": 528,
+        "nota": "corregido 16-oct: en identificacion aislada sigue la orden (ganancia 1.0); el 0.04 de v1 era un error",
+        "cuentas_por_grado": 2.522,
+        "histeresis_grados": 1.13,
+        "no_linealidad_rms_grados": 1.1,
+        "saturacion_servo_max": 105,
+        "sensor": "C10"
+      },
+      "front_right_femur_joint": {
+        "nombre": "front_right_femur_joint",
+        "r": -0.996,
+        "retardo_s": 0.099,
+        "fiable": true,
+        "ganancia": 1.0,
+        "sensor": "C8",
+        "muestras": 528,
+        "histeresis_grados": 0.88
+      },
+      "rear_right_femur_joint": {
+        "nombre": "rear_right_femur_joint",
+        "r": -0.995,
+        "retardo_s": 0.099,
+        "fiable": true,
+        "ganancia": 1.0,
+        "sensor": "C9",
+        "muestras": 528,
+        "histeresis_grados": 0.62
+      },
+      "front_right_tibia_joint": {
+        "nombre": "front_right_tibia_joint",
+        "r": -0.993,
+        "retardo_s": 0.116,
+        "fiable": true,
+        "ganancia": 1.0,
+        "sensor": "ENC_T1",
+        "muestras": 528
+      }
+    },
+    "tibia1_sin_pwm": true,
+    "coxas_fijas_grados": {
+      "coxa1": 150,
+      "coxa2": 45,
+      "coxa3": 55,
+      "coxa4": 150
+    },
+    "periodo_control_s": 0.028999999999999915,
+    "fuente_v2": [
+      "ronda1_11.csv",
+      "ronda1_37.csv",
+      "ronda1_71.csv",
+      "ronda1_nominal.csv"
+    ],
+    "zona_muerta_grados": 0.42,
+    "fuente_v3": "identificacion_sistema.json (escalones y senoides por articulacion, 16-oct)",
+    "identificacion": {
+      "femur2": {
+        "canal": "C5",
+        "cuentas_por_grado": -2.47,
+        "r2_escala": 0.999,
+        "ruido_cuentas": 0.5,
+        "mesetas_grados": {
+          "escalon_+1": 0.5,
+          "escalon_-1": -1.1,
+          "escalon_+2": 1.7,
+          "escalon_-2": -1.9,
+          "escalon_+6": 5.8,
+          "escalon_-6": -5.6,
+          "escalon_+12": 12.2,
+          "escalon_-12": -12.1
+        },
+        "subida_10_90_ms_escalon12": 132,
+        "senoides": {
+          "0.5Hz": {
+            "ganancia": 1.0,
+            "retardo_ms": 80
+          },
+          "1.0Hz": {
+            "ganancia": 0.97,
+            "retardo_ms": 84
+          },
+          "2.0Hz": {
+            "ganancia": 0.87,
+            "retardo_ms": 85
+          }
+        },
+        "acoplamiento_otros_canales": {}
+      },
+      "femur4": {
+        "canal": "C6",
+        "cuentas_por_grado": -2.48,
+        "r2_escala": 1.0,
+        "ruido_cuentas": 0.0,
+        "mesetas_grados": {
+          "escalon_+1": 0.2,
+          "escalon_-1": -1.0,
+          "escalon_+2": 1.9,
+          "escalon_-2": -1.8,
+          "escalon_+6": 5.9,
+          "escalon_-6": -5.8,
+          "escalon_+12": 11.9,
+          "escalon_-12": -12.2
+        },
+        "subida_10_90_ms_escalon12": 163,
+        "senoides": {
+          "0.5Hz": {
+            "ganancia": 1.0,
+            "retardo_ms": 78
+          },
+          "1.0Hz": {
+            "ganancia": 0.96,
+            "retardo_ms": 77
+          },
+          "2.0Hz": {
+            "ganancia": 0.89,
+            "retardo_ms": 77
+          }
+        },
+        "acoplamiento_otros_canales": {}
+      },
+      "tibia2": {
+        "canal": "C9",
+        "cuentas_por_grado": -2.47,
+        "r2_escala": 0.999,
+        "ruido_cuentas": 0.2,
+        "mesetas_grados": {
+          "escalon_+1": 0.3,
+          "escalon_-1": -0.9,
+          "escalon_+2": 1.5,
+          "escalon_-2": -2.1,
+          "escalon_+6": 5.6,
+          "escalon_-6": -5.8,
+          "escalon_+12": 12.1,
+          "escalon_-12": -12.2
+        },
+        "subida_10_90_ms_escalon12": 165,
+        "senoides": {
+          "0.5Hz": {
+            "ganancia": 1.02,
+            "retardo_ms": 73
+          },
+          "1.0Hz": {
+            "ganancia": 0.98,
+            "retardo_ms": 77
+          },
+          "2.0Hz": {
+            "ganancia": 0.92,
+            "retardo_ms": 76
+          }
+        },
+        "acoplamiento_otros_canales": {}
+      },
+      "tibia3": {
+        "canal": "C11",
+        "cuentas_por_grado": 0.73,
+        "r2_escala": 0.008,
+        "ruido_cuentas": 0.5,
+        "mesetas_grados": {
+          "escalon_+1": -55.9,
+          "escalon_-1": -49.1,
+          "escalon_+2": -57.3,
+          "escalon_-2": -46.4,
+          "escalon_+6": 182.7,
+          "escalon_-6": -32.7,
+          "escalon_+12": -88.6,
+          "escalon_-12": -10.9
+        },
+        "subida_10_90_ms_escalon12": 0,
+        "senoides": {
+          "0.5Hz": {
+            "ganancia": 2.96,
+            "retardo_ms": 1504
+          },
+          "1.0Hz": {
+            "ganancia": 2.38,
+            "retardo_ms": 863
+          },
+          "2.0Hz": {
+            "ganancia": 10.18,
+            "retardo_ms": 6
+          }
+        },
+        "acoplamiento_otros_canales": {}
+      },
+      "tibia4": {
+        "canal": "C10",
+        "cuentas_por_grado": -2.45,
+        "r2_escala": 1.0,
+        "ruido_cuentas": 0.5,
+        "mesetas_grados": {
+          "escalon_+1": 0.2,
+          "escalon_-1": -0.6,
+          "escalon_+2": 1.9,
+          "escalon_-2": -1.8,
+          "escalon_+6": 6.0,
+          "escalon_-6": -5.9,
+          "escalon_+12": 12.1,
+          "escalon_-12": -12.0
+        },
+        "subida_10_90_ms_escalon12": 99,
+        "senoides": {
+          "0.5Hz": {
+            "ganancia": 1.04,
+            "retardo_ms": 63
+          },
+          "1.0Hz": {
+            "ganancia": 0.98,
+            "retardo_ms": 67
+          },
+          "2.0Hz": {
+            "ganancia": 0.74,
+            "retardo_ms": 63
+          }
+        },
+        "acoplamiento_otros_canales": {}
+      }
+    },
+    "fuente_v4": "barrido de rango ±40° (barrido_rango/modelo_rango.json)",
+    "tibia1_con_pwm": true,
+    "retardo_pasos_rango": [
+      1,
+      4
+    ],
+    "fuente_ciclo": {
+      "nombre": "ciclo2",
+      "caminatas": [
+        "/home/pavilion/Documentos/Cuadrupedo/Experimentos/camaras/grabaciones/rep_ciclo2_gateo_base_r1",
+        "/home/pavilion/Documentos/Cuadrupedo/Experimentos/camaras/grabaciones/rep_ciclo2_gateo_base_r2",
+        "/home/pavilion/Documentos/Cuadrupedo/Experimentos/camaras/grabaciones/rep_ciclo2_gateo_ppo1_r1",
+        "/home/pavilion/Documentos/Cuadrupedo/Experimentos/camaras/grabaciones/rep_ciclo2_gateo_ppo1_r2",
+        "/home/pavilion/Documentos/Cuadrupedo/Experimentos/camaras/grabaciones/rep_ciclo2_gateo_ppo2_r1",
+        "/home/pavilion/Documentos/Cuadrupedo/Experimentos/camaras/grabaciones/rep_ciclo2_gateo_ppo2_r2",
+        "/home/pavilion/Documentos/Cuadrupedo/Experimentos/camaras/grabaciones/rep_ciclo2_trote_base_r1",
+        "/home/pavilion/Documentos/Cuadrupedo/Experimentos/camaras/grabaciones/rep_ciclo2_trote_base_r2",
+        "/home/pavilion/Documentos/Cuadrupedo/Experimentos/camaras/grabaciones/rep_ciclo2_trote_ppo1_r1",
+        "/home/pavilion/Documentos/Cuadrupedo/Experimentos/camaras/grabaciones/rep_ciclo2_trote_ppo1_r2"
+      ],
+      "resumen": {
+        "front_right_femur_joint": {
+          "sensor": "C8",
+          "caminatas": 10,
+          "retardo_ms": 99,
+          "histeresis_grados": 0.88,
+          "residuo_grados": 1.6,
+          "retardo_min_ms": 99,
+          "retardo_max_ms": 99
+        },
+        "front_left_femur_joint": {
+          "sensor": "C5",
+          "caminatas": 10,
+          "retardo_ms": 99,
+          "histeresis_grados": 0.58,
+          "residuo_grados": 1.79,
+          "retardo_min_ms": 99,
+          "retardo_max_ms": 99
+        },
+        "rear_right_femur_joint": {
+          "sensor": "C9",
+          "caminatas": 10,
+          "retardo_ms": 99,
+          "histeresis_grados": 0.62,
+          "residuo_grados": 2.47,
+          "retardo_min_ms": 66,
+          "retardo_max_ms": 99
+        },
+        "rear_left_femur_joint": {
+          "sensor": "C6",
+          "caminatas": 10,
+          "retardo_ms": 99,
+          "histeresis_grados": 0.78,
+          "residuo_grados": 1.96,
+          "retardo_min_ms": 99,
+          "retardo_max_ms": 99
+        },
+        "front_right_tibia_joint": "sin sensor válido",
+        "front_left_tibia_joint": {
+          "sensor": "ENC_T2",
+          "caminatas": 10,
+          "retardo_ms": 66,
+          "histeresis_grados": 1.12,
+          "residuo_grados": 1.25,
+          "retardo_min_ms": 66,
+          "retardo_max_ms": 99
+        },
+        "rear_right_tibia_joint": "sin sensor válido",
+        "rear_left_tibia_joint": {
+          "sensor": "C10",
+          "caminatas": 10,
+          "retardo_ms": 99,
+          "histeresis_grados": 1.13,
+          "residuo_grados": 1.86,
+          "retardo_min_ms": 66,
+          "retardo_max_ms": 99
+        }
+      }
+    }
+  },
+  "hardware_transfer": false,
+  "observacion": [
+    "front_left_femur_joint",
+    "front_left_tibia_joint",
+    "front_right_femur_joint",
+    "front_right_tibia_joint",
+    "rear_left_femur_joint",
+    "rear_left_tibia_joint",
+    "rear_right_femur_joint",
+    "rear_right_tibia_joint",
+    "sin_fase",
+    "cos_fase",
+    "residual_previo x12"
+  ],
+  "sin_residual": [
+    "front_left_coxa_joint",
+    "front_right_coxa_joint",
+    "rear_left_coxa_joint",
+    "rear_right_coxa_joint"
+  ],
+  "aleatorizar_actuador": true,
+  "limite_cambio_grados": 3.0000000000000004,
+  "nota": "Simulación ajustada al robot real del 16-oct; no transferida al robot.",
+  "origen": "ppo_v22_paso/semilla_3013/intermedias/policy_100000_steps.zip"
+}

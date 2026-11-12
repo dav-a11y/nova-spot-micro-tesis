@@ -1,0 +1,1 @@
+bus I2C bloqueado (SDA a 0) durante la caminata; caminata incompleta o sin sensores. 20-oct 09:10

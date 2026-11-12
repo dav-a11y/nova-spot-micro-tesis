@@ -1,0 +1,106 @@
+\chapter{Cronograma y presupuesto}
+
+El cronograma original se utilizó como punto de partida, pero el seguimiento
+se actualizó semanalmente según evidencia producida y bloqueos reales. Al cierre
+de esta versión estaban desarrolladas las líneas base de simulación, la
+integración de monitoreo, la instrumentación y calibración del robot, la
+identificación del actuador, el entrenamiento de las políticas PPO y su
+evaluación con el robot suspendido. Permanecían abiertas la seguridad
+eléctrica, la migración del bucle de control a la Raspberry~Pi y la evaluación
+de la locomoción apoyada.
+
+\section{Cronograma planificado}
+
+La figura~\ref{fig:cronograma-anteproyecto} reproduce el cronograma de 32
+semanas del anteproyecto. Frente a él, el modelado y la simulación se
+extendieron más de lo previsto, la arquitectura electrónica se resolvió de forma
+provisional con una interfaz de E/S para no detener los ensayos, y la
+evaluación de estabilidad con apoyo quedó fuera del periodo cubierto por esta
+versión.
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{ganttchart}[
+vgrid,
+hgrid,
+bar/.style={fill=blue!40},
+bar height=0.6
+]{1}{32}
+\gantttitle{Semanas de trabajo}{32} \\
+\gantttitlelist{1,...,32}{1} \\
+\ganttbar{Definición del problema}{1}{2} \\
+\ganttbar{Formulación de objetivos y alcance}{2}{3} \\
+\ganttbar{Estado del arte y revisión bibliográfica}{3}{5} \\
+\ganttbar{Redacción del marco teórico y alcance}{4}{5} \\
+\ganttbar{Definición de metodología y presupuesto}{5}{6} \\
+\ganttbar{Modelado cinemático del robot}{7}{15} \\
+\ganttbar{Validación de los modelos}{16}{17} \\
+\ganttbar{Diseño de arquitectura electrónica}{16}{18} \\
+\ganttbar{Implementación electrónica}{17}{20} \\
+\ganttbar{Programación del sistema embebido}{19}{23} \\
+\ganttbar{Pruebas individuales de articulaciones}{21}{25} \\
+\ganttbar{Desarrollo de algoritmos de locomoción}{23}{29} \\
+\ganttbar{Evaluación de estabilidad}{26}{31} \\
+\ganttbar{Validación experimental}{27}{31} \\
+\ganttbar{Redacción del documento final}{28}{31} \\
+\ganttbar{Revisión del asesor}{28}{31} \\
+\ganttbar{Entrega del trabajo de grado}{31}{32} \\
+\ganttbar{Sustentación}{31}{32}
+\end{ganttchart}%
+}
+\caption{Cronograma del anteproyecto. Fuente: elaboración propia.}
+\label{fig:cronograma-anteproyecto}
+\end{figure}
+
+\section{Presupuesto del anteproyecto}
+
+El presupuesto del anteproyecto consideró los costos directos de componentes
+electrónicos y servomotores, con precios de referencia de tiendas de
+electrónica y comercio electrónico en Colombia: valores promedio de kits para
+los componentes pequeños y precios de mercado para los elementos más costosos.
+Los equipos del laboratorio de robótica (osciloscopio, fuente de laboratorio,
+estación de soldadura, computadores y la propia plataforma cuadrúpeda) son
+infraestructura institucional, por lo que no se incluyó su costo ni se asignó
+un prorrateo; si se adoptara, se calcularía según el número de estudiantes o
+proyectos que usan los equipos durante su vida útil.
+
+\begin{table}[H]
+\centering
+\caption{Costos directos estimados en el anteproyecto.}
+\label{tab:costos_materiales}
+\begin{tabular}{clcr}
+\toprule
+\textbf{Ítem} & \textbf{Descripción} & \textbf{Cantidad} & \textbf{Total (COP)} \\
+\midrule
+1 & Raspberry~Pi~5 de 16~GB & 1 & 1.035.300 \\
+2 & Módulo IMU BNO055 de 9 GDL & 1 & 65.000 \\
+3 & Sensor de temperatura digital DS18B20 & 12 & 5.500 \\
+4 & Servomotores & 12 & 384.000 \\
+5 & Conector hembra de 2,54~mm 1$\times$14 & 1 & 2.000 \\
+6 & Impresión de PCB & 1 & 50.000 \\
+7 & Controlador PWM PCA9685 & 1 & 35.000 \\
+8 & Regulador DC--DC LM2596ADJ & 1 & 15.000 \\
+\midrule
+\multicolumn{3}{r}{\textbf{Suma de los ítems}} & \textbf{1.591.800} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El resumen del anteproyecto reportó un total general de 2.029.270~COP, sin
+costos prorrateados, que no coincide con la suma de los ítems listados
+(1.591.800~COP); la diferencia de 437.470~COP no está desglosada. El valor de
+los doce sensores DS18B20 (5.500~COP en total) también requiere aclarar si es
+unitario o total.
+
+\section{Conciliación con los componentes utilizados}
+
+La plataforma ejecutada se apartó de esa lista. Se empleó una Raspberry~Pi~4 en
+lugar de la Raspberry~Pi~5 presupuestada; los servomotores son MG996R; la PCB y los sensores de temperatura no forman parte
+de la plataforma ensayada, y se añadieron
+potenciómetros y encoders magnéticos AS5600 con su multiplexor TCA9548A, el
+multiplexor analógico CD74HC4067 y la interfaz de E/S. La lista completa, con el
+estado de cada componente (en uso, en inventario o por adquirir), está en el
+anexo (tabla~\ref{tab:lista-materiales}). El presupuesto anterior se conserva
+como antecedente y no se presenta como costo final ejecutado; la conciliación
+con los precios de compra reales permanece pendiente.

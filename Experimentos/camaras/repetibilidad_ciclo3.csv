@@ -1,0 +1,10 @@
+condicion,articulacion,n,media_grados,sd_entre_reps,cv_pct,tendencia_grados_por_min,valores
+gateo_ppo1,femur1,2,1.129,0.163,14.5,-0.4194,1.245 1.014
+gateo_ppo1,femur2,2,1.62,0.119,7.4,-0.1738,1.535 1.704
+gateo_ppo1,femur3,2,2.356,0.092,3.9,-0.4735,2.421 2.290
+gateo_ppo1,femur4,2,1.423,0.102,7.2,-0.1528,1.351 1.495
+gateo_ppo1,tibia2,2,1.287,0.424,32.9,-0.0078,1.587 0.988
+gateo_ppo1,tibia4,2,1.078,0.058,5.3,-0.1387,1.037 1.118
+gateo_ppo1,coxa2,2,3.521,1.539,43.7,0.3494,4.610 2.433
+gateo_ppo1,coxa3,2,1.09,0.117,10.8,-0.0809,1.173 1.007
+gateo_ppo1,coxa4,2,1.145,0.304,26.6,-0.0951,1.360 0.930

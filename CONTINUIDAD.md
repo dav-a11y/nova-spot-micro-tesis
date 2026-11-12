@@ -1,6 +1,6 @@
 # Continuidad histórica de la tesis Nova Spot Micro
 
-Última actualización: 25 de septiembre de 2026, America/Bogota.
+Última actualización: 14 de octubre de 2026, America/Bogota.
 
 
 ## Objetivos vigentes — corrección del usuario del 7 de septiembre de 2026
@@ -2288,3 +2288,635 @@ esta caracterización. Antes de realimentación o marcha faltan cero/sentido por
 articulación, tratamiento del cruce 0°/360°, repetibilidad en movimiento,
 márgenes respecto a topes y resolución de señales variables, además de las
 puertas eléctricas y de parada segura.
+
+### Cierre del dataset de grados absolutos AS5600 — 29 de septiembre de 2026
+
+Por solicitud del operador, las veinte muestras por articulación y sentido
+quedan finalizadas como dataset de ángulos absolutos del imán. Se actualizaron
+el estado y alcance en `Raspberry/configuracion/as5600_caracterizacion_provisional.yaml`
+y `Raspberry/RESUMEN_CARACTERIZACION_AS5600_2026-09-28.md`; se preservan los
+rangos amplios y las señales inestables. “Finalizado” no significa cero,
+sentido o límites articulares calibrados, y no habilita PWM ni caminata. El
+barrido único posterior del 29 de septiembre se mantiene separado de las
+ventanas de veinte muestras.
+
+El operador fijó además intervalos finales de referencia magnética para las
+doce articulaciones y ambos sentidos. Se registraron en el YAML bajo
+`operator_fixed_reference_ranges_deg` y en el resumen tabular. Son referencias
+absolutas del imán, no límites mecánicos ni posiciones articulares en radianes;
+se preservan intactas las estadísticas empíricas originales.
+
+### Pruebas físicas, visor 3D y preparación de calibración — 29 de septiembre de 2026
+
+El archivo `Experimentos/visor_pose_inicial_3d.py` amplió el deslizador de
+tibia hasta `+1.00 rad`, solo en la visualización. Se abrió con Pata 4; después
+el operador compartió una postura de Pata 3: coxa `0.10`, fémur `-0.42` y
+tibia `-0.88 rad`. Esos radianes no se enviaron al robot porque no existe
+conversión calibrada a PWM.
+
+Se hizo un barrido AS5600 de solo lectura en la Raspberry; respondieron las
+doce rutas. Ángulos RAW de imán de esa captura (grados; no mezclados con las
+ventanas de 20 muestras ni convertidos a radianes):
+
+| Pata | Coxa | Fémur | Tibia |
+|---:|---:|---:|---:|
+| 1 | 286.172 | 179.824 | 140.010 |
+| 2 | 118.477 | 261.299 | 9.668 |
+| 3 | 137.900 | 194.414 | 335.039 |
+| 4 | 148.887 | 317.725 | 354.814 |
+
+El operador informó haber hecho la preparación indicada para calibrar Pata 1,
+pero no se han recibido los resultados de los pulsos, la clasificación del
+servo (posicional o giro continuo) ni la respuesta de la tibia 1. Por tanto,
+ningún servo queda marcado como calibrado. Mapa de Pata 1: PCA CH0/AS5600
+`0x71`/3 coxa; CH4/`0x71`/1 fémur; CH8/`0x71`/0 tibia. Las señales de coxa 1
+y fémur 1 han dado campo magnético débil. La señal de tibia 1 fue válida, pero
+una prueba previa `1500→1505→1500 µs` dio movimiento no repetible; revisar su
+acople antes de inferir una escala.
+
+Tras adaptar `Raspberry/codigo/thonny_marcha_nova.py` al preset de avance
+Nova `march_forward`, se ejecutaron por SSH cuatro invocaciones de un ciclo;
+cada registro terminó con código 0 y apagado de PWM, aunque varias lecturas
+AS5600 dieron error I²C 121. Los registros de fases prueban que el script
+emitió órdenes, no que alcanzara una posición calibrada. El operador informó
+en una prueba anterior movimiento sin topar, sin medición repetible de la
+postura. Se comprobó después en la Pi `hardware_ready: false`, cero servos
+marcados calibrados y `nova-hardware.service` inactivo. El script directo de
+Thonny llama a `arm()`/`set_pulse_us()` sin consultar esa configuración; no
+volver a ejecutarlo hasta cerrar calibración y protección. Se registra que esa
+ruta directa se usó en las invocaciones anteriores.
+
+La ficha de `MG996R-360` anuncia 360 grados, pero su descripción suministrada
+también habla de giro de 60° y no define relación PWM--posición; el modo real
+de control todavía debe identificarse con un servo aislado y sin carga.
+Siguiente acción: registrar exactamente ese resultado y las mediciones de
+tibia 1 antes de modificar `calibracion_servos.csv` o habilitar hardware.
+
+## Campaña MuJoCo step transferida desde JULI — 28 de septiembre de 2026
+
+Se verificó por huella SSH y se conectó al equipo `JULI` como `juli`. La campaña
+`Experimentos/campana_distribuida_step_s23_20260928` se copió sin eliminar ni
+modificar el original. La evidencia tiene 80 políticas, 80 semillas completas
+y 160 filas de evaluación; todas las sumas SHA-256 incluidas coinciden. El
+paquete (333 archivos versionados contando código) quedó en la rama
+`resultados/mujoco-step-80-semillas-20260928`, commit `106ee5a`, con autor
+configurado `davidediaz <davidediaz@users.noreply.github.com>`. La rama sigue
+local y aún no se ha publicado en GitHub. Ninguna política está aprobada para
+transferencia física.
+
+El análisis reproducible quedó en
+`Experimentos/campana_distribuida_step_s23_20260928/INFORME_ANALISIS_80_SEMILLAS.md`.
+La diferencia media pareada PPO−nominal es +2,903 m de avance (78/80 semillas
+mejoran) y +34,18 de retorno (76/80), pero también +0,03342 rad en inclinación
+reportada (80/80 empeoran). No hay política que mejore avance sin aumentar
+inclinación. La evaluación reutiliza cinco episodios sin aleatorización de
+dominio; requiere validación más amplia. `hardware_transfer=false` sigue vigente.
+
+Para avanzar se preparó una campaña de desarrollo separada,
+`Experimentos/campana_step_estabilidad_w32_20260928`: PPO desde cero con peso de
+actitud 32 (base 8), cinco semillas predefinidas 11/23/37/53/71, 200.000 pasos
+por semilla y evaluación de desarrollo de 20 ciclos con semillas 601–605. Las
+semillas finales 101/202/303/404/505 quedan reservadas. Se amplió el informe
+MuJoCo para recoger roll/pitch RMS y máximos, altura, contactos, deriva lateral,
+seguimiento y saltos articulares. Los umbrales de la ficha de aprobación siguen
+sin firma: la campaña es desarrollo, no certificación ni transferencia física.
+
+La primera tanda w32 terminó las cinco semillas, pero no se acepta: la evaluación
+mostró excursión lateral media 6,886 m y error articular máximo medio 0,1461 rad.
+Además, una auditoría detectó que el entorno antiguo recorría nueve ciclos por
+ciclo declarado (índice de fase avanzaba cada 20 ms, aunque cada muestra debía
+durar nueve pasos). Por ello las 80 semillas anteriores y w32 son exploratorias,
+no evidencia válida a la cadencia prevista. Se corrigió el entorno para
+interpolar cada muestra durante nueve pasos: el nominal ahora completa cinco
+ciclos en 1.440 pasos, 5,76 s por ciclo, y su salto de referencia tras el arranque
+es 0,0081 rad. Siguiente campaña aislada `campana_step_estabilidad_xy_w32_20260928`:
+actitud 32, posición lateral/rumbo 8 cada uno, observación de 30 dimensiones,
+semillas 11/23/37/53/71; evalúa desarrollo 701–705 a 20 ciclos. No usará las
+semillas finales reservadas.
+
+La campaña lateral/rumbo terminó el 28 de septiembre sin errores: cinco PPO de
+200.000 pasos y cinco episodios de evaluación de desarrollo por política, cada
+uno de 20 ciclos. Informe y artefactos:
+`Experimentos/campana_step_estabilidad_xy_w32_20260928/INFORME_RESULTADOS.md`.
+Las políticas mantienen inclinación RMS y altura dentro de los objetivos
+numéricos provisionales, pero no se selecciona ninguna: tres de cinco avanzan
+menos que el nominal; excursión lateral máxima media 0,0826 m frente a 0,0040 m
+nominal; deriva lateral final media 0,0360 m; contacto medio 0,8355. El error
+articular máximo medio 0,0738 rad y RMS medio 0,0138 rad empeoran frente al
+nominal, pero cumplen los límites de ficha de 0,15 rad máximo y 0,05 rad RMS.
+Las semillas finales 101/202/303/404/505 permanecen sin usar.
+La ficha de aprobación sigue sin firma, por lo que la marcha no está aprobada y
+no se debe transferir PPO al robot. Próximo paso: corregir/validar control
+nominal lateral y seguimiento articular antes de otra optimización PPO.
+
+Corrección de referencia step: la trayectoria anterior de 32 puntos/0,18 s
+tenía un salto articular de waypoint máximo de 0,07277 rad. Se cambió a 48
+puntos/0,12 s, conservando 5,76 s por ciclo; el salto nominal calculado pasa a
+0,04911 rad. Pasaron las 15 pruebas cinemáticas y la respuesta dinámica
+nominal a 20 ciclos en MuJoCo antes de iniciar la siguiente campaña.
+
+### Referencia step de 48 waypoints y PPO lateral — 29 de septiembre de 2026
+
+La referencia se corrigió de 32 puntos/0,18 s a 48/0,12 s, manteniendo ciclo
+5,76 s. El salto de waypoint bajó de 0,072772 a 0,049115 rad; pasaron las 15
+pruebas de cinemática. En MuJoCo, la línea base de 20 ciclos tuvo 0,08415 m de
+avance, 0,00415 m de excursión lateral, error articular RMS 0,01170 rad y
+máximo 0,03795 rad; no hubo caída.
+
+La campaña nueva `Experimentos/campana_step_estabilidad_xy48_w32_l64_20260929`
+entrenó cinco PPO (11/23/37/53/71, 200.000 pasos c/u; actitud32/lateral64/
+rumbo32). Resultado aleatorizado emparejado: avance medio PPO 0,04219 m vs
+0,08414 nominal; excursión lateral máxima 0,06486 m vs 0,00417 m. Solo 1/5
+políticas supera el avance nominal. El error articular máximo medio 0,06210 rad
+y RMS 0,01297 rad sí están bajo los límites de ficha 0,15/0,05 rad. Escala de
+residual 0,25 reduce desviación, pero aún da 0,07301 m de avance y 0,02438 m de
+excursión lateral, peor que nominal. No se selecciona PPO; semillas finales
+101/202/303/404/505 siguen reservadas.
+
+La matriz sin aleatorización repitió un estado idéntico. En la evaluación
+emparejada con fricción/amortiguamiento aleatorizados, el avance nominal varió
+0,08348–0,08467 m y la excursión lateral 0,00386–0,00417 m. Las filas nominales
+del CSV agregado coinciden porque todas las políticas comparten las mismas
+cinco condiciones; no se perturbó pose inicial. Faltan perturbaciones
+iniciales representativas, margen estático y protocolo formal firmado. La marcha no está
+formalmente aprobada ni se autoriza transferencia física. Informe:
+`Experimentos/campana_step_estabilidad_xy48_w32_l64_20260929/INFORME_RESULTADOS.md`.
+
+Se solicitó apagar la Raspberry Pi. Se verificó que `172.18.81.198` presenta el
+hostname `cuadrupedo-pi` y responde por la identidad SSH conocida. `sync` se
+completó, pero el apagado remoto no: la cuenta requiere contraseña para `sudo`
+y systemd requiere autorización interactiva. El operador debe ejecutar
+`sudo poweroff` localmente o `ssh -t pavilion@172.18.81.198 'sudo poweroff'`
+desde una terminal propia y escribir allí la contraseña. La alimentación
+independiente de los servos debe permanecer desconectada.
+
+### Raspberry Pi: conexión SSH vigente — 29 de septiembre de 2026
+
+La Raspberry volvió a la red y se conectó satisfactoriamente como
+`cuadrupedo-pi` en `10.139.240.198`; comprobación remota: hostname y uptime
+(39 minutos al momento de la conexión). La clave ED25519 presentada coincide
+con la huella SSH ya registrada para `cuadrupedo-pi`:
+`SHA256:mTERAysLSgm2Xlw36tOoV0uv5gC3vj7Xoycel2xe16M`.
+Se actualizó `/home/pavilion/.ssh/config`, alias `cuadrupedo-pi`, para usar
+esta IP; la conexión normal es `ssh cuadrupedo-pi`. La IP previa
+`172.18.81.198` ya no es válida en la red actual. La IP parece asignada por
+DHCP y podría cambiar; si vuelve a fallar, consultar `hostname -I` en la Pi o
+reservar esta dirección en el router. No se enviaron órdenes de movimiento.
+
+### Prueba mínima de tibia 1 y diagnóstico de sensores — 29 de septiembre de 2026
+
+Por autorización expresa se probó únicamente tibia 1, PCA CH8 y AS5600
+`0x71`/canal 0: `1500 → 1505 → 1500 µs`. El sensor partió en 144,756°, marcó
+150,645° a 1505 µs (+5,889°) y 161,455° al volver a 1500 µs (+16,699°). Una
+lectura posterior con PWM deshabilitado llegó a 170,947°, pese a que el estado
+magnético fue válido. No se continuó con otra articulación ni con una marcha.
+
+Veinte barridos pasivos encontraron seis sensores magnéticamente válidos, pero
+coxa 2 tuvo 27,070° de dispersión pese a `MD=1`; solo cinco señales fueron
+estables dentro de 2° y magnéticamente válidas. Las restantes incluyen tres
+estados de imán débil y tres sin detección. El detalle y la tabla completa están
+en `Raspberry/DIAGNOSTICO_AS5600_2026-09-29_POSTPRUEBA.md`.
+
+Después de la prueba se forzó OE BCM17 en HIGH y se verificaron individualmente
+los dieciséis canales en `FULL_OFF`; no se confió en el registro de apagado
+global porque su lectura no confirmó el bit. Se encontró que el driver local
+liberaba OE al cerrar y no fijaba `FULL_OFF` individual por canal. Se corrigió
+`Raspberry/codigo/pca9685_seguro.py`, se añadieron cuatro pruebas unitarias y
+pasaron también `py_compile`. Luego se instaló en la Pi con respaldo del driver
+previo; SHA-256 desplegado `a92e47aa75139f42b04cead746112818cddb6e1cdc35abdb22ef747eca8321e1`.
+En la Pi pasó `compile()` y se verificó OE BCM17 alto, 16/16 canales
+individualmente `FULL_OFF` y servicio de hardware inactivo. Se continúa solo
+con análisis pasivo; no se manda otra orden PWM mientras el retorno no sea
+repetible y la inestabilidad de sensores no esté resuelta.
+
+Reverificación tras indicar el operador que no movió el robot: quince barridos
+pasivos sin PWM repitieron señales variables (tibia 3 26,191°, coxa 3 28,389°,
+coxa 1 58,359° y coxa 2 27,070° de rango circular; algunas con estado magnético
+inválido). No se atribuye una causa única; se deben revisar alineación/fijación
+de imanes y sensores, cableado/alimentación y holgura o caída mecánica sin par.
+La razón directa de que no haya movimiento quedó verificada: OE BCM17 HIGH,
+16/16 canales PCA `FULL_OFF`, `hardware_ready: false`, 0/12 calibrados y
+servicio `nova-hardware.service` inactivo. Ningún PWM se ejecuta. Detalle en
+`Raspberry/DIAGNOSTICO_AS5600_2026-09-29_POSTPRUEBA.md`.
+
+Al continuar, se hicieron 60 barridos pasivos adicionales: las 12 rutas I²C
+respondieron 60/60. Seis sensores mantuvieron estado magnético OK, pero coxa 2
+dispersó 34,805° pese a MD=1; solo cinco señales fueron simultáneamente válidas
+y estables dentro de 2°. La falla no es el bus I²C: las salidas permanecen
+inhibidas intencionalmente y el feedback magnético/mecánico de siete ejes no es
+usable. Resultado completo en `Raspberry/DIAGNOSTICO_AS5600_2026-09-29_POSTPRUEBA.md`.
+
+Durante una posterior ventana en que el operador dijo enviar pulsos, se hizo
+otra lectura estrictamente pasiva de fémur 1 (60 muestras): 167,607–167,783° y
+`0x13` en todas (`MD=0`, `ML=1`, imán débil). No se envió PWM ni se pudo
+correlacionar el ángulo RAW con pulsos cuyos valores no fueron capturados. No
+cuenta como movimiento confirmado ni calibración; detalle en el diagnóstico.
+
+### Continuación de movimiento en MuJoCo headless — 29 de septiembre de 2026
+
+Como continuación sin tocar la realimentación física, se inició MuJoCo headless
+en `ROS_DOMAIN_ID=73` aislado de la Pi. Se verificaron los nodos de simulación,
+`gait_controller`, `joint_trajectory_controller`, métricas y supervisor. El
+gateo nominal corrió durante 6,71 s (parámetros congelados: 24 muestras, ciclo
+4,32 s, paso 18 mm y elevación 14 mm) y recibió `stop`; la simulación quedó en
+reposo. Una muestra de métricas posterior al stop dio x=0,004767 m,
+y=-0,000105 m, altura=0,234259 m; es una instantánea posterior, no métricas
+agregadas del ciclo. No se envió PWM ni se comunicó con la Raspberry. El proceso
+MuJoCo permanece abierto en reposo para inspección.
+
+### Reanudación de pruebas AS5600 desde Arduino Uno; Raspberry no alcanzable — 7 de octubre de 2026
+
+Se retomó el diagnóstico desde el Uno, que ya compila y ejecuta Blink. El escaneo
+exhaustivo previo cubrió direcciones I²C 0x08–0x77 en los canales disponibles de
+ambos TCA9548A y detectó doce AS5600 en `0x70` canales 0–5 y `0x71` canales 0, 1,
+3, 4, 5 y 6. En el sketch de 12 sensores, el operador identificó FEMUR 2 en
+`0x71`/canal 6 y se observó una lectura de 226,14°; las lecturas iniciales de
+aproximadamente nueve iteraciones variaron como máximo ~0,09° por sensor. Esto
+es una observación preliminar, no la caracterización de 100 muestras ni una
+calibración.
+
+Queda una discrepancia de asignación por resolver antes de alterar el mapa
+oficial: `Raspberry/CONEXIONES.md` asigna FEMUR 2 a `0x71`/canal 5 y COXA 2 al
+canal 6, mientras el sketch del Uno y la identificación física comunicada por
+el operador intercambian esas dos etiquetas. La presencia de `0x36` en ambas
+rutas no basta por sí sola para identificar cuál articulación es cada sensor.
+
+Se intentó reconectar por el alias SSH conocido `cuadrupedo-pi` y la dirección
+registrada `10.139.240.198`, desde el host `10.200.8.231/20`. SSH agotó el tiempo
+de conexión y tampoco se encontró la Pi por mDNS. No se ejecutó ningún comando
+remoto ni se obtuvieron nuevas lecturas de la Raspberry. El último estado
+documentado de seguridad permanece: OE BCM17 alto, 16/16 canales PCA9685 en
+`FULL_OFF`, `hardware_ready: false`, 0/12 servos calibrados y servicio inactivo.
+En esta sesión no se envió PWM ni se movieron servos.
+
+Para continuar, encender/conectar la Raspberry a una red alcanzable y confirmar
+cuando esté disponible. Revalidar la identidad SSH conocida, leer estado de
+seguridad sin alterarlo y usar únicamente el lector pasivo de AS5600. Comparar
+especialmente `0x71`/canales 5 y 6; reconciliar FEMUR 2/COXA 2 con seguimiento
+físico y lecturas repetibles antes de corregir `Raspberry/CONEXIONES.md`. No
+habilitar PWM ni declarar estabilidad con la observación preliminar del Uno.
+
+### Captura de referencias por postura, 100 muestras — 7 de octubre de 2026
+
+El operador aportó estadísticas de 100 lecturas por articulación para fémures
+(adelante/atrás), coxas (arriba/abajo) y tibias (adelante/atrás). Aclaró que
+servos/patas 1 y 2 son delanteros. Los datos completos quedan en
+`Raspberry/configuracion/as5600_caracterizacion_provisional.yaml`, bajo
+`operator_posture_samples_2026_10_07`, y resumidos en
+`Raspberry/RESUMEN_CARACTERIZACION_AS5600_2026-09-28.md`. Son ángulos absolutos
+del imán, no límites de servo/PWM ni topes mecánicos calibrados. Destaca fémur 3
+variable (15,820° de rango comunicado en postura adelante) y coxa 3 con 0,791°
+en ambos estados. La captura se conserva separada del dataset previo de 20
+muestras; no modifica la autorización de control, que continúa desactivada.
+
+### Registro de transferencia a Raspberry — comprobado el 7 y asentado el 14 de octubre de 2026
+
+Se recuperó la conexión SSH al hostname `cuadrupedo-pi.local`, IP observada
+`10.150.110.198`; la clave SSH conocida fue aceptada y se actualizó el alias
+local `cuadrupedo-pi` para resolver el hostname mDNS, ya que la IP anterior
+rechazaba conexiones. Se verificó la conexión por alias, hostname e IP. Esto no
+implica una prueba nueva de sensores ni de actuadores.
+
+Para compartir los datos de estabilidad y las referencias angulares se creó
+`Nuevo.md` y se copió, sin reemplazar archivos, a la raíz del checkout de la
+Raspberry (`/home/pavilion/nova-spot-micro-tesis/Nuevo.md`). También se copiaron
+`Raspberry/AVANCES_2026-10-07.md` y una copia fechada del dataset a
+`Raspberry/configuracion/as5600_caracterizacion_2026-10-07.yaml`. Los hashes
+SHA-256 remoto/local coincidieron: `Nuevo.md`
+`38f0a0e371a3727552ef151f7f3fc519dec31f0c60444fb492e62c76ab6326d1`, informe
+`4366ec67fc809f7023ef153b6e8cfe7e557c3dd097aea59d0c0cbff74755fbf2`, y YAML
+`4de8926f13b71189d923aa40a8db0fbdd5ff2ec46cfeac693ca31c057cf40bfc`. El YAML
+se pudo leer en la Pi y contiene 24 combinaciones articulación/postura, con 100
+muestras por combinación.
+
+Se transfirió además el archivo exacto `/home/pavilion/CODIGO/CODIGO.ino` a
+`Raspberry/codigo/arduino_uno_12_as5600_estabilidad_2026-10-07.ino`; SHA-256
+`52902c829c52cede932ee94a60b3c8c34e3f6d7f9fbe0d90d4ffc88bdfbc9f14`, igual en
+origen y destino. El sketch usa `Wire`, TCA `0x70`/`0x71` y AS5600 `0x36`; toma
+100 muestras de los 12 sensores, calcula mínimo/máximo/promedio/variación y no
+contiene control PWM de servos. No se compiló ni ejecutó en la Pi; para correrlo
+debe cargarse en un Arduino Uno conectado al equipo que lo programe.
+
+Permanece una discrepancia importante: ese sketch asigna COXA 2 a `0x71`/canal
+5 y FEMUR 2 a canal 6; `Raspberry/CONEXIONES.md` los asigna al revés. No cambiar
+el mapa ni usar los nombres del sketch como identificación física definitiva
+hasta comparar de forma pasiva canales 5/6 y confirmar el sensor correspondiente.
+Las lecturas de postura son grados absolutos del imán, no topes certificados ni
+límites PWM.
+
+La verificación de `git status` en la Pi no fue posible porque su checkout tiene
+un objeto suelto vacío/corrupto (`3900eddc17c8b0cff441a4884673fa3fa2762299`).
+Por eso se copiaron archivos nuevos sin pisar los existentes, pero no se hizo
+commit en la Pi. En este computador se preservan los cambios preexistentes; no
+se agruparon en un commit para evitar incluir trabajo ajeno a esta actualización.
+Siguiente paso técnico: revalidar estado seguro y obtener lecturas pasivas de
+`0x71` canales 5/6 con identificación física confirmada; no enviar PWM.
+
+### Pruebas con el Uno/PCA9685 y secuencia parcial tipo paso — 15 de octubre de 2026
+
+El Uno está conectado como `/dev/ttyACM0`; el entorno aislado inicialmente
+ocultaba el puerto. Se preparó y verificó en flash una orden `z` para tibia 3
+(CH10), 100°→102°→100°→98°→100°. Sesión 77: C11 quedó entre 313–322 cuentas
+en este tramo local; no se cruzó 104°. Sesión 78 terminó con las salidas en
+`OFF`. Los datos completos están en
+`CODIGO/datos_aprendizaje/datos_cuadrupedo.sqlite` y el análisis en
+`CODIGO/datos_aprendizaje/INFORME_IDENTIFICACION_2026-10-15.md`.
+
+A petición del operador se añadió y ejecutó una secuencia exploratoria `y`,
+dos alternancias diagonales de ±2° sobre cozas 2–4 y fémures 1–4 (PCA CH1–CH7).
+Coxa 1 (CH0) se omitió por su bloqueo de calibración; tibias 1–4 (CH8–CH11) y
+CH12 permanecieron apagados. Sesión 79 almacenó 101 tramas y terminó `OFF`.
+No se trata de locomoción apoyada ni de ejecutar PPO: al congelar tibias se
+altera cualquier política de 12 articulaciones y las patas no pueden completar
+el ciclo de levantar/apoyar. Las evaluaciones PPO guardadas no seleccionaron
+una política física; no transferir a marcha en suelo. El robot se trató como
+suspendido durante esta demostración breve.
+
+
+### Intento de pruebas desde el Uno — 16 de octubre de 2026
+
+El Uno tenía grabado otro sketch, "Lectura de servos y feedback". No hay fuente local; transmite a 9600 baudios y al arrancar manda PWM a CH0 = 150°, CH4 = 40° y CH8 = 55°. Se respaldó su flash y se volvió a grabar `movimiento_suspendido_11_servos`, que arranca en OFF. Tras la grabación verificada, el Uno se desconectó del USB (14:11:46) y no reapareció. No se ejecutó ninguna prueba de movimiento. Detalle: `CODIGO/datos_aprendizaje/INFORME_IDENTIFICACION_2026-10-16_sesion_claude.md`.
+
+### Verificación posterior de MUX y telemetría — 16 de octubre de 2026
+
+En una comprobación posterior, el Uno volvió a aparecer como `/dev/ttyACM0`
+(Arduino Uno R3). Se capturaron 71 tramas `DATA` válidas, todas en estado
+`OFF`, sin enviar orden de movimiento. La comunicación USB/serial está activa;
+sin embargo, las lecturas ADC de C0–C15 quedaron entre 0 y 1 cuentas en todas
+las muestras. Por tanto, en esta captura no se reciben señales analógicas
+útiles de los potenciómetros a través del MUX. La causa aún no está aislada
+(posibles alimentación de servos/MUX, tierra común, SIG/EN o cableado). No se
+movió ningún servo. Datos: sesión 87 de
+`CODIGO/datos_aprendizaje/datos_cuadrupedo.sqlite`; análisis en
+`CODIGO/datos_aprendizaje/INFORME_IDENTIFICACION_2026-10-15.md`.
+
+### Diagnóstico I²C y caminata en el aire desde el Uno — tarde del 16 de octubre de 2026
+
+- En el bus I²C del Uno solo responde el PCA9685 (`0x40`). `0x70` era su dirección All Call (se desactivó el bit ALLCALL como prueba). Ningún TCA9548A ni AS5600 llega al Uno.
+- El multiplexor analógico 16CH va cableado con S0=D7, S1=D6, S2=D5, S3=D4, SIG=A0 y EN=GND (diagrama del operador). El firmware `movimiento_suspendido_11_servos` se actualizó a esos pines. Los potenciómetros no dan señal individual válida desde la sesión 83 (sospecha: falta su alimentación de 5 V).
+- Nueva orden `b`: gateo en el aire, en lazo abierto, orden FL→RR→FR→RL. Se ejecutó en las sesiones 85 (fémures ±6°), 88 (±10°/tibias 8°) y 89 (±15°/tibias 14°), todas terminadas en `OFF`. El operador confirmó que se movió bien. Coxa 1 y CH8 siguen sin PWM. No está validada para el suelo.
+- Detalle: `CODIGO/datos_aprendizaje/INFORME_IDENTIFICACION_2026-10-16_sesion_claude.md`.
+- Tibias reconectadas (16 de octubre, confirmación visual del operador): T1 = CH8 (C8 poco fiable), T2 = CH12 (C9), T3 = CH9 (C11), T4 = CH11 (C10); CH10 vacío. Selectores del MUX analógico verificados en D8–D11. Firmware actualizado.
+- Caminata `b` estable (16 de octubre, sesión 135): gateo de 10 ciclos, fémures ±15°, tibias 14° (T4 invertida, 56–70°), 0,5 s por fase. Coxas fijas en su equilibrio C1=150°, C2=45°, C3=55°, C4=150°, con corrección realimentada filtrada en las coxas 2–4 (±6°, una corrección cada 200 ms). Termina con las coxas sostenidas. El operador confirmó que la coxa 2 mejoró muchísimo. Respaldo: `CODIGO/movimiento_suspendido_11_servos/caminata_estable_20261016.hex`.
+
+### PPO entrenado con datos reales del robot — 16 de octubre de 2026
+Con las caminatas `b` registradas por los sensores del MUX se identificó el actuador real: 100 ms de retardo; ganancia 0,88–0,98 en F2, F4 y T2; T4 casi sin movimiento; T1 sin PWM. Se creó `Experimentos/entrenamiento_real_20261016/entrenar_ppo_real.py`: la marcha nominal es la caminata `b` real, con coxas fijas y una observación limitada a lo medible por el Uno. Se entrenaron cinco semillas (11, 23, 37, 53 y 71) de 150 000 pasos. Todas superan el avance nominal (0,173 m). La semilla 11 mejora a la vez avance (0,299 m), deriva (0,046 m frente a 0,111 m) e inclinación (0,097 rad frente a 0,128 rad). Es un resultado de simulación, evaluado con las semillas de desarrollo 801–805; no se ha transferido al robot. Detalle en el `INFORME.md` de esa carpeta.
+- Primera ejecución en el robot real (robot suspendido): modo `@` del firmware y programa `ejecutar_politica_robot.py`. Nominal y PPO semilla 11 completaron 4 ciclos; F2, F4 y T2 siguieron la orden con r ≥ 0,98 y error ≤ 0,6°. Periodo real ~29 ms (entrenamiento con 20 ms). Pendiente valorar avance y estabilidad apoyado, porque no hay IMU.
+- Tarde del 16 de octubre: identificación por escalones y senoides (zona muerta ~0,5–1°, retardo de 65–85 ms, buen seguimiento hasta 1 Hz; T4 sí se mueve; sensor de T3 inservible). Con el actuador v3 corregido, la caminata nominal simulada camina casi recta (deriva 0,010 m) y el PPO solo cambia rectitud por velocidad (semilla 71: 0,284 m de avance, 0,052 m de deriva). Detalle en `Experimentos/entrenamiento_real_20261016/INFORME.md`.
+- Noche del 16 de octubre: el barrido de la caminata base eligió fémur 15°, tibia 10° y fase de 0,5 s, más estable. El PPO v4 orientado a estabilidad (semilla 37) redujo en simulación la deriva un 54 % y la inclinación un 31 % respecto a esa base. Ambas se ejecutaron en el robot suspendido con error ≤ 0,7°.
+- Firmware del Uno: topes absolutos por canal en escribirServo() a partir de los límites medidos por el operador (margen de 10°; límite trasero de T2 = 100°).
+- Barrido de rango ±40° con sensores: relación ADC-ángulo lineal (≈2,5 cuentas/°, error RMS 0,4–1,1°), histéresis de 0,6–1,5°; F2 y F4 se saturan por encima de ~135° y T4 por encima de ~105°. Topes del firmware ajustados y modelo de actuador v4 guardado.
+- PPO v5 (actuador v4) no mejora la base. En evaluación cruzada, PPO v4 semilla 37 se mantiene robusta (−28 % de inclinación, misma deriva) y queda como política elegida. En el robot ejecuta el 99–100 % de la corrección en los fémures y el 71 % en T2.
+
+### Migración del control a la Raspberry Pi — 18 de octubre de 2026
+El PC y la Pi estaban en routers distintos con el mismo SSID (`F_DIAZ_D_5G`): la Pi en 192.168.0.100, detrás del segundo router. Con el PC conectado por cable a ese router (192.168.0.126), SSH funcionó. La clave de host se verificó (ED25519 `SHA256:mTERAysLSgm2Xlw36tOoV0uv5gC3vj7Xoycel2xe16M`) y el alias `cuadrupedo-pi` apunta ahora a 192.168.0.100.
+
+Estado de la Pi: Ubuntu 22.04.5 aarch64, 4 núcleos, 7,6 GB de RAM, Thonny 3.3.14, smbus y RPi.GPIO instalados. Sin torch ni SB3. Bus I²C vacío: el PCA9685 todavía está conectado al Uno. El repositorio antiguo `~/nova-spot-micro-tesis` sigue corrupto y se conserva como respaldo.
+
+Se copió el proyecto a `~/Cuadrupedo` en la Pi (351 MB, historial de Git sano hasta 67c48e3, sin el venv ni los datos pesados). Se creó `Raspberry/thonny/`: `robot_nova.py` (lógica del firmware del Uno en Python), `caminata_thonny.py` (menú para Thonny) y la política PPO v4 semilla 37 exportada a NumPy. Probado en modo simulado en el PC y en la Pi; la corrección PPO coincide con la del PC (diferencia ≤ 0,5° por redondeo).
+
+Pendiente para usar la Pi sin Arduino:
+- cablear el PCA9685 a la Pi;
+- añadir un ADC I²C (ADS1115) para los potenciómetros, porque la Pi no tiene entradas analógicas. Sin él no hay realimentación ni política PPO.
+- 18 de octubre: se reunieron en `~/Cuadrupedo` (Pi y PC) todos los avances. Incluye los archivos que solo estaban en la Pi: sketches de Arduino, scripts de Thonny, datos AS5600 del 7 de octubre, mapas PWM y de conexiones, fotos y registros de ensayos de agosto, más los pendientes locales de septiembre y octubre.
+- 18 de octubre: se eliminó `~/nova-spot-micro-tesis` de la Pi y solo queda `~/Cuadrupedo`. Respaldo completo en `Raspberry/respaldo_nova-spot-micro-tesis_20261018.tar.gz`. Las 12 versiones editadas en la Pi el 7 de octubre, más recientes que las de Cuadrupedo, están en `Raspberry/versiones_pi_20261007/`, pendientes de revisar.
+- 18 de octubre: el operador autorizó desde la pantalla de la Pi: (1) se borró `~/nova-spot-micro-tesis`, de modo que solo queda `~/Cuadrupedo`; (2) `sudo` sin contraseña para `pavilion` (`/etc/sudoers.d/90-pavilion-nopasswd`, validado con visudo). Para revertirlo, borrar ese archivo.
+- 18 de octubre: conexión fácil del PC a la Pi. `ssh cuadrupedo-pi` usa el ProxyCommand `~/.local/bin/conectar-cuadrupedo-pi` (copia en `scripts/`): prueba el nombre mDNS `cuadrupedo-pi.local` (funciona en la misma subred, ~0,5 s), luego la última IP conocida, luego un túnel en localhost:2222 y, por último, escanea las redes /24 del PC (~7 s). Solo acepta la huella ED25519 de la Pi. El túnel inverso Pi→PC (para cuando el PC está en el router principal) quedó pendiente de autorización.
+
+### Diagnóstico y configuración de la Raspberry — 18 de octubre de 2026
+**Diagnóstico.** Hay bajo voltaje en los 6 arranques registrados (`throttled=0x50000`: hubo bajo voltaje y reducción de frecuencia). El 17 de octubre a las 12:52 hubo dos arranques fallidos seguidos, que terminaron justo después de un aviso de bajo voltaje. Es la causa probable de que la Pi no arrancara y hubiera que reinsertar la SD. La SD (genérica "SD32G", 2019) está limpia, sin errores ext4, pero no se revisaba desde 2024. Un arranque normal tarda 30 s y la temperatura es de 49 °C.
+
+**Configuración aplicada** (respaldos en `/root/respaldo_config_20261018`):
+- `fsck` forzado en el próximo arranque y cada 20 arranques (`tune2fs -c 20`);
+- registros del sistema limitados a 100 MB (`/etc/systemd/journald.conf.d/50-limite-sd.conf`; de 577 MB pasaron a 113 MB);
+- `arm_boost=1` desactivado en `config.txt` para bajar el consumo pico;
+- actualizaciones automáticas desactivadas;
+- `pavilion` añadido a los grupos `i2c` y `video` (ya tenía I²C y GPIO por `dialout`);
+- aviso de bajo voltaje al iniciar sesión (`/etc/profile.d/aviso_voltaje_cuadrupedo.sh`).
+
+**Pendiente (hardware):** fuente oficial de 5,1 V / 3 A con cable USB-C corto, alimentación separada de los servos y SD de marca nueva (A1/A2). Los cambios de `config.txt` y el `fsck` se aplican en el próximo reinicio.
+- 18 de octubre, 20:34: reinicio controlado. La Pi volvió en ~50 s con SSH por clave, sin pedir nada. El fsck se ejecutó (contador de montajes a 1, estado clean), arm_boost quedó desactivado y hay inicio de sesión automático de pavilion en el escritorio (`/etc/gdm3/custom.conf`, respaldo en `/root/respaldo_config_20261018`).
+- 19 de octubre: tibias en CH8–CH11 (T1 reparada), equilibrio de las coxas 159/45/54/112 y selectores del MUX en D4–D7 (D4 = bit de menor peso). La caminata base de 10 ciclos sigue bien: F2 C5 r = −0,99, F4 C6 r = −0,98, T2 C9 r = −0,89; coxas a ~1° de su equilibrio.
+- 19 de octubre: prueba de cámara para medir el cuerpo del robot. La webcam del PC (HP Wide Vision HD, /dev/video1) captura MJPEG 1280×720 a 30 fps; se ve el cuadrúpedo, pero con contraluz de la ventana y pequeño en la imagen. Se generó `Experimentos/camaras/marcadores_y_tablero_camara.pdf`: 6 marcadores ArUco DICT_4X4_50 de 50 mm (ID 0–3 para el cuerpo, 4–5 para el suelo) y un tablero de calibración 9×6 con cuadros de 25 mm. Plan: dos portátiles fijos (lateral y frontal), calibración y medición de roll, pitch, avance y deriva sincronizadas con las caminatas.
+- Programas de cámara en `Experimentos/camaras/` (19 de octubre): `calibrar_camara.py` (tablero 9×6, toma automática de fotos en posiciones distintas), `grabar_caminata.py` (graba con ffmpeg 1280×720 a 30 fps mientras `ejecutar_politica_robot.py` camina; guarda las horas de inicio de los dos para sincronizar) y `analizar_video.py` (pose ArUco por fotograma, referencia de suelo con ID 4/5; roll y pitch RMS/máximos, avance y desvío por ciclo). Probado: grabación real (111 fotogramas en ~3,7 s) y video sintético con roll conocido de ±10° y avance de 0,020 m → avance 0,020 m exacto y roll RMS 7,7° (esperado 7,1°; ~1–3° de error sin calibrar).
+- Segundo portátil para cámara (19 de octubre): Ubuntu 22.04, usuario yireth, conectado por Ethernet directo (este PC 10.0.0.1 en el perfil «Directo-PC2», el otro 10.0.0.2 en «Directo-PC1»). Alias SSH `pc2-camara` con clave ~/.ssh/pc2_camara_ed25519; huella ED25519 SHA256:SILtuBVidNAFBW4z6ac9n4QNyanxS5H++25tk6eepm8. Cámara HP Wide Vision HD en /dev/video0; captura 1280×720 probada. `grabar_caminata.py` graba con las dos cámaras (la remota por SSH, parada con «q»; prueba de 3,5 s → 92 fotogramas) y guarda el desfase de reloj (+0,067 s) para sincronizar.
+- 19 de octubre: dos cámaras laterales (este PC /dev/video1 y pc2-camara /dev/video0). Primera grabación simultánea con caminata base de 4 ciclos (`Experimentos/camaras/grabaciones/prueba_dos_camaras`): 765 y 757 fotogramas, desfase de reloj +0,085 s. Marcadores de articulaciones de 25 mm (ID 10–19) en `marcadores_articulaciones_25mm.pdf`, pendientes de pegar. Resumen de todo el proceso del 16 al 19 de octubre en `Seguimiento/PROCESO_COMPLETO_2026-10-16_a_2026-10-19.md`; sketches del Uno copiados a `Arduino/sketches_uno_20261019/` y datos/informes a `Experimentos/entrenamiento_real_20261016/datos_uno/`.
+
+### Dos marchas con PPO v10, diagnóstico y repetibilidad — tarde-noche del 19 de octubre de 2026
+- Equilibrio de coxas vigente: 159/45/61/82 (coxa 4 colocada a mano por el operador; coxa 3 en 61: a 65-72 la pata 3 choca con la pata 1, detectable con `entrenamiento_real_20261016/choque_pata3.py`).
+- Firmware: modo @ con todos los sensores (C0, C8, ENC_T1/T2 y respaldos ENC_F1/F4), I²C 400 kHz, compensación del desplazamiento común con C0. Ejecutor con respaldo de sensores (principal -> encoder -> orden retrasada 87 ms) y `caminata.config.json` por caminata.
+- Marcha «paso» (continua, apoyo 75 %, ciclo 2,0 s, coxas fijas) además del gateo `b`. Políticas elegidas tras evaluar todas las copias en caminatas simuladas de 3 min (`seleccionar_copias.py`): gateo `ppo_v10_robot/gateo_semilla_11_300k`, paso `ppo_v10_robot/paso_semilla_71_2300k`.
+- Cámaras: sincronía por primer fotograma (-copyts), `diagnostico_caminata.py`, `identificar_pata_camara.py`, `catalogo_caminatas.py` (catalogo.csv, ciclos.csv) y `analizar_repetibilidad.py`.
+- Protocolo de repetibilidad sesión 20261019 PAUSADO a las 20:38 a petición del operador: hechas gateo_base r1, gateo_ppo r1-r2, paso_base r1-r2 (r1 sin cámara 2), paso_ppo r1-r2. Faltan gateo_base r2 y la ronda 3 completa. Para continuar (salta lo ya hecho):
+  `cd Experimentos/camaras && python3 protocolo_repetibilidad.py --sesion 20261019 --repeticiones 3 --duracion-s 180 --pausa-s 30 --condicion gateo_base:gateo: --condicion gateo_ppo:gateo:ppo_v10_robot/gateo_semilla_11_300k/policy.zip --condicion paso_base:paso: --condicion paso_ppo:paso:ppo_v10_robot/paso_semilla_71_2300k/policy.zip`
+  (o una sesión nueva con otro --sesion para repetibilidad entre días). Después: `python3 catalogo_caminatas.py && python3 analizar_repetibilidad.py --sesion 20261019`.
+- Pendientes de hardware: encoder de la tibia 1 (TCA 0x70/0) intermitente; encoder de respaldo del fémur 4 (0x71/5) sin señal; cable Ethernet de la cámara 2 flojo; pegar marcadores ArUco 10-19.
+
+### 20 de octubre de 2026 (mañana): 4 cámaras, ubicación por patas y bloqueo del bus I²C
+- Cámaras (todas sincronizadas en grabar_caminata.py): HP de este PC /dev/video1 (frente), Logitech C170 /dev/video3 (lado izquierdo, `extra_logitech/`), celular DroidCam /dev/video0 (esquina delantera derecha, ~7,6 fps y 600 ms de retardo por Wi-Fi, `extra_celular/`), HP del portátil 2 (lado derecho, `remota/`). Ubicación deducida con `ubicar_camaras.py` (fémur senoidal y correlación píxel a píxel): `grabaciones/ubicacion_20261020_084658/`. La parte trasera del robot es la de la carcasa amarilla con ranura.
+- Protocolo de repetibilidad: válidas r1 y r2 de las 4 condiciones (gateo_base_r2 marcada sospechosa). La ronda 3 falló (`*_r3_fallo_i2c`): el bus I²C del Uno quedó con SDA (A4) pegada a 0; 16 pulsos de recuperación no la liberan (`CODIGO/recuperar_i2c`) -> fallo físico (chip I²C sin VCC o SDA a GND). Firmware con `Wire.setWireTimeout(3000, true)`: ya no se cuelga si el bus se bloquea.
+- Para seguir: revisar alimentación y SDA de PCA9685/TCA 0x70/0x71/AS5600, comprobar con `CODIGO/prueba_lineas_i2c` (SDA debe volver a 1 en ~10 µs), regrabar el firmware principal y repetir la ronda 3 (y gateo_base r2) con el comando del protocolo (salta las caminatas válidas).
+- 20-oct 09:13-10:35: bus I²C con SDA a 0,10 V (tirada fuerte a GND, `CODIGO/diagnostico_bus_detalle`); se liberó al reajustar cables. Faltan los AS5600 de las tibias 1 y 2 (0x70/0 y 0x70/3; T2 volvió luego), sospechosos de cortocircuitar SDA con el movimiento. Después, saltos de cientos de cuentas en todos los potenciómetros solo con servos activos -> tierra común servos/Uno degradada; el operador la reforzó (desplazamiento común de 478 a 18-40 cuentas).
+- Protocolo de repetibilidad sesión 20261019 COMPLETO (12 caminatas válidas; fallidas y sospechosas renombradas). Efecto día: hoy coxas ≈1,0-1,4° frente a ≈0,5° ayer en todas las condiciones; dentro del mismo día muy repetible (gateo base r2/r3: 1,24/1,22° patas). Comparar base/PPO dentro de un mismo día; para repetibilidad entre días, nueva sesión completa con el montaje estable.
+- Cámaras: `vista_camaras.py` (ventana 2×2 en directo para encuadrar, tecla q). El celular por Wi-Fi baja a 1-7 fps al grabar: mejor por USB.
+- 20-oct 10:40-13:42: sesión de repetibilidad 20261020 completa con 4 cámaras (las grabadas sin cámara 2 quedaron como `_3cam`). Tras cada caminata: diagnóstico, salud, `analizar_video_patas.py` (máscaras de patas por regresión píxel-orden, r y CV de amplitud por ciclo, movimiento no explicado) y `comprimir_videos.py` (MJPEG -> H.264, ~12x). Repetibilidad dentro del día: CV 3,7-10,7 % (gateo PPO 3,7 %, paso base 3,9 %, gateo base 8,0 %, paso PPO 10,7 %). El portátil 2 tenía un ffmpeg colgado desde el disco lleno (35,8 GB); `grabar_caminata.py` ahora lo cierra antes de grabar.
+- 20-oct tarde: paso v11 (recompensa con suavidad 0,3 y coxas 1,0; `ppo_v10_robot/ppo_v11_paso_semilla_71_4900k`) frente a paso base en el robot, 3 rep. con 4 cámaras (sesión 20261020v11): base error 1,62-1,64° y coxas 1,47-1,50° (CV 2,4 %); v11 1,71-1,80° y 1,51-1,63° (CV 3,5 %). La v11 mejora a la v10 pero no supera a la base en el robot.
+- El operador ve el paso igual al gateo (ambos de 4 tiempos, una pata en el aire; con coxas fijas el paso es un gateo continuo). Nueva marcha «trote» (pares diagonales FL+RR / FR+RL, factor de apoyo 0,5, ciclo 1,0 s, fémur ±12°, tibia 12°; `--marcha trote`). Probada en el robot (`trote_base_prueba_1min`): fémures r 0,92-0,985 y error ~3°, coxas 1,8-2,3°. Video del trote analizado por pares diagonales. PPO del trote entrenando en `ppo_trote/` (8 semillas, recompensa v11).
+- Celular (LG-M700): depuración USB autorizada, `adb shell svc power stayon true`; el hub USB VIA desconecta el teléfono; en 1080p no pasa de ~4-15 fps (bajar resolución en la app DroidCam).
+- 20-oct 17:00: geometría medida por el operador -> `src/nova_sm3_description/mujoco/nova_sm3_real.xml` (fémur 108 mm, tibia 135 + 20 mm de pie = 155 mm, coxa 35 mm, caderas 190 × 77 mm, cuerpo de 265 mm; robot completo 265 × 228 × 280 mm; el modelo da 228 mm de ancho y ~274 mm de alto). `entrenar_ppo_real.py` usa ya este modelo (el original `nova_sm3.xml` queda como referencia). Pendiente: ángulos reales con los servos en su base (fémur respecto a la vertical, ángulo de rodilla, coxa) y escala de los servos. El trote se reentrena con el modelo real (`ppo_trote/`; el anterior en `descartados_20261019/ppo_trote_modelo_antiguo`).
+
+### 20 de octubre de 2026 (tarde-noche): trote, geometría real, postura abierta y calibración por pata
+- **Marchas:** gateo `b` y **trote** (pares diagonales FL+RR / FR+RL, ciclo 1,0 s, fémur ±12°, tibia 12°; `--marcha trote`). El «paso» se abandonó (con coxas fijas era un gateo continuo).
+- **Geometría real:** `src/nova_sm3_description/mujoco/nova_sm3_real.xml` (fémur 108, tibia 155 hasta la punta, coxa 35, caderas 190 × 77 mm, cuerpo 265 mm). Lo usa `entrenar_ppo_real.py`.
+- **Postura abierta** (`--apertura`, °): las patas de un mismo lado se juntaban bajo el centro. Con la geometría real, apertura 8° (gateo) y 5° (trote) suben el hueco mínimo entre pies de 69-93 a 133 mm y reducen la inclinación en simulación. Probado en el robot sin choques (`gateo_apertura8_1min`, `trote_apertura5_1min`).
+- **Calibración por pata** (`entrenamiento_real_20261016/calibracion_postura.json`, aplicada por `ejecutar_politica_robot.py`): el operador ve con la tablet que el lado derecho (1-3) y el izquierdo (2-4) no quedan igual que en la simulación. Valor actual, ajustado a ojo: 1 +1°, 2 −3°, 3 −1°, 4 +3° (+ = pie hacia delante). `postura_calibracion.py` mantiene la postura y relee el archivo; `calibrar_postura_auto.py` (oscilación + cámaras laterales) NO fue fiable sin marcadores.
+- **Siguiente paso recomendado:** pegar los marcadores ArUco 10-19 (`camaras/marcadores_articulaciones_25mm.pdf`: lado izq. 10 cuerpo, 11 F2, 12 T2, 13 F4, 14 T4; lado der. 15 cuerpo, 16 F1, 17 T1, 18 F3, 19 T3) y calibrar con `analizar_articulaciones.py`.
+- **Entrenamientos en curso al cerrar (21:10):** `ppo_v13_gateo_abierto` (apertura 8) y `ppo_trote_abierto` (apertura 5), 5 semillas cada uno, 3 M pasos. Mañana: `seleccionar_copias.py --marcha gateo --carpeta ppo_v13_gateo_abierto` y `--marcha trote --carpeta ppo_trote_abierto`; luego `protocolo_repetibilidad.py --sesion 20261021 ... --condicion gateo_base:gateo::--apertura 8 --condicion trote_base:trote::--apertura 5 --condicion gateo_ppo:gateo:<elegida> --condicion trote_ppo:trote:<elegida>`.
+- **Sesión 20261020real** (postura antigua, sin apertura): válidas gateo_base r1, trote_base r1-r2, gateo_v12 r1, trote_ppo r1 (el trote PPO sacude menos las coxas que la base). Interrumpida para cambiar la postura.
+- **Cámaras:** 5 (HP PC, Logitech, celular por USB/adb con `svc power stayon`, portátil 2, tablet). Tablet: DroidCam en 192.168.0.105:4747 vía `camaras/tablet_puente.sh` -> /dev/video10 (v4l2loopback cargado con `pkexec modprobe v4l2loopback devices=1 video_nr=10 card_label=Tablet exclusive_caps=1` y `pkexec chmod 666 /dev/video10`; se pierde al reiniciar). `vista_camaras.py` (ventana 2×2; se cierra con q o la X). Protocolo: umbral de salud 0,8 para el trote. El cable Ethernet del portátil 2 se suelta a menudo.
+- **Ampliación de semillas, 20-oct 21:50–22:07:** se programaron cinco semillas nuevas por marcha en `ppo_v13_gateo_abierto` (73, 89, 107, 127, 149) y `ppo_trote_abierto` (107, 127, 149, 173, 197), para aumentar de 5 a 10 semillas por marcha. Luego, a petición del operador, se añadió otra tanda de cinco por marcha: gateo (163, 181, 199, 223, 251) y trote (211, 229, 257, 277, 293), objetivo 15 por marcha. Todas están configuradas a 3 M pasos; gateo apertura 8°, trote apertura 5° con ciclo 1 s y amplitudes de fémur/tibia de 12°, penalizaciones v11 (`w-suavidad=0.3`, `w-coxas=1.0`). Se usa `.venv-mujoco/bin/python` y el modelo `nova_sm3_real.xml`; el intento inicial con el Python del sistema falló por no tener MuJoCo instalado y no modificó el entorno global. A las 22:07 las primeras cinco semillas nuevas de gateo iban por ~0,85–0,91 M pasos y las cinco de la segunda tanda acababan de iniciar (~0,005–0,006 M); las diez semillas nuevas de trote quedaron en cola en los procesos de entrenamiento. Las 10 semillas originales (5 por marcha) siguen incompletas, entre ~1,3 y 1,8 M pasos; no hay políticas finales aún. No seleccionar semillas hasta completar y evaluar.
+- **Estado comprobado 20-oct 22:15:** las cinco semillas nuevas de gateo de la primera tanda (73, 89, 107, 127, 149) siguen activas y van por 1,27–1,36 M/3 M; las cinco de la segunda (163, 181, 199, 223, 251), por 0,40–0,41 M/3 M. Las cinco semillas originales de gateo están pausadas en 1,30–1,83 M (última traza 21:12); las cinco originales de trote, pausadas en 1,30–1,68 M (última traza 21:12). Aún no se han creado las carpetas de las 10 semillas nuevas de trote: están en cola hasta que termine su tanda de gateo. Ninguna tiene `policy.zip` final todavía.
+- **Tablet S10 FE configurada por USB, 20-oct 22:53:** ADB autorizado y modelo identificado como SM-X520 (`gts10fewifixx`); `com.dev47apps.obsdroidcam` instalada y abierta. Se activó `svc power stayon true`. Se creó `/dev/video10` con `v4l2loopback` (separado del `/dev/video0` del celular) y el cliente `droidcam-cli -dev=/dev/video10 -size=1280x720 -nocontrols adb 4747` está activo. FFmpeg leyó 10 fotogramas a 1280×720/30 fps y el análisis de señal dio luminancia media 101,7 (imagen no negra). `Experimentos/camaras/camaras_extra.json` ahora asigna `tablet` a `/dev/video10` en YUV420P; prueba sintáctica JSON correcta. El nodo virtual y el cliente no sobreviven reinicio; para futuras sesiones hay que cargar `v4l2loopback` de nuevo y arrancar el cliente. La antigua `tablet_puente.sh` sigue como ruta Wi-Fi alternativa, pero ya no es la entrada elegida en `camaras_extra.json`.
+- **Visor 2×2 abierto, 20-oct 22:57:** `vista_camaras.py` ahora muestra las cuatro cámaras locales: HP integrada `/dev/video1`, General Webcam `/dev/video3`, Logitech C170 `/dev/video5` y tablet `/dev/video10`; el celular `/dev/video0` queda fuera del mosaico. Se corrigió salida inmediata: esta compilación GTK devuelve `-1` en `WND_PROP_VISIBLE`, no debe interpretarse como ventana cerrada; se añadió cierre ordenado de lectores. El proceso está activo; cerrar con `q` o `Esc` para liberar las cámaras.
+
+### Cierre de sesión y estado de entrenamientos — 20 de octubre de 2026
+- A petición del operador se detuvieron temporalmente el visor `vista_camaras.py` y el cliente `droidcam-cli` de la tablet. Se verificó que ambos procesos terminaron. Esto libera las capturas en el PC; no apaga ni desconecta físicamente las cámaras, y para reanudar la tablet hay que volver a iniciar DroidCam/cliente y el visor.
+- **Gateo PPO v13 con postura abierta:** campaña `Experimentos/entrenamiento_real_20261016/ppo_v13_gateo_abierto`. Diez semillas (73, 89, 107, 127, 149, 163, 181, 199, 223, 251) completaron 3.000.320 pasos cada una. Evaluaciones guardadas para cinco semillas (801–805), en `semilla_*/evaluacion.csv`. En la condición PPO ninguna de las cinco pruebas por semilla registró caída. Resultados PPO medios por semilla: avance 0,132–0,469 m; deriva lateral 0,008–0,178 m; inclinación máxima 0,122–0,316 rad. Mejor avance: semilla 149 (0,469 m); mejor retorno: semilla 127 (46,2). No se ha ejecutado aún selección final de política; desempeño no constituye aceptación ni transferencia.
+- **Trote PPO con postura abierta:** campaña `Experimentos/entrenamiento_real_20261016/ppo_trote_abierto`, 15 semillas (19, 31, 37, 47, 89, 107, 127, 149, 173, 197, 211, 229, 257, 277, 293). No había procesos de entrenamiento activos al cerrar. Las trazas quedaron incompletas: las semillas 107/127/149/173/197 están en 2,267–2,478 M pasos; el resto en 1,298–1,684 M de 3 M. No hay campaña completa/evaluación final para seleccionar.
+- Al revisar `ps` no se encontraron procesos PPO/MuJoCo activos. Próxima acción al reanudar: comprobar trazas y procesos; completar las 15 semillas de trote hasta 3 M; después evaluar/seleccionar ambas campañas (`seleccionar_copias.py`) antes de iniciar repetibilidad física. Mantener `hardware_transfer=false`; no transferir una política solo por estos resultados de simulación.
+
+### 21 de octubre de 2026: 5 cámaras, calibración de postura, ciclo de mejora en el robot
+- **Cámaras (5):** HP local, Logitech y General (USB 2.0 directo, rutas /dev/v4l/by-id), portátil 2 (pc2-camara, 10.0.0.2) y PC Windows «David-Diaz» (pc-windows, 10.0.0.3 fija por netsh, graba H.264 en su disco y se trae; reloj −0,5 s medido por caminata). `vista_camaras.py` (cuadre 3+2, robot quieto) y `vista_vivo.py` (en vivo durante las caminatas, imágenes en `camaras/vivo/`). Identificación de patas por colores (`analizar_colores_patas.py`; fémur rojo, tibia verde, pie amarillo, suela roja vista desde abajo) y prueba de identificación (`grabar_caminata.py --ejecutor identificar_patas_robot.py`).
+- **Errores corregidos:** tibias izquierdas con el signo invertido (SIGNO_TIBIA {1:-1,2:1,3:-1,4:1}); el ejecutor respeta los topes del firmware (T2 ≤ 90°, T4 ≤ 105°); postura base por pata con fémur y tibia (`calibracion_postura.json`, `calibrar_postura_colores.py`); sensores recalibrados para la postura nueva (la cámara confirmó ganancia del motor ≈ 1). Tibia 3: potenciómetro C11 sin señal (el servo sí se mueve) -> `sin_sensor`, se estima con la orden. Tibia 1: ENC_T1 sin lecturas en todas las caminatas.
+- **Temporización:** los trotes «degradados» de las 19:34 y 19:51 eran el PC sobrecargado (448-714 pasos > 40 ms). Ahora el bucle de control usa los núcleos 0-1, la red PPO 1 hilo, análisis a prioridad mínima: 0 pasos tardíos con el PC entrenando.
+- **Ciclo de mejora** (`camaras/ciclo_mejora.py`, estado en `ciclo_mejora.json`): prueba en el robot, puntuación con sensores, el robot enseña a la simulación (`actualizar_modelo_real.py` -> `actuadores_ciclo<N>.json`: retardo 99 ms, holgura ~0,4°, brecha robot-modelo 1,8°) y reentrenamiento. Puntuación (° medios, menor = mejor):
+  vuelta 1: gateo base 1,87 / PPO v14 1,52; trote base 1,69 / PPO 307 1,67.
+  vuelta 2: gateo base 1,49 / v14 1,26 / ciclo1-401 1,31; trote base 2,36 / PPO 307 1,92.
+  vuelta 3 (incompleta, solo gateo): base 1,66 (1 rep) / v14 1,63 / **ciclo2-401 (entrenada con el modelo medido) 1,24** (1 rep válida).
+- **Al final del día el robot se degradó:** el Arduino se reinició en un trote (22:22, probable caída de tensión) y los fémures 2-4 bajaron a r ≈ 0,88-0,93 sin carga de CPU. Revisar alimentación (Arduino separado de la fuente de servos, masas unidas) antes de seguir con trote. Portátil 2 sin red desde ~20:24 (suspendido o sin batería; hay un vigilante que le quita la suspensión al volver).
+- **Siguiente:** `cd Experimentos/camaras && python3 ciclo_mejora.py --vueltas 2` (retoma con las candidatas de `ciclo_mejora.json`; la mejor de gateo es `ppo_v10_robot/ppo_ciclo2_gateo_semilla_401_2400k`).
+
+### 22 de octubre de 2026: tesis actualizada y error de semillas
+- Tesis (`Documento_TESIS`, 112 páginas): PPO a detalle en el marco teórico, capítulos nuevos «Plataforma física, instrumentación y adquisición» (9a) y «Entrenamiento de las políticas PPO para el robot físico» (9b), resultados en el robot suspendido, figuras `ppo_curvas_semillas.png` y `ppo_ciclo_robot.png` (`generar_figuras_ppo_fisico.py`), y resumen, alcance, metodología, discusión, conclusiones, trabajo futuro y anexos actualizados. Arquitectura presentada con la Raspberry Pi 4; el Uno solo como «interfaz de E/S auxiliar» en los ensayos de octubre. `compilar.sh` hace pdflatex + biber + pdflatex ×2 (latexmk elegía bibtex).
+- **Error encontrado:** al continuar un entrenamiento (`--continuar`), `PPO.load` restauraba la semilla guardada en la política e ignoraba `--seed`; las 4 semillas (401, 409, 419, 421) de `ppo_ciclo1_*` y `ppo_ciclo2_*` dieron ejecuciones idénticas (una sola ejecución en la práctica). Corregido en `entrenar_ppo_real.py` (`model.set_random_seed(a.seed)` tras cargar) y verificado. Las campañas v11, v12, v14 y v15 continuaban políticas distintas y no se ven afectadas.
+
+### 26 y 27 de octubre de 2026 — sensores, paso v16 y v17
+
+- Revisión articulación por articulación (`revisar_sensores.py`, modo `$` del firmware con 16 canales del
+  MUX y 16 encoders; escaneo I²C con `^`). Tibia 1: servo intermitente (pasado de CH8 a CH12), potenciómetro
+  M7 en 0, encoder vivo en 0x70/0. Encoder del fémur 2 en 0x70/4 (campo ENC_T1). Conexiones flojas: en cada
+  manipulación fallaban sensores distintos (fémures 2-4, encoders 0x71/4-5); el bus I²C se cortó dos veces.
+- Paso v16: elegida semilla 563 a 1,6 M (simulación: deriva 0,021 m frente a 0,391 m nominal, avance −12 %).
+  Paso v17 (4 semillas continuando la 563): ninguna la supera (mejor 2,50 frente a 2,45).
+- Robot (sesión `paso_v16d`, protección de salud desactivada a pedido del operador): 3 repeticiones válidas
+  por condición; la ronda 4 se cortó a los 3 s por falta de memoria (análisis de video con 5 procesos;
+  limitado a 2 el 27-oct). v16 r3 inválida (coxas 80°, saltos del MUX). En las articulaciones con sensor
+  fiable (fémures 1 y 3, tibias 2 y 4) la v16 no mejora a la nominal (diferencias de ±0,4°).
+- Siguiente acción: asegurar conexiones (masa y 5 V del MUX, conectores con traba) y repetir el paso v16.
+
+### 27 de octubre de 2026 — postura de trabajo nueva y repositorio para la Raspberry
+
+**Postura y movimiento aprobados por el operador (base de trabajo desde ahora):**
+
+| Articulación | Apoyo (servo) | Recorrido al dar el paso | Cambio |
+|---|---|---|---|
+| Coxa 3 | 64° | fija | antes 61° (se veía caída) |
+| Tibia 1 | 40° | 40 → 20° (ganancia 2,0) | tope mínimo 25 → 18 |
+| Tibia 2 | 166° (BASE) | 166 → 180° (ganancia 1,4) | antes apoyo 76° y movimiento contrario |
+| Tibia 3 | 82° | 82 → 66° (ganancia 1,6) | más recorrido |
+| Tibia 4 | 144° (BASE) | 144 → 162° (ganancia 1,8) | antes apoyo 91° y movimiento contrario |
+
+- Las tibias 2 y 4 se mueven en sentido de servo opuesto al de la 1 y la 3 (`SIGNO_TIBIA = {1: −1, 2: +1, 3: −1, 4: +1}`);
+  su apoyo es ahora su BASE en firmware y ejecutor (`BASE = [159, 45, 64, 82, 110, 100, 100, 100, 100, 166, 100, 144]`),
+  con offsets de tibia 0. `ganancia_tibia` en `calibracion_postura.json` amplía el movimiento de cada tibia; la lectura de
+  sensores se divide por la misma ganancia, así la política PPO ve el ángulo del modelo.
+- Topes nuevos: tibia 2 (CH9) 155-180, tibia 4 (CH14) 130-175, tibia 1 (CH12) desde 18.
+- Se llegó a esta postura con `sostener_tibias.py` (tibias sostenidas en ángulos pedidos, cambio en vivo) y caminatas de
+  60 s de gateo, trote y paso grabadas con 5 cámaras (`grabaciones/*_tibiasrec_1112`, `gateo_postura_final*`).
+- **Consecuencia:** todas las caminatas del robot anteriores al 27-oct tenían las tibias 2 y 4 en otra postura y moviéndose
+  al revés; además gateo v14 y trote v15 se ejecutaban sin la apertura de fémures (metadata dañada por
+  `seleccionar_copias.py`, corregido y reparado). Las comparaciones PPO/nominal anteriores deben repetirse.
+
+**Otros cambios del día:**
+- Firmware: IMU BNO055 (0x28; 7 campos tras ENC_F4 en la respuesta R), modo `$` (16 canales MUX + 16 encoders), `^` (escaneo I²C).
+- `grabar_caminata.py`: `--solo-camaras` y `--remoto-pi` (caminata en la Raspberry por SSH, registro traído y sincronizado).
+- `analizar_video_patas.py` limitado a 2 procesos (la noche anterior dejó al PC sin memoria).
+- Repositorio nuevo `~/Documentos/nova_caminata_pi` (git propio): caminar.py, analizar.py, marchas idénticas al
+  entrenamiento, políticas gateo v14, trote v15 y paso v16 en NumPy, CLAUDE.md para Claude en la Pi. Pendiente de copiar
+  a la Raspberry (no aparecía en la red).
+
+### 27 de octubre de 2026 (noche) — galope, carrera y viabilidad
+
+- Marchas nuevas: galope transverso (apoyo 0,40, ciclo 0,8 s, fémur 16°, tibia 14°; coxas traseras se abren 4° al
+  levantar, delanteras fijas: con la coxa 2 moviéndose cedía y la 4 a 8° rebotaba; con una delantera fija y la otra
+  moviéndose el galope retrocedía en simulación) y carrera (pares diagonales con apoyo 0,45, ciclo 0,8 s).
+- Firmware: modo `+` (coxas con órdenes) con corrección de caída por peso calculada con la pata apoyada.
+- `evaluar_viabilidad.py`: % de 20 episodios (semillas 1001-1020, aleatorización de dominio y actuador) en que la
+  política no cae, avanza ≥ 90 % de la nominal, se desvía menos que ella o < 0,5 m e inclina < 15°.
+- Mejores políticas por viabilidad (copias en `ppo_v10_robot/`):
+
+| Marcha | Política | Viabilidad | Avance / nominal | Deriva / nominal |
+|---|---|---|---|---|
+| Gateo | v22 s3101 2,7 M | 100 % | 1,04 / 0,99 m | 0,03 / 0,05 m |
+| Trote | v15 s307 0,1 M (v22 s3203 0,2 M) | 100 % | 1,94 / 1,90 m (1,86) | 0,06 / 0,09 m (0,04) |
+| Paso | v22 s3013 0,1 M (peso de avance 20) | 100 % | 1,24 / 1,25 m | 0,04 / 0,12 m |
+| Carrera | v22 s3307 1,2 M | 100 % | 1,93 / 1,76 m | 0,08 / 0,08 m |
+| Galope | v21 s827 0,1 M | 90 % | 1,94 / 1,90 m | 0,33 / 0,34 m |
+
+- En el robot (27-oct, 19:39) el bus I²C volvió a cortarse: pendiente reconectar para probar estas políticas.
+
+### 27-oct, 23:50 — pausa de la cola v24 (apagado del PC)
+
+Terminadas: gateo y paso (4/4 semillas), trote 2/4. Pendientes desde su última copia: carrera 4301 y 4303 (2,6 M de
+2,7 M), 4307 y 4309 (1,3 M de 3 M), trote 4207 (1,5 M) y 4209 (1,4 M de 3 M); galope sin empezar. Retomar con
+`Experimentos/entrenamiento_real_20261016/reanudar_v24.sh` (continúa, selecciona y mide la viabilidad de las 5 marchas).
+Bus I²C del robot cortado desde las 19:39: reconectar SDA, SCL, 5 V y GND antes de las pruebas físicas.
+
+## 28-oct-2026 (tarde) — pruebas en el robot suspendido, coxa 2 y calibración de la tibia 2
+
+- Cola v24 retomada 14:10, terminó 15:11. Viabilidad 100 %: paso v24 s4109 200k, trote v24 s4209 200k, carrera v24 s4309 200k (copiadas a ppo_v10_robot/). Gateo v24/v25/v26 ≤55 % (avanza <90 % de la nominal). Galope: la marcha base fémur 16/tibia 14 se caía 20/20 con las ganancias de tibia; barrido_nominal.py → fémur 18, tibia 7 (2,1 m sin caídas). Galope v25 65 %, v26 (w-avance 30) 85 %.
+- Bus I²C colgado por el encoder del fémur 2 (TCA 0x70 canal 4): desconectado, el bus queda estable.
+- Coxa 2: se caía hacia adentro al caminar; su potenciómetro C1 no sigue la coxa (fijo en ~646), así que el firmware no la corregía. Ajustada en vivo con el operador (sostener_coxas.py, modo +): base 48 → 42 en firmware y ejecutar_politica_robot.py. Firmware cargado con avrdude del sistema (arduino-cli snap no abre el puerto). Ya no se cae.
+- Tibia 2 (ENC_T2): k −0,5921 → −1,15 (regresión encoder–orden en 3 caminatas, r≈0,97); el valor viejo duplicaba la amplitud medida. comparar_sim_real.py --calibracion-actual.
+- Parecido sim–real (60 s, coxa 2 a 42, calibración nueva): paso 83 %, trote 70 % (fémur trasero derecho C9 con r=0,25 en esa toma), carrera 69 %. Forma r≈0,99; robot 60–130 ms atrasado; en carrera los fémures se mueven 1,2–1,8× más que en la simulación.
+- Servicio apagar-cuadrupedo instalado (systemd, envía «x» al apagar).
+
+### 28-oct-2026 (noche) — gateo y galope, presentación
+
+- Gateo v27 (wav 40, continúa v26 6007/6001): **100 % viable** con la semilla 7013 a 4,1 M (avance 0,99 m frente a 1,03 m; deriva 0,03 frente a 0,14). El PC se apagó a las 16:50 y 17:02 con el gateo en 4,1–4,2 M de 4,5 M; se evaluaron las copias guardadas (reanudar_v27.sh) y se copió metadata.json desde v26 6007.
+- Galope: v26 85 %, v27 90 % (7403 a 150 k), v28 90 % (8417 a 175 k; 8 semillas cortas desde v27). Techo del 90 % con esta marcha base; siguiente paso sería ajustar ciclo o desfases, no entrenar más igual.
+- Copias para el robot en ppo_v10_robot/: paso v24 4109 200k, trote v24 4209 200k, carrera v24 4309 200k (100 %), gateo v27 7013 4100k (100 %), galope v28 8417 175k (90 %).
+- Revisión completa de sensores (revisar_sensores.py --completo): encoder fémur 2 (0x70/4) vuelve a funcionar; potenciómetro de la tibia 3 responde en M12 (el firmware no lo transmite aún); coxa 2 (C1) no sigue la coxa.
+- COMO_FUNCIONA_LA_RED.md: explicación de la red, estados, acciones, recompensa, GAE y PPO.
+- Presentación completa (46 diapositivas) en Documentacion/presentacion_20261028/ y como artifact.
+- Pendiente: probar gateo y galope en el robot; caminatas en el piso con IMU y cámaras diagonales.
+
+### 29-oct-2026 — explicaciones, gráficas de entrenamiento y presentaciones
+
+- Notas del orador de la presentación completa (https://claude.ai/artifact/RZ5pm312XNrX46RKTqrzYb) con la explicación de cada ecuación; parámetros de la red corregidos a ≈ 12 100 (actor ≈ 6 400).
+- entrenar_ppo_real.py --registrar-perdidas: guarda progress.csv (pérdidas de PPO por actualización) y monitor.csv (recompensa de cada episodio).
+- Campaña v30: las 5 marchas desde cero, 1 M de pasos, con registro (paso s4109, trote s4207, carrera s4309, gateo s4009, galope s6403). Paso, gateo y carrera convergen; trote casi; galope no converge en 1 M (varianza explicada ≈ 0).
+- graficas_recompensa_perdida.py: recompensa por episodio (cruda + tendencia) y 8 paneles de pérdidas por marcha, más recompensa de las 5 marchas. Copiadas a Documento_TESIS/Figures/Resultados (ppo_recompensa_<marcha>_episodios.png, ppo_perdidas_<marcha>.png); aún no están en el texto de la tesis.
+- Presentación resumida en línea de tiempo, 29 diapositivas, ecuaciones sin explicar y una sola tabla de resultados: https://claude.ai/artifact/HfRaeqjedTApv4aB1gmPgd (copia en Documentacion/presentacion_charla_20261029/).
+- El documento de tesis (PDF del 22-oct) sigue sin los resultados del 26 al 29-oct. Pendiente: actualizarlo; probar gateo y galope en el robot; caminatas en el piso; exportar las políticas nuevas a NumPy para la Raspberry.
+
+### 3-nov-2026 — videos de las caminatas movidos al disco externo
+
+Para liberar espacio se comprimieron a H.264 los videos MJPEG (comprimir_videos.py: 199 comprimidos; 4 de extra_general conservados en MJPEG por un desfase de ≈0,15 s en el primer fotograma) y las 217 caminatas con video se copiaron a `Vidios tesis` en el disco externo USB2 (rsync, verificación por suma de comprobación sin diferencias). Los 407 `video.mkv` se borraron del PC; los datos (csv, json, análisis) siguen también en `Experimentos/camaras/grabaciones`. Disco del PC: de 28 a 96 GB libres. Para reanalizar un video hay que conectar el disco; las caminatas nuevas se siguen grabando en el PC.
+
+### 3-nov-2026 — convergencia por marcha en el informe
+
+Campaña v31 (cola_v31.sh): las 5 marchas desde cero con registro de cada término de la recompensa (terminos.csv), 3 M de pasos y galope 5 M, una semilla por marcha. graficas_convergencia.py: recompensa y castigo frente a pasos y épocas, épocas frente a pasos y castigos por término. Convergencia de la recompensa: gateo 0,60 M (2937 épocas), paso 0,73 M (3560), carrera 0,83 M (4044), trote 1,39 M (6758), galope 2,05 M (10 020). El avance por episodio baja durante el entrenamiento en todas. Añadida la sección 13.5 a la tesis (capítulo de políticas PPO), con 2 tablas y 5 figuras. El resto del documento sigue sin los resultados del 26 al 29-oct (viabilidad, carrera y galope en el capítulo de resultados, parecido simulación-robot).
+
+### 3-nov-2026 — tesis actualizada con los resultados del 26-oct al 3-nov
+
+Cap. 12: mapa de articulaciones (coxa 2 a 42, coxa 3 a 64, tibia 1 en CH12, bases y topes de tibias 2 y 4), modos + $ ^ del firmware, fallos nuevos. Cap. 13: tabla de marchas (5), ganancias de tibia, campañas v17–v31 (tabla nueva), viabilidad (ecuación), sensores al 28-oct. Cap. 14: postura del 27-oct, viabilidad, parecido sim–real por articulación, mejores políticas, pendientes y alcance. Cap. 15–17, resumen y anexo actualizados. generar_inventario_resultados.py separa carrera y galope. Inferencias nuevas señaladas en el texto: copias elegidas con las mismas 20 semillas (optimista) y copias vecinas muy distintas (s7001 v27: 30/100/60 %). No actualizada: MATRIZ_OBJETIVO_EVIDENCIA.md.
+
+### 5-nov-2026 — gateo y galope en el robot suspendido; convergencia a ±2 %
+
+- graficas_convergencia.py con banda ±2 % (antes ±5 %, marcaba la línea cuando la curva aún subía): gateo 0,89 M, paso 0,95, carrera 1,23, trote 2,06; galope no converge en 5 M. Tesis 13.5 actualizada (commit dc7dad8).
+- robot05_gateo_v27_7013_60s_1811 y robot05_galope_v28_8417_60s_1813: inválidas, ningún sensor sigue la orden (r≈0, coxas 23–51°); probablemente servos sin fuerza en ese momento. revisar_sensores.py --completo (18:17) sí respondió: fémures M5/M6/M8/M9 r≈0,98, tibia 2 E70_3, tibia 3 M12; coxas y tibia 4 sin lectura.
+- Repetidas: gateo v27 r2_1822 parecido 76 % (90 % sin tibia 4; fémures r 0,94–0,99, coxas ≈1,7°); galope v28 r2_1825 parecido 66 % (fémur 2 deriva −13,9°, fémur 4 r 0,80 con ciclos negativos, desplazamiento común 60 cuentas; tibias 1,2–1,8× la simulación). pc2-camara se cayó de la red durante el galope: su video quedó en remota_incompleta.
+- Tibia 4 (C10) ya no sigue a su servo (r≈0,1 en caminata y sin lectura en la revisión).
+- Python con MuJoCo: ../../.venv-mujoco/bin/python (comparar_sim_real.py y revisar_sensores.py lo necesitan).
+
+### 5-nov-2026 (tarde) — modelo de servos ajustado por marcha (v32) y tope de la tibia 1
+
+- ajustar_ganancia_marcha.py: ganancia por articulación = amplitud robot/sim de las tomas de 60 s (r ≥ 0,8) → actuadores_<marcha>_articulacion.json. En tomas no usadas para el ajuste el parecido subió: paso 78/80 → 91/88, trote 61/79 → 69/87, carrera 66 → 76 % (la ganancia única por marcha no mejoraba). comparar_sim_real.py y evaluar_viabilidad.py aceptan --actuador.
+- v32 (cola_v32.sh + viabilidad_v32.sh): 4 semillas por marcha continuando las elegidas con el modelo ajustado. Con este modelo, la marcha nominal empeora mucho en simulación (carrera cae 19/20, galope retrocede). Viabilidad: paso 9109 300k 100 %, gateo 9009 4,6 M 100 %, carrera 9301 500k 95 %, trote 9209 650k 60 %, galope 9407 475k 60 %; las de partida con el modelo nuevo: paso y gateo 100 %, trote 5 %, carrera y galope 0 %. Copias en ppo_v10_robot/ppo_v32_*.
+- Robot suspendido (parecido sin tibia 4, cuyo potenciómetro C10 ya no sigue): trote 70 → 80, carrera 71 → 83, galope 69 → 82 (r2_1936; la primera toma se cortó a 45 s por desconexión USB), paso 85 → 81, gateo 90 → 84. Elegidas para el robot: paso v24, gateo v27, trote/carrera/galope v32. En el galope los potenciómetros de los fémures 2 y 4 se alteran (deriva 13°).
+- Tibia 1: se mueve (probar_tibia1.py). Tope mínimo 18 → 12 en firmware (copia .antes_tope_t1_20261105) y ejecutar_politica_robot.py; en el trote va ahora de 42 a 15°.
+- v33 (cola_v33.sh) en el PC 2 (pc2-camara, ~/Cuadrupedo_entreno, venv copiado): las 5 marchas desde cero con el modelo ajustado y registro, para las gráficas de convergencia (graficas_convergencia.py --campana v33).
+
+### 5-nov-2026 (noche) — convergencia con el modelo ajustado (v33, PC 2), videos de evidencia, visor MuJoCo
+
+- v33 en el PC 2 (5 marchas desde cero, modelo de servos ajustado, semilla 9900). Convergencia ±2 %: trote 1,28 M, carrera 0,35 M pero degenerada (cae en el 100 % de los episodios al final, 47 pasos: con recompensa por paso negativa, caer pronto da más retorno), paso no converge (sigue subiendo a 3 M), gateo y galope tampoco con ±2 % (planos a la vista desde ~1,5 y ~2 M). Con el modelo ajustado la marcha nominal de carrera cae; de ahí el fracaso desde cero (la v32, que continúa una política buena, no lo sufre).
+- graficas_convergencia.py: --campana/--semilla; media móvil sin repetir el último episodio en los bordes (v31 no cambia). Gráficas para la presentación en Documentacion/graficas_convergencia_20261105 (v31 y v33) y en el Escritorio.
+- Caminatas de evidencia (19:45-19:57, 60 s, 5 cámaras): gateo v27, paso v24, trote/carrera/galope v32; videos 2×2 en ~/Escritorio/Videos_evidencia_5nov (video_evidencia.py); datos en grabaciones/evidencia_*_1945.
+- ver_politica_mujoco.py: política en MuJoCo, ventana (ffplay) o video, piso o colgado. Etiqueta politicas-elegidas-20261105 en GitHub con README, SHA256SUMS, verificar.sh, requirements.txt y firmware.
+
+### Para continuar el 6-nov-2026
+
+- Gráficas de convergencia con fecha y hora: ~/Escritorio/Graficas_convergencia_2026-11-05_2027 (también en el Escritorio del PC 2) y Documentacion/graficas_convergencia_20261105. Se regeneran con `python3 graficas_convergencia.py [--campana v33 --salida graficas/convergencia_v33]` a partir de los terminos.csv/progress.csv de ppo_v31_* y ppo_v33_* (ya en el repositorio).
+- Decisión pendiente del operador sobre la v33: (1) usar en la presentación las v31 y la v33 solo como diapositiva extra (recomendado), o (2) quitar la línea de la carrera v33 y marcarla como degenerada. Motivo: con ±2 % del recorrido la línea de la carrera v33 queda en 0,35 M y la curva aún sube hasta ~0,5 M (empezó en −2800 por las caídas); ninguna regla única (1 %, ruido final, codo, 95 % de la mejora) acierta en todas las marchas.
+- Políticas elegidas para el robot (etiqueta politicas-elegidas-20261105): gateo v27 7013 4,1 M, paso v24 4109 0,2 M, trote v32 9209 650k, carrera v32 9301 500k, galope v32 9407 475k.
+- Pendientes: probar el visor de Gazebo en el PC 2 (si se decide), cables de los potenciómetros de los fémures 2 y 4 y de la tibia 4, cámara General (0 fotogramas), subir videos a YouTube (los sube el operador) y poner los enlaces en la tesis, ventiladores del PC 2 a automático.
+- Copias de seguridad de ppo_v32_* y ppo_v33_* en el PC 2 (~/Cuadrupedo_entreno/Experimentos/entrenamiento_real_20261016).
+
+### 6-nov-2026 — marcha nueva «pace» (v34), lista para probar en el robot
+
+- Pedido del operador: el paso v24 se veía igual que el gateo (mismo orden de patas, de a una; el paso solo no hace pausas). Se agregó el **pace** puro en entrenar_ppo_real.py (`--marcha pace`): FL+RL y luego FR+RR, apoyo 0,5, coxas ±8° en contrafase por lado (la pata en el aire abre, la apoyada cierra). Con ciclo 1 s solo se balanceaba (0,4 m/20 s); con **0,45 s** avanza 3,5 m/20 s sin caídas (barrido en MuJoCo; coxas al revés retrocede). Aprobada por el operador en MuJoCo.
+- Campaña v34 (cola_pace.sh, cola_pace_extra.txt): pesos del trote v32/v33, modelo actuadores_trote_articulacion.json, `--w-coxas 0.1` (con 1.0 el castigo por la coxa en movimiento, que la política no controla, hacía preferible caerse), 27 ciclos por episodio. 4 semillas desde cero (3 M) y 8 desde el trote v32 9209 (1 M).
+- **Elegida: ppo_v10_robot/ppo_v34_pace_semilla_9517_1600k**, 100 % viable en 60 episodios (40 nuevos), avance 3,75 m (base 3,27), deriva 0,22 m (base 0,58), 0 caídas, incl. 7,9°. Paquete para reproducir: politica_pace_20261106/ (README, SHA256SUMS, verificar.sh); etiqueta politica-pace-20261106.
+- Gráficas: graficas_pace_v34.py → graficas/convergencia_v34_pace (recompensa frente a pasos/episodios/épocas, castigo, pérdidas de PPO, línea de convergencia). 9501 (desde cero) converge en 2,03 M. La 9517 y la 9521 se continúan 2 M más (cola_pace_parte2.sh) para ver su convergencia.
+- Siguiente: probar en el robot colgado (ver precauciones en politica_pace_20261106/README.md: ciclo rápido, cuatro coxas en movimiento, coxa 2 rebotaba en el galope).
+
+### 6-nov-2026 (noche) — gráficas de presentación y diapositivas de la sustentación
+- Gráficas de 4 paneles por marcha (`graficas_presentacion_pace_v34.py`): pace v34 9517 con líneas de convergencia
+  elegidas por el usuario; gateo, trote y galope tomados de la v33 desde cero (semilla 9900), porque las v32 eran
+  ajustes finos con curvas planas. El usuario aprobó estas gráficas y descartó reentrenar.
+- Presentación de sustentación sobre la plantilla USTA del anteproyecto:
+  `ProyectoII_Clases/Sustentacion_20261106/Sustentacion_Proyecto_Grado_II_v3.odp` (33 diapositivas). El usuario
+  la edita a mano; se agregó la diapositiva 16, «Conexión del hardware» (PC → Arduino Uno → PCA9685, TCA9548A
+  0x70/0x71 y CD74HC4067).
+- Ver `ProyectoII_Clases/Sustentacion_20261106/LEEME.md`, que tiene las reglas de edición y los pendientes.

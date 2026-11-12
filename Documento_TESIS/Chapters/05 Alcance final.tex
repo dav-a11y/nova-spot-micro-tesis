@@ -1,0 +1,117 @@
+\chapter{Alcance y delimitaciones}
+
+El proyecto abordó la reactivación progresiva del robot cuadrúpedo Nova Spot
+Micro mediante modelado, simulación, control de locomoción, preparación
+electrónica y entrenamiento y evaluación de una capa correctiva de aprendizaje por refuerzo.
+El sistema se limitó a postura y locomoción de baja velocidad tipo gateo, paso
+y trote, evaluadas en simulación y en el robot físico suspendido, bajo
+condiciones controladas.
+
+\section{Componentes desarrollados}
+
+\begin{itemize}
+\item Se formularon e implementaron modelos cinemáticos y dinámicos nominales,
+jacobianos y descripciones URDF/SDF y MJCF.
+\item Se integró una arquitectura ROS~2 con control articular, métricas,
+supervisor, fase de marcha, contacto, IMU y margen de estabilidad nominal.
+\item Se implementaron y evaluaron en simulación postura, marcha paso y gateo.
+El galope se conservó únicamente como experimento opcional, deshabilitado por
+defecto y excluido de los criterios principales.
+\item Se preparó la Raspberry Pi como controlador embebido, se verificó
+comunicación DDS e I$^2$C y se realizaron pruebas progresivas del PCA9685.
+\item Se instrumentaron las articulaciones con potenciómetros y encoders
+magnéticos, se identificó el actuador real y se ejecutaron marchas nominales y
+políticas PPO en el robot suspendido, con registro sincronizado de sensores y
+hasta cinco cámaras.
+\item Se entrenaron y seleccionaron políticas PPO residuales con el actuador
+identificado, mediante un ciclo que evalúa las candidatas en el robot y
+actualiza el modelo con sus datos.
+\item Se definieron el protocolo, las métricas, las cantidades experimentales y
+las semillas para la comparación final.
+\end{itemize}
+
+\section{Delimitaciones}
+
+No se abordaron navegación autónoma, conectividad en la nube, percepción del
+entorno ni locomoción rápida sobre terreno irregular. La política aprendida no
+comandará directamente PWM ni sustituirá límites articulares, saturaciones o el
+supervisor independiente.
+
+Se identificaron la geometría de las patas y el actuador (retardo, zona
+muerta, histéresis y saturación), pero no las masas, inercias ni la fricción, por
+lo que el modelo sigue considerándose nominal computable y no un gemelo
+digital. El margen de estabilidad calculado en simulación no se presentó como
+medición física. El seguimiento articular real se midió con los sensores
+añadidos, salvo en dos tibias sin sensor operativo, que se estimaron con la
+orden.
+
+La primera estrategia PPO, entrenada con el modelo nominal, no demostró la
+mejora requerida y no fue aceptada para transferencia. Las estrategias
+posteriores, entrenadas con el actuador identificado, sí se ejecutaron en el
+robot suspendido. La seguridad eléctrica y la alimentación (separación entre
+electrónica y servos) siguen abiertas para OE1. OE3 requiere demostrar estabilidad y continuidad del control aprendido
+en paso y gateo. OE4 exige completar la Prueba de Margen de Estabilidad Estática,
+la Prueba de Seguimiento de Posición Articular y la Prueba de Repetibilidad del
+Patrón de Marcha; la evidencia parcial en simulación no cierra su evaluación integral.
+
+\section{Productos obtenidos y productos abiertos}
+
+Se obtuvieron código versionado, modelos de simulación, documentación
+matemática, controladores nominales, pruebas automatizadas, bolsas de datos,
+analizadores, informes, un protocolo experimental, un conjunto de datos físicos
+(caminatas con sensores y video sincronizados), políticas PPO seleccionadas en
+el robot y su comparación con la marcha nominal. Quedan abiertas la validación
+de seguridad eléctrica, la locomoción apoyada con medición de la orientación
+del cuerpo y una comparación estadística con más repeticiones. La separación evita presentar productos esperados como si
+hubieran sido obtenidos.
+
+\section{Alcance planteado en el anteproyecto y estado de cada producto}
+
+El anteproyecto propuso la reactivación funcional del Nova Spot Micro del
+laboratorio de robótica de la Universidad Santo Tomás mediante la
+caracterización geométrica y estructural de la plataforma, la formulación de
+los modelos cinemático y dinámico con sus jacobianos, la integración de la
+arquitectura electrónica de accionamiento y sensado, una marcha nominal
+coordinada por una máquina de estados finitos para postura, paso y gateo, una
+política de aprendizaje por refuerzo como capa correctiva entrenada en
+simulación y evaluada también en el robot, un mecanismo de interacción
+humano--robot para la operación y un esquema de validación experimental en
+condiciones controladas. Su impacto esperado era habilitar la plataforma como
+herramienta académica y de investigación, con una base técnica documentada
+para desarrollos posteriores.
+
+Las limitaciones fijadas entonces se mantuvieron: no se desarrolló un sistema
+autónomo ni conectividad en la nube; la política no comanda PWM ni sustituye
+los límites articulares o el supervisor; no se optimizó el sistema energético
+ni se caracterizaron baterías; la operación se restringió a superficies planas
+y baja velocidad, sin velocidad máxima como requisito, y la transferencia al
+robot fue progresiva con parada de los servos independiente de la política.
+Hubo dos cambios respecto del plan. El anteproyecto excluía el trote como
+locomoción rápida; en la fase física se incorporó un trote lento de ciclo
+1{,}0~s porque la marcha paso, con las coxas fijas, resultó en la práctica un
+gateo continuo (sección~\ref{sec:eleccion-marchas}).
+Además, los cinco objetivos específicos iniciales se consolidaron en los
+cuatro del capítulo de objetivos.
+
+La tabla~\ref{tab:productos-anteproyecto} contrasta cada producto esperado con
+lo efectivamente obtenido.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Productos esperados en el anteproyecto y estado al cierre de esta versión.}
+\label{tab:productos-anteproyecto}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.34\textwidth}p{0.13\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}}
+\toprule
+\textbf{Producto esperado} & \textbf{Estado} & \textbf{Evidencia o pendiente} \\
+\midrule
+Informe técnico final & Obtenido & Este documento y la bitácora de continuidad del repositorio. \\
+Modelos cinemático y dinámico formales con jacobianos & Obtenido & Capítulo~\ref{cap:modelo}; dinámica nominal sin identificación de masas e inercias. \\
+Arquitectura electrónica: diagramas, computador embebido, actuadores y sensores & Parcial & Esquema propuesto (anexo), Raspberry~Pi preparada, sensores articulares integrados; seguridad eléctrica y migración del bucle a la Raspberry~Pi abiertas. \\
+Código fuente documentado de postura, marchas y política & Obtenido & Repositorio Git con controladores, entornos, entrenamiento y ejecución en el robot. \\
+Prototipo funcional con comparación con y sin capa aprendida & Parcial & Marchas y políticas ejecutadas y comparadas con el robot suspendido; falta la locomoción apoyada. \\
+Mecanismo de interacción humano--robot & Parcial & Panel gráfico de selección de marchas sobre ROS~2 en la Raspberry~Pi y vista de cámaras en vivo; sin interfaz integrada para la fase física. \\
+Manual técnico de operación & Parcial & Protocolos y comandos de reproducción en los anexos; falta un manual consolidado. \\
+\bottomrule
+\end{tabular}
+\end{table}

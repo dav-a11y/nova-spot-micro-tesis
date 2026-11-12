@@ -1,0 +1,82 @@
+\chapter*{Resumen}
+\addcontentsline{toc}{chapter}{Resumen}
+
+Este documento presenta el desarrollo de un sistema de locomoción para el
+robot cuadrúpedo Nova Spot Micro. Se implementaron modelos cinemáticos y
+dinámicos nominales, una descripción reproducible para Gazebo y MuJoCo, un
+controlador de postura y marchas cartesianas tipo paso y gateo, métricas en
+línea y un supervisor de seguridad. La arquitectura se integró en ROS~2 Humble
+y se verificó mediante pruebas automatizadas y ensayos registrados con
+\textit{rosbag2}.
+
+La línea base de gateo con temporización corregida reprodujo ciclos de
+4,32~s con diferencias menores al 0,2~\% entre dos ejecuciones. La marcha paso
+completó ensayos independientes en Gazebo y una validación articular en MuJoCo.
+La instrumentación simulada incluyó contacto en los cuatro pies, IMU y margen
+de estabilidad nominal. Un ensayo específico de 24 ciclos distinguió el
+contacto crudo del contacto filtrado: las interrupciones de las patas traseras
+duraron menos de 0,09~s y ninguna superó el criterio de persistencia de
+0,12~s. Por tanto, el avance observado no demostró un vuelo trasero sostenido y
+se concluyó que el patrón físico simulado todavía no coincide con la secuencia
+ideal de contactos.
+
+En la fase física, el robot se operó suspendido con una arquitectura basada en
+una Raspberry~Pi~4, un controlador PWM PCA9685 y sensores articulares
+(potenciómetros y encoders magnéticos), registrados junto con hasta cinco
+cámaras sincronizadas.
+Con esos datos se identificó el actuador real (retardo de unos 99~ms,
+histéresis de 0,6 a $1{,}5^\circ$) y se midió la geometría del robot, y con
+ambos se entrenaron políticas PPO residuales en MuJoCo para cinco marchas (gateo,
+paso, trote, carrera y galope), con entre cuatro y diez semillas por configuración. Un ciclo automático
+de prueba en el robot, actualización del modelo y reentrenamiento seleccionó las
+políticas con el robot real: la política de gateo redujo entre un 15 y un 19~\%
+el error medio de seguimiento y de desviación de las coxas frente a la marcha
+nominal en dos vueltas completas, y la de trote un 19~\% en una de ellas. Las
+políticas elegidas alcanzaron en simulación una viabilidad del 100~\% en cuatro marchas
+y del 90~\% en galope, en 20 episodios con aleatorización y sin caídas, y el robot
+reprodujo la forma de los movimientos simulados, con un parecido del 66 al 83~\% en las
+cinco marchas. La
+comparación con cámaras reveló y permitió corregir errores de la interfaz
+robot--modelo, como el sentido invertido de dos articulaciones y una postura
+base distinta de la simulada.
+
+Estos resultados se obtuvieron con el robot suspendido: miden el seguimiento de
+las órdenes y la estabilidad de las coxas, no el avance ni la estabilidad sobre
+el suelo. La validación de la locomoción apoyada, con medición de la
+orientación del cuerpo y la realimentación de tres tibias y una coxa permanecen pendientes y no se presentan como logros terminados.
+
+\textbf{Palabras clave:} robot cuadrúpedo, locomoción, ROS~2, Gazebo, MuJoCo,
+contacto, estabilidad, aprendizaje por refuerzo, PPO, transferencia
+simulación--realidad.
+
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+This document presents the development of a locomotion system for the Nova
+Spot Micro quadruped robot. Nominal kinematic and dynamic models, reproducible
+Gazebo and MuJoCo descriptions, posture and Cartesian gait controllers, online
+metrics, and a safety supervisor were implemented using ROS~2 Humble. Baseline
+experiments demonstrated repeatable crawl and step trajectories in simulation.
+A 24-cycle experiment separated raw from debounced foot-contact observations.
+Rear-foot interruptions remained below 0.09~s and never met the 0.12~s
+persistence criterion; therefore, simulated forward motion did not demonstrate
+sustained rear-foot flight.
+
+In the physical phase, the suspended robot was operated with an architecture
+based on a Raspberry Pi~4 and a PCA9685 PWM controller, with joint sensors
+(potentiometers and magnetic encoders) and up to five synchronized cameras. These data were used
+to identify the real actuator (about 99~ms delay) and the robot geometry, and
+residual PPO policies were trained in MuJoCo for five gaits (crawl, step, trot, run and
+gallop) with four to ten seeds per configuration. An automatic loop of on-robot testing, model
+update and retraining selected policies on the real robot: the crawl policy
+reduced the mean tracking and hip-deviation error by 15--19~\% relative to the
+nominal gait in two complete rounds, and the trot policy by 19~\% in one round.
+In simulation, the selected policies reached 100~\% viability in four gaits and 90~\% in
+gallop over 20 randomized episodes, with no falls; on the robot, the five gaits
+reproduced the shape of the simulated motion, with a similarity of 66--83~\%.
+These results were obtained with the robot suspended; they measure command
+tracking and hip stability, not locomotion on the ground, which remains to be
+validated.
+
+\textbf{Keywords:} quadruped robot, locomotion, ROS~2, Gazebo, MuJoCo,
+contact, stability, reinforcement learning, PPO, sim-to-real transfer.

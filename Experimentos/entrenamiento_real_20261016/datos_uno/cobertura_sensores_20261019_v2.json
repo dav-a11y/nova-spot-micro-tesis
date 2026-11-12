@@ -1,0 +1,98 @@
+[
+  {
+    "articulacion": "coxa1",
+    "canal_pca": 0,
+    "pot": "C0",
+    "encoder": "0x70/2",
+    "encoder_cambio": -999.0,
+    "cobertura": "solo potenciómetro"
+  },
+  {
+    "articulacion": "coxa2",
+    "canal_pca": 1,
+    "pot": "C1",
+    "encoder": "0x70/5",
+    "encoder_cambio": -2.7,
+    "cobertura": "solo potenciómetro"
+  },
+  {
+    "articulacion": "coxa3",
+    "canal_pca": 2,
+    "pot": "C3",
+    "encoder": "0x71/2",
+    "encoder_cambio": -999.0,
+    "cobertura": "solo potenciómetro"
+  },
+  {
+    "articulacion": "coxa4",
+    "canal_pca": 3,
+    "pot": "C2",
+    "encoder": "0x71/6",
+    "encoder_cambio": -3.7,
+    "cobertura": "solo potenciómetro"
+  },
+  {
+    "articulacion": "femur1",
+    "canal_pca": 4,
+    "pot": "C8",
+    "encoder": "0x70/1",
+    "encoder_cambio": -29.1,
+    "cobertura": "AMBOS"
+  },
+  {
+    "articulacion": "femur2",
+    "canal_pca": 5,
+    "pot": "C5",
+    "encoder": "0x70/4",
+    "encoder_cambio": 4.8,
+    "cobertura": "solo potenciómetro"
+  },
+  {
+    "articulacion": "femur3",
+    "canal_pca": 6,
+    "pot": "C9",
+    "encoder": "0x71/1",
+    "encoder_cambio": 0.1,
+    "cobertura": "solo potenciómetro"
+  },
+  {
+    "articulacion": "femur4",
+    "canal_pca": 7,
+    "pot": "C6",
+    "encoder": "0x71/5",
+    "encoder_cambio": 7.7,
+    "cobertura": "AMBOS"
+  },
+  {
+    "articulacion": "tibia1",
+    "canal_pca": 8,
+    "pot": null,
+    "encoder": "0x70/0",
+    "encoder_cambio": -18.0,
+    "cobertura": "solo encoder"
+  },
+  {
+    "articulacion": "tibia2",
+    "canal_pca": 9,
+    "pot": null,
+    "encoder": "0x70/3",
+    "encoder_cambio": -13.3,
+    "cobertura": "solo encoder"
+  },
+  {
+    "articulacion": "tibia3",
+    "canal_pca": 10,
+    "pot": "C11",
+    "encoder": "0x71/0",
+    "encoder_cambio": 0.1,
+    "cobertura": "solo potenciómetro"
+  },
+  {
+    "articulacion": "tibia4",
+    "canal_pca": 14,
+    "pot": "C10",
+    "encoder": "0x71/4",
+    "encoder_cambio": -999.0,
+    "cobertura": "solo potenciómetro"
+  }
+]

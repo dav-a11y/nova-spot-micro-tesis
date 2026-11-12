@@ -1,0 +1,110 @@
+[
+  {
+    "articulacion": "coxa1",
+    "canal_pca": 0,
+    "pot_canal": 0,
+    "pot_cuentas": 53.7,
+    "enc": "0x70/1",
+    "enc_grados": 10.3,
+    "cobertura": "AMBOS"
+  },
+  {
+    "articulacion": "coxa2",
+    "canal_pca": 1,
+    "pot_canal": 1,
+    "pot_cuentas": 38.7,
+    "enc": null,
+    "enc_grados": 2.7,
+    "cobertura": "solo potenciómetro"
+  },
+  {
+    "articulacion": "coxa3",
+    "canal_pca": 2,
+    "pot_canal": 3,
+    "pot_cuentas": 47.2,
+    "enc": null,
+    "enc_grados": 1.5,
+    "cobertura": "solo potenciómetro"
+  },
+  {
+    "articulacion": "coxa4",
+    "canal_pca": 3,
+    "pot_canal": 2,
+    "pot_cuentas": 54.7,
+    "enc": "0x70/4",
+    "enc_grados": 85.9,
+    "cobertura": "AMBOS"
+  },
+  {
+    "articulacion": "femur1",
+    "canal_pca": 4,
+    "pot_canal": 8,
+    "pot_cuentas": 51.5,
+    "enc": "0x70/1",
+    "enc_grados": 30.6,
+    "cobertura": "AMBOS"
+  },
+  {
+    "articulacion": "femur2",
+    "canal_pca": 5,
+    "pot_canal": 5,
+    "pot_cuentas": 47.2,
+    "enc": "0x70/4",
+    "enc_grados": 6.1,
+    "cobertura": "AMBOS"
+  },
+  {
+    "articulacion": "femur3",
+    "canal_pca": 6,
+    "pot_canal": null,
+    "pot_cuentas": 8.3,
+    "enc": null,
+    "enc_grados": 1.4,
+    "cobertura": "NINGUNO"
+  },
+  {
+    "articulacion": "femur4",
+    "canal_pca": 7,
+    "pot_canal": 6,
+    "pot_cuentas": 49.2,
+    "enc": "0x71/5",
+    "enc_grados": 8.4,
+    "cobertura": "AMBOS"
+  },
+  {
+    "articulacion": "tibia1",
+    "canal_pca": 8,
+    "pot_canal": null,
+    "pot_cuentas": 6.3,
+    "enc": "0x70/0",
+    "enc_grados": 18.1,
+    "cobertura": "solo encoder"
+  },
+  {
+    "articulacion": "tibia2",
+    "canal_pca": 9,
+    "pot_canal": 9,
+    "pot_cuentas": 50.7,
+    "enc": "0x70/3",
+    "enc_grados": 12.8,
+    "cobertura": "AMBOS"
+  },
+  {
+    "articulacion": "tibia3",
+    "canal_pca": 10,
+    "pot_canal": 11,
+    "pot_cuentas": 50.2,
+    "enc": null,
+    "enc_grados": 4.3,
+    "cobertura": "solo potenciómetro"
+  },
+  {
+    "articulacion": "tibia4",
+    "canal_pca": 14,
+    "pot_canal": 10,
+    "pot_cuentas": 50.7,
+    "enc": "0x71/4",
+    "enc_grados": 16.7,
+    "cobertura": "AMBOS"
+  }
+]

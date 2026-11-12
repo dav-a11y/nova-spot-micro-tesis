@@ -6,7 +6,9 @@ modelo y no sustituyen la calibracion de los sensores AS5600.
 """
 
 import argparse
+import csv
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -124,9 +126,9 @@ def make_figure(selected_leg, initial_q=None):
     axes = []
     sliders = []
     labels = ("Coxa", "Femur", "Tibia")
-    # Los rangos ampliados de coxa y tibia son exploratorios: quedan fuera de
-    # los limites nominales hasta validarlos con el montaje y los AS5600.
-    limits = ((-3.00, 3.00), (-1.20, 1.20), (-3.00, 0.10))
+    # Los rangos ampliados de coxa y tibia son exploratorios y solo afectan
+    # este visor 3D. No son límites físicos ni autorizan comandos a servos.
+    limits = ((-3.00, 3.00), (-1.20, 1.20), (-3.00, 1.00))
     for index, (label, (low, high)) in enumerate(zip(labels, limits)):
         slider_ax = fig.add_axes([0.10, 0.16 - index * 0.045, 0.54, 0.025])
         slider = Slider(slider_ax, label, low, high, valinit=poses[selected_leg][index], valstep=0.01)
@@ -156,7 +158,7 @@ def make_figure(selected_leg, initial_q=None):
     reset_ax = fig.add_axes([0.70, 0.08, 0.12, 0.045])
     save_ax = fig.add_axes([0.84, 0.08, 0.12, 0.045])
     reset_button = Button(reset_ax, "Reiniciar")
-    save_button = Button(save_ax, "Guardar PNG")
+    save_button = Button(save_ax, "Guardar PNG + CSV")
 
     leg_buttons = {}
     for index, leg in enumerate(range(1, 5)):
@@ -178,9 +180,19 @@ def make_figure(selected_leg, initial_q=None):
         refresh()
 
     def save(_event):
-        output = ROOT / "Experimentos" / "pose_inicial_3d.png"
+        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output = ROOT / "Experimentos" / f"pose_3d_{stamp}.png"
+        positions = ROOT / "Experimentos" / f"pose_3d_{stamp}.csv"
         fig.savefig(output, dpi=180, bbox_inches="tight")
+        with positions.open("w", newline="", encoding="utf-8") as stream:
+            writer = csv.writer(stream)
+            writer.writerow(("pata", "descripcion", "coxa_rad", "femur_rad",
+                             "tibia_rad", "fuente"))
+            for leg in range(1, 5):
+                writer.writerow((leg, NAMES[leg], *poses[leg],
+                                 "ajuste_visual_manual_no_calibrado"))
         print(f"Captura guardada en: {output}")
+        print(f"Posiciones guardadas en: {positions}")
 
     reset_button.on_clicked(reset)
     save_button.on_clicked(save)

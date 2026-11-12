@@ -1,0 +1,99 @@
+{
+  "seed": 11,
+  "timesteps": 150528,
+  "eval_seeds": [
+    801,
+    802,
+    803,
+    804,
+    805
+  ],
+  "control_dt": 0.03,
+  "actuador": {
+    "sesiones": [
+      131,
+      135,
+      136
+    ],
+    "retardo_s": 0.087,
+    "ganancia": 1.008,
+    "articulaciones": {
+      "front_left_femur_joint": {
+        "nombre": "Femur 2",
+        "r": 0.995,
+        "retardo_s": 0.087,
+        "ganancia": 1.008,
+        "fiable": true,
+        "muestras": 1298,
+        "rango_servo_alcanzado": [
+          84.9,
+          120.4
+        ]
+      },
+      "rear_left_femur_joint": {
+        "nombre": "Femur 4",
+        "r": 0.996,
+        "retardo_s": 0.087,
+        "ganancia": 1.011,
+        "fiable": true,
+        "muestras": 1298,
+        "rango_servo_alcanzado": [
+          83.3,
+          116.6
+        ]
+      },
+      "front_left_tibia_joint": {
+        "nombre": "Tibia 2",
+        "r": 0.99,
+        "retardo_s": 0.087,
+        "ganancia": 1.0,
+        "fiable": true,
+        "muestras": 1298,
+        "rango_servo_alcanzado": [
+          61.2,
+          82.9
+        ]
+      },
+      "rear_right_tibia_joint": {
+        "nombre": "Tibia 3",
+        "r": -0.104,
+        "retardo_s": 0.4,
+        "ganancia": 0.725,
+        "fiable": false,
+        "muestras": 1298
+      },
+      "rear_left_tibia_joint": {
+        "nombre": "Tibia 4",
+        "r": -0.008,
+        "retardo_s": 0.2,
+        "ganancia": 0.04,
+        "fiable": false,
+        "muestras": 1298
+      }
+    },
+    "tibia1_sin_pwm": true,
+    "coxas_fijas_grados": {
+      "coxa1": 150,
+      "coxa2": 45,
+      "coxa3": 55,
+      "coxa4": 150
+    },
+    "periodo_control_s": 0.029,
+    "fuente_v2": [
+      "ronda1_11.csv",
+      "ronda1_37.csv",
+      "ronda1_71.csv",
+      "ronda1_nominal.csv"
+    ]
+  },
+  "hardware_transfer": false,
+  "observacion": [
+    "front_left_femur_joint",
+    "rear_left_femur_joint",
+    "front_left_tibia_joint",
+    "sin_fase",
+    "cos_fase",
+    "residual_previo x12"
+  ],
+  "nota": "Simulación ajustada al robot real del 16-oct; no transferida al robot."
+}

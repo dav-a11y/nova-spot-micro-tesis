@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+"""Al apagar el PC: deja sin PWM los 16 canales de la PCA9685 del cuadrúpedo (orden 'x' del firmware).
+La placa sigue alimentada por el USB, pero sin sostener ningún servo (27-oct-2026).
+Se instala como /usr/local/bin/apagar-cuadrupedo junto con apagar-cuadrupedo.service."""
+import os
+import termios
+import time
+
+try:
+    fd = os.open("/dev/ttyACM0", os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK)
+    a = termios.tcgetattr(fd)
+    a[4] = a[5] = termios.B115200
+    termios.tcsetattr(fd, termios.TCSANOW, a)
+    time.sleep(2.5)          # abrir el puerto reinicia la placa
+    os.write(fd, b"x")
+    time.sleep(0.5)
+    os.close(fd)
+except OSError:
+    pass

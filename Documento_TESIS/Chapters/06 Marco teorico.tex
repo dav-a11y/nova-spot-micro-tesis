@@ -1,0 +1,182 @@
+\chapter{Marco teórico}
+
+\section{Locomoción cuadrúpeda}
+
+Un robot cuadrúpedo alterna fases de apoyo y oscilación para desplazar el cuerpo sin perder estabilidad. La secuencia temporal de estas fases define la marcha. En una marcha estática, el movimiento se ejecuta con suficiente lentitud para que el equilibrio pueda analizarse principalmente mediante la proyección del centro de masa y el polígono formado por los pies en contacto. En una marcha dinámica también deben considerarse la velocidad, la aceleración, las fuerzas de reacción y los efectos inerciales~\cite{zamani2011dynamics}.
+
+Las plataformas cuadrúpedas modernas utilizan doce articulaciones actuadas, normalmente tres por extremidad. Esta configuración permite posicionar cada pie en tres dimensiones y controlar simultáneamente la postura del tronco~\cite{bledt2018cheetah3,hutter2016anymal}.
+
+\section{Teorías y modelos que sustentan el análisis}
+
+El fenómeno estudiado en esta tesis es la locomoción coordinada de un robot
+cuadrúpedo con actuadores de posición y recursos limitados. Para explicarlo y
+analizarlo se emplean cinco fundamentos principales: teoría de locomoción
+cuadrúpeda, modelado cinemático, modelado dinámico y de contacto, control
+discreto de marcha, y aprendizaje por refuerzo.
+
+La teoría de locomoción cuadrúpeda permite describir la marcha como una
+secuencia temporal de apoyos y oscilaciones. A partir de esta teoría se definen
+los modos de paso y gateo, el ciclo de marcha, las fases de contacto y el
+criterio de estabilidad estática basado en la relación entre el centro de masa y
+el polígono de soporte. Este fundamento sustenta la Prueba de Margen de
+Estabilidad Estática y la interpretación de contactos durante la marcha.
+
+El modelo cinemático explica la relación entre las posiciones articulares y la
+posición cartesiana de cada pie. Este modelo permite transformar trayectorias de
+los pies en referencias para las doce articulaciones, verificar si una postura
+es alcanzable y analizar continuidad entre muestras. Por ello, sustenta el
+diseño de las marchas nominales y la Prueba de Seguimiento de Posición
+Articular.
+
+El modelo dinámico y de contacto permite interpretar la interacción entre el
+cuerpo del robot, los actuadores y el suelo. Aunque el proyecto utiliza un
+modelo nominal no identificado físicamente, este fundamento es necesario para
+simular masas, inercias, gravedad, fricción, fuerzas de contacto y perturbaciones
+en Gazebo y MuJoCo. También permite explicar por qué una validación en
+simulación debe contrastarse posteriormente con mediciones físicas.
+
+El control discreto mediante una máquina de estados finitos permite organizar la
+marcha en fases repetibles. Cada estado define qué pata está en oscilación, qué
+patas deben permanecer en apoyo y qué referencia debe enviarse al controlador.
+Este modelo sustenta la generación de patrones de paso y gateo, además de la
+Prueba de Repetibilidad del Patrón de Marcha.
+
+El aprendizaje por refuerzo sustenta la capa correctiva propuesta. En este
+enfoque, una política aprende a seleccionar acciones a partir de observaciones y
+recompensas. En la tesis, estas acciones se delimitan como correcciones pequeñas
+sobre referencias nominales, no como comandos directos de PWM. Este fundamento
+permite analizar la comparación entre marcha nominal y marcha nominal con
+corrección aprendida, manteniendo límites y supervisión de seguridad.
+
+\section{Modelado cinemático}
+
+La cinemática directa relaciona las posiciones articulares con la pose del pie respecto al cuerpo. Para una extremidad con tres grados de libertad puede expresarse de forma general como
+
+\begin{equation}
+    \mathbf{p}_{f}=f(\mathbf{q}),
+    \label{eq:cinematica-directa}
+\end{equation}
+
+donde $\mathbf{q}$ contiene las posiciones articulares y $\mathbf{p}_{f}$ representa la posición cartesiana del pie. La cinemática inversa determina las posiciones articulares compatibles con una referencia cartesiana. Debido a los límites mecánicos y a la existencia de múltiples soluciones, el algoritmo debe comprobar el espacio alcanzable y seleccionar una configuración coherente con la geometría de la extremidad.
+
+La relación diferencial entre velocidad articular y velocidad cartesiana se obtiene mediante el jacobiano:
+
+\begin{equation}
+    \dot{\mathbf{p}}_{f}=\mathbf{J}(\mathbf{q})\dot{\mathbf{q}}.
+    \label{eq:jacobiano}
+\end{equation}
+
+Estas relaciones permiten generar trayectorias de los pies y transformarlas en referencias articulares para el controlador de posición.
+
+\section{Dinámica y contacto}
+
+El modelo dinámico de un cuadrúpedo con base flotante puede escribirse como
+
+\begin{equation}
+    \mathbf{M}(\mathbf{q})\ddot{\mathbf{q}}+
+    \mathbf{h}(\mathbf{q},\dot{\mathbf{q}})=
+    \mathbf{S}^{\mathsf{T}}\boldsymbol{\tau}+
+    \mathbf{J}_{c}^{\mathsf{T}}\boldsymbol{\lambda},
+    \label{eq:dinamica}
+\end{equation}
+
+donde $\mathbf{M}$ es la matriz de inercia, $\mathbf{h}$ agrupa los términos de Coriolis, centrífugos y gravitacionales, $\boldsymbol{\tau}$ contiene los esfuerzos actuados y $\boldsymbol{\lambda}$ representa las fuerzas de contacto. Los controladores de cuerpo completo y predictivos incorporan esta dinámica junto con restricciones de fricción, contacto y saturación~\cite{bellicoso2018dynamic,dicarlo2018mpc,neunert2018wholebody}.
+
+\section{Control discreto de marcha}
+
+Una máquina de estados finitos describe una marcha mediante posturas y transiciones. Cada estado identifica las extremidades en apoyo y oscilación, además de las referencias articulares o cartesianas. Para el gateo se mueve una extremidad a la vez con el propósito de conservar un triángulo de apoyo. Este enfoque proporciona una referencia nominal interpretable y permite incorporar límites antes de operar el hardware.
+
+\section{Aprendizaje por refuerzo}
+
+En aprendizaje por refuerzo, el agente observa el estado del sistema, ejecuta una acción y recibe una recompensa. El objetivo es aprender una política $\pi(\mathbf{a}\mid\mathbf{s})$ que maximice el retorno esperado. En locomoción, las observaciones pueden incluir orientación, velocidades, estado articular, contactos y fase de marcha; las acciones pueden corresponder a correcciones sobre referencias nominales.
+
+Los resultados publicados muestran que la elección de la recompensa puede inducir patrones de locomoción coordinados y favorecer comportamientos energéticamente eficientes~\cite{heess2017emergence,fu2021energy}. En este proyecto la política no comandará directamente las señales PWM: generará correcciones acotadas que serán verificadas por el supervisor de seguridad.
+
+\subsection{Proceso de decisión de Markov y retorno}
+
+El problema se formaliza como un proceso de decisión de Markov (MDP) $(\mathcal{S},\mathcal{A},P,r,\gamma)$~\cite{sutton2018rl}. En cada paso de control $t$ el agente recibe una observación $\mathbf{s}_t\in\mathcal{S}$, elige una acción $\mathbf{a}_t\in\mathcal{A}$ según la política estocástica $\pi_\theta(\mathbf{a}_t\mid\mathbf{s}_t)$, de parámetros $\theta$, y el entorno responde con un nuevo estado $\mathbf{s}_{t+1}\sim P(\cdot\mid\mathbf{s}_t,\mathbf{a}_t)$ y una recompensa escalar $r_t$. El objetivo es maximizar el retorno descontado esperado
+\begin{equation}
+    J(\theta)=\mathbb{E}_{\tau\sim\pi_\theta}\left[\sum_{t=0}^{T-1}\gamma^{t}r_t\right],
+    \label{eq:retorno}
+\end{equation}
+donde $\tau=(\mathbf{s}_0,\mathbf{a}_0,r_0,\ldots)$ es una trayectoria y $\gamma\in[0,1)$ es el factor de descuento, que fija cuánto pesan las recompensas futuras. Con $\gamma=0{,}99$, usado en este trabajo, el horizonte efectivo es del orden de $1/(1-\gamma)=100$ pasos, es decir, unos 3~s con el periodo de control de 30~ms: algo más que un ciclo completo de gateo.
+
+Dos funciones auxiliares describen la calidad de un estado y de una acción: la función de valor $V^{\pi}(\mathbf{s})=\mathbb{E}_\pi[\sum_{k\ge0}\gamma^k r_{t+k}\mid\mathbf{s}_t=\mathbf{s}]$ y la función acción-valor $Q^{\pi}(\mathbf{s},\mathbf{a})$, que fija además la primera acción. Su diferencia es la \emph{ventaja}
+\begin{equation}
+    A^{\pi}(\mathbf{s},\mathbf{a})=Q^{\pi}(\mathbf{s},\mathbf{a})-V^{\pi}(\mathbf{s}),
+\end{equation}
+que indica si una acción es mejor ($A>0$) o peor ($A<0$) que el comportamiento medio de la política en ese estado.
+
+\subsection{Gradiente de la política y arquitectura actor-crítico}
+
+Los métodos de gradiente de la política ajustan $\theta$ en la dirección que aumenta $J(\theta)$. El teorema del gradiente de la política permite estimarla a partir de trayectorias muestreadas~\cite{sutton2018rl}:
+\begin{equation}
+    \nabla_\theta J(\theta)=\mathbb{E}_{t}\left[\nabla_\theta\log\pi_\theta(\mathbf{a}_t\mid\mathbf{s}_t)\,\hat{A}_t\right],
+    \label{eq:gradiente-politica}
+\end{equation}
+donde $\hat{A}_t$ es una estimación de la ventaja. En la arquitectura actor-crítico se entrenan simultáneamente dos redes: el \emph{actor}, que representa $\pi_\theta$, y el \emph{crítico}, que aproxima $V_\phi(\mathbf{s})$ y sirve para calcular $\hat{A}_t$ con menor varianza que el retorno observado.
+
+Para acciones continuas, como las correcciones articulares de este proyecto, el actor produce la media $\boldsymbol{\mu}_\theta(\mathbf{s})$ de una distribución gaussiana diagonal, $\pi_\theta(\mathbf{a}\mid\mathbf{s})=\mathcal{N}(\boldsymbol{\mu}_\theta(\mathbf{s}),\operatorname{diag}(\boldsymbol{\sigma}^2))$, con desviaciones $\boldsymbol{\sigma}$ que también se aprenden. Durante el entrenamiento la acción se muestrea de esa distribución, lo que produce la exploración; en la evaluación y en el robot se usa directamente la media (política determinista).
+
+\subsection{Estimación generalizada de la ventaja}
+
+La ventaja se estima con GAE (\emph{Generalized Advantage Estimation})~\cite{schulman2016gae}, que combina el error temporal de un paso
+\begin{equation}
+    \delta_t=r_t+\gamma V_\phi(\mathbf{s}_{t+1})-V_\phi(\mathbf{s}_t)
+\end{equation}
+en una suma ponderada exponencialmente:
+\begin{equation}
+    \hat{A}_t=\sum_{l=0}^{T-t-1}(\gamma\lambda)^{l}\,\delta_{t+l}.
+    \label{eq:gae}
+\end{equation}
+El parámetro $\lambda\in[0,1]$ regula el compromiso entre sesgo y varianza: con $\lambda=0$ solo se usa el error de un paso (poca varianza, más sesgo del crítico) y con $\lambda=1$ se usa el retorno completo (sin sesgo, mucha varianza). En este trabajo se emplea $\lambda=0{,}95$. El objetivo del crítico es el retorno estimado $\hat{R}_t=\hat{A}_t+V_\phi(\mathbf{s}_t)$.
+
+\subsection{Optimización de política proximal (PPO)}
+
+Aplicar el gradiente~\eqref{eq:gradiente-politica} con pasos grandes puede degradar bruscamente la política, porque los datos fueron recogidos con la política anterior. PPO (\emph{Proximal Policy Optimization})~\cite{schulman2017ppo} limita cuánto puede cambiar la política en cada actualización, con una idea cercana a TRPO~\cite{schulman2015trpo} pero mucho más sencilla de implementar. Se define la razón de probabilidades entre la política nueva y la que recogió los datos,
+\begin{equation}
+    \rho_t(\theta)=\frac{\pi_\theta(\mathbf{a}_t\mid\mathbf{s}_t)}{\pi_{\theta_{\text{ant}}}(\mathbf{a}_t\mid\mathbf{s}_t)},
+\end{equation}
+y se maximiza el objetivo recortado
+\begin{equation}
+    L^{\text{CLIP}}(\theta)=\mathbb{E}_t\Big[\min\big(\rho_t(\theta)\hat{A}_t,\;\operatorname{clip}(\rho_t(\theta),1-\epsilon,1+\epsilon)\,\hat{A}_t\big)\Big].
+    \label{eq:ppo-clip}
+\end{equation}
+Si una acción resultó mejor que lo esperado ($\hat{A}_t>0$), el objetivo deja de premiar el aumento de su probabilidad cuando $\rho_t$ supera $1+\epsilon$; si resultó peor ($\hat{A}_t<0$), deja de premiar su reducción por debajo de $1-\epsilon$. Así cada actualización queda dentro de una región de confianza alrededor de la política anterior. Se usa $\epsilon=0{,}2$.
+
+La función de pérdida total que se minimiza combina el objetivo recortado, el error del crítico y un término de entropía:
+\begin{equation}
+    \mathcal{L}(\theta,\phi)=-L^{\text{CLIP}}(\theta)+c_1\,\mathbb{E}_t\big[(V_\phi(\mathbf{s}_t)-\hat{R}_t)^2\big]-c_2\,\mathbb{E}_t\big[\mathcal{H}(\pi_\theta(\cdot\mid\mathbf{s}_t))\big],
+    \label{eq:ppo-perdida}
+\end{equation}
+con $c_1=0{,}5$. El término de entropía $\mathcal{H}$ favorece la exploración; en este trabajo $c_2=0$, porque la exploración ya la aporta la desviación $\boldsymbol{\sigma}$ aprendida y porque las correcciones deben ser pequeñas y deliberadas.
+
+\subsection{Ciclo de entrenamiento de PPO}
+
+El entrenamiento alterna dos fases~\cite{schulman2017ppo,raffin2021sb3}:
+\begin{enumerate}
+    \item \textbf{Recolección (\emph{rollout}).} La política actual interactúa con el simulador durante $N$ pasos ($N=2048$) y guarda observaciones, acciones, recompensas, valores y probabilidades. Cuando un episodio termina, el entorno se reinicia y la recolección continúa.
+    \item \textbf{Optimización.} Con esos $N$ pasos se calculan las ventajas~\eqref{eq:gae} y se recorre el conjunto durante $K$ épocas ($K=10$), en minilotes de $256$ muestras, aplicando descenso por gradiente (Adam) sobre~\eqref{eq:ppo-perdida}. La norma del gradiente se recorta a $0{,}5$. Si la divergencia de Kullback--Leibler estimada entre la política nueva y la anterior supera un umbral ($0{,}03$ en este trabajo), las épocas restantes se omiten: es una salvaguarda adicional para que la política no cambie demasiado con un solo lote de datos.
+\end{enumerate}
+El número total de pasos de entrenamiento ($10^5$ a $5\cdot10^6$ en las campañas de este proyecto) es, por tanto, un múltiplo de $N$, y cada actualización usa únicamente datos recogidos con la política inmediatamente anterior (método \emph{on-policy}).
+
+\subsection{Aprendizaje por refuerzo residual}
+
+En el aprendizaje residual la política no genera la acción completa, sino una corrección que se suma a un controlador conocido~\cite{johannink2019residual}:
+\begin{equation}
+    \mathbf{q}^{\text{ord}}_t=\mathbf{q}^{\text{nom}}(\phi_t)+\Delta\mathbf{q}_t,\qquad \Delta\mathbf{q}_t=\operatorname{sat}\big(\pi_\theta(\mathbf{s}_t)\big),
+    \label{eq:residual}
+\end{equation}
+donde $\mathbf{q}^{\text{nom}}(\phi_t)$ es la referencia de la marcha nominal en la fase $\phi_t$ y $\operatorname{sat}(\cdot)$ limita la magnitud y la velocidad de la corrección. Esta formulación tiene tres ventajas para un robot real: la marcha nominal ya funciona sin aprendizaje, por lo que la política parte de un comportamiento seguro; la política solo debe aprender cómo mejorarla, un problema mucho más pequeño; y las saturaciones garantizan que, aunque la política se equivoque, la orden nunca se aleje más de unos grados de la referencia.
+
+\subsection{Semillas, variabilidad y reproducibilidad}
+
+El entrenamiento de PPO es estocástico: la inicialización de las redes, el muestreo de acciones, el orden de los minilotes y las condiciones aleatorias del simulador dependen de un generador de números pseudoaleatorios. La \emph{semilla} es el valor con el que se inicializa ese generador; fijarla hace el entrenamiento reproducible, y cambiarla produce otra ejecución independiente del mismo algoritmo. Distintas semillas pueden dar políticas con resultados muy diferentes, por lo que un resultado obtenido con una sola semilla no es concluyente~\cite{henderson2018matters}. Por ello, en este trabajo cada configuración se entrena con varias semillas (entre cuatro y diez), se informan todas, y las semillas de entrenamiento se mantienen separadas de las semillas de evaluación (801--805 para evaluar al final de cada entrenamiento y 901--902 para la selección en caminatas largas), de modo que una política no se evalúa en las mismas condiciones aleatorias con las que fue entrenada.
+
+\subsection{Aleatorización del dominio y transferencia al robot}
+
+Una política entrenada en simulación puede aprovechar detalles del modelo que no existen en el robot real. La aleatorización del dominio varía en cada episodio los parámetros inciertos del simulador, de modo que la política aprende a funcionar en un intervalo de condiciones que incluye, con suerte, la real~\cite{tobin2017domain,tan2018simtoreal}. En robots con actuadores de bajo costo, el modelo del actuador (retardo, ganancia, zona muerta y saturación) suele ser la mayor fuente de diferencia entre simulación y realidad, y se obtiene mejor identificándolo con datos del propio robot~\cite{hwangbo2019anymal}. Este trabajo combina ambas ideas: el modelo del actuador se identifica con las caminatas reales y su retardo y ganancia se aleatorizan alrededor de los valores medidos.
+
+\section{Simulación y transferencia}
+
+La simulación permite estudiar contactos, perturbaciones y variaciones de parámetros de manera repetible. MuJoCo proporciona un motor físico orientado a sistemas articulados y control basado en modelos~\cite{todorov2012mujoco}. Para reducir la diferencia entre simulación y hardware se pueden variar masas, fricción, retardos, ruido y ganancias durante el entrenamiento. La transferencia se realizará progresivamente: simulación, ejecución sin actuadores, robot suspendido y pruebas sobre el suelo con soporte de seguridad.

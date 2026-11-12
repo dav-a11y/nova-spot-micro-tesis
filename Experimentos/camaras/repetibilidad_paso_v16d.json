@@ -1,0 +1,188 @@
+{
+  "paso_base": {
+    "segundos_por_ciclo": 2.226639344262295,
+    "repeticiones": [
+      1,
+      2,
+      3
+    ],
+    "por_repeticion": {
+      "1": {
+        "error_patas": 3.9158231707317075,
+        "coxas": 4.507837398373984,
+        "variacion_ciclo_patas": 1.4210975892118303,
+        "tendencia_coxas": -0.01066087656860503
+      },
+      "2": {
+        "error_patas": 3.228121951219512,
+        "coxas": 2.731040650406504,
+        "variacion_ciclo_patas": 1.0220076907330953,
+        "tendencia_coxas": 0.0008064561770115703
+      },
+      "3": {
+        "error_patas": 3.556802083333334,
+        "coxas": 5.3932875,
+        "variacion_ciclo_patas": 1.1616140222379525,
+        "tendencia_coxas": 0.07304611267385529
+      }
+    },
+    "metricas": {
+      "femur1": {
+        "media": 1.8749826219512193,
+        "sd_entre_repeticiones": 0.6977997487329568,
+        "cv_pct": 37.21633153094425,
+        "tendencia_media_por_ciclo": -0.03162910654544584,
+        "n": 3
+      },
+      "femur2": {
+        "media": 5.872075406504066,
+        "sd_entre_repeticiones": 0.436817868913858,
+        "cv_pct": 7.438900877022577,
+        "tendencia_media_por_ciclo": -0.005229743788482205,
+        "n": 3
+      },
+      "femur3": {
+        "media": 2.999031707317073,
+        "sd_entre_repeticiones": 0.4327026374989096,
+        "cv_pct": 14.428078117453596,
+        "tendencia_media_por_ciclo": -0.019569368094770525,
+        "n": 3
+      },
+      "femur4": {
+        "media": 8.123031808943088,
+        "sd_entre_repeticiones": 0.5016058701267352,
+        "cv_pct": 6.1751065602684205,
+        "tendencia_media_por_ciclo": -0.00945139705219516,
+        "n": 3
+      },
+      "tibia2": {
+        "media": 0.8368890243902438,
+        "sd_entre_repeticiones": 0.03810584161359404,
+        "cv_pct": 4.553272955319004,
+        "tendencia_media_por_ciclo": 0.0012377202427998415,
+        "n": 3
+      },
+      "tibia4": {
+        "media": 1.6954838414634148,
+        "sd_entre_repeticiones": 0.5037949654652372,
+        "cv_pct": 29.71393493378262,
+        "tendencia_media_por_ciclo": -0.011198564241988477,
+        "n": 3
+      },
+      "coxa2": {
+        "media": 5.126739837398374,
+        "sd_entre_repeticiones": 1.6463341745246658,
+        "cv_pct": 32.1126920175477,
+        "tendencia_media_por_ciclo": 0.031239271327244657,
+        "n": 3
+      },
+      "coxa3": {
+        "media": 5.242621544715447,
+        "sd_entre_repeticiones": 1.7109551730740309,
+        "cv_pct": 32.635488914866855,
+        "tendencia_media_por_ciclo": 0.030274978957142196,
+        "n": 3
+      },
+      "coxa4": {
+        "media": 2.2628041666666663,
+        "sd_entre_repeticiones": 0.7512983524053998,
+        "cv_pct": 33.20209337921347,
+        "tendencia_media_por_ciclo": 0.0016774419978749858,
+        "n": 3
+      }
+    }
+  },
+  "paso_v16": {
+    "segundos_por_ciclo": 2.2417457305502846,
+    "repeticiones": [
+      1,
+      2,
+      3
+    ],
+    "por_repeticion": {
+      "1": {
+        "error_patas": 3.3486422764227637,
+        "coxas": 5.42480081300813,
+        "variacion_ciclo_patas": 1.5871001064041212,
+        "tendencia_coxas": -0.00536039369764512
+      },
+      "2": {
+        "error_patas": 3.311357723577236,
+        "coxas": 4.02129268292683,
+        "variacion_ciclo_patas": 1.7578195052797252,
+        "tendencia_coxas": -0.045447176238830655
+      },
+      "3": {
+        "error_patas": 8.137351898734178,
+        "coxas": 79.03174261603375,
+        "variacion_ciclo_patas": 4.782980865003149,
+        "tendencia_coxas": 1.4152407578708204
+      }
+    },
+    "metricas": {
+      "femur1": {
+        "media": 4.085304466399094,
+        "sd_entre_repeticiones": 3.1967528660516145,
+        "cv_pct": 78.25005192010389,
+        "tendencia_media_por_ciclo": -0.016610574459553232,
+        "n": 3
+      },
+      "femur2": {
+        "media": 7.6428294741175264,
+        "sd_entre_repeticiones": 2.5756904035048303,
+        "cv_pct": 33.70074410566684,
+        "tendencia_media_por_ciclo": -0.01393460852016643,
+        "n": 3
+      },
+      "femur3": {
+        "media": 4.810039466913656,
+        "sd_entre_repeticiones": 2.535444192499205,
+        "cv_pct": 52.71150496663312,
+        "tendencia_media_por_ciclo": -0.0580752115224178,
+        "n": 3
+      },
+      "femur4": {
+        "media": 6.948109190079243,
+        "sd_entre_repeticiones": 2.471556091505388,
+        "cv_pct": 35.57163573414136,
+        "tendencia_media_por_ciclo": -0.002580318157285452,
+        "n": 3
+      },
+      "tibia2": {
+        "media": 0.7344268292682927,
+        "sd_entre_repeticiones": 0.015608088706678685,
+        "cv_pct": 2.1252067714123375,
+        "tendencia_media_por_ciclo": -8.897378130407556e-05,
+        "n": 2
+      },
+      "tibia4": {
+        "media": 2.9063526808685807,
+        "sd_entre_repeticiones": 1.7299452420791832,
+        "cv_pct": 59.52289457046138,
+        "tendencia_media_por_ciclo": -0.03995540865322245,
+        "n": 3
+      },
+      "coxa2": {
+        "media": 30.694392353607075,
+        "sd_entre_repeticiones": 42.77602918870528,
+        "cv_pct": 139.3610555827746,
+        "tendencia_media_por_ciclo": 0.4559910173644584,
+        "n": 3
+      },
+      "coxa3": {
+        "media": 29.93622553257178,
+        "sd_entre_repeticiones": 41.10417929732497,
+        "cv_pct": 137.30581783799707,
+        "tendencia_media_por_ciclo": 0.43898734646110843,
+        "n": 3
+      },
+      "coxa4": {
+        "media": 27.847218225789856,
+        "sd_entre_repeticiones": 44.85591935340143,
+        "cv_pct": 161.07863625624006,
+        "tendencia_media_por_ciclo": 0.469454824108778,
+        "n": 3
+      }
+    }
+  }
+}

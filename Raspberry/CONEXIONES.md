@@ -66,10 +66,27 @@ seleccionado. Los canales de cada TCA aíslan los AS5600, que todos usan la
 dirección fija `0x36`.
 
 El lector de diagnóstico `codigo/leer_as5600_tca.py` no genera PWM ni modifica
-`OE`. Lee los doce canales descritos por el sketch Arduino y conserva como
-pendiente `0x71`, canal 3: el sketch proporcionado duplica «fémur 2» y no
-identifica «coxa 2», por lo que esa asociación debe confirmarse físicamente
-antes de publicar posiciones articulares.
+`OE`. Este es el mapa de los doce sensores confirmado por el operador. Los
+canales `0x70`:6--7 y `0x71`:2,7 quedan vacíos; `0x71`:3 es coxa de Pata 1.
+
+| Pata | Articulación | TCA/canal | Servo PCA9685/canal |
+|---:|---|---|---:|
+| 1 delantera derecha | Coxa | `0x71`/3 | CH0 |
+| 1 | Fémur | `0x71`/1 | CH4 |
+| 1 | Tibia | `0x71`/0 | CH8 |
+| 2 delantera izquierda | Coxa | `0x71`/6 | CH1 |
+| 2 | Fémur | `0x71`/5 | CH5 |
+| 2 | Tibia | `0x71`/4 | CH9 |
+| 3 trasera derecha | Coxa | `0x70`/5 | CH2 |
+| 3 | Fémur | `0x70`/4 | CH6 |
+| 3 | Tibia | `0x70`/3 | CH10 |
+| 4 trasera izquierda | Coxa | `0x70`/2 | CH3 |
+| 4 | Fémur | `0x70`/1 | CH7 |
+| 4 | Tibia | `0x70`/0 | CH11 |
+
+Cada AS5600 responde en dirección fija I2C `0x36` detrás del canal indicado;
+el PCA9685 responde en `0x40`. El mapa identifica cableado, pero no calibra
+cero, sentido ni relación grados magnéticos/PWM.
 
 | Canal | Articulación | Canal | Articulación |
 |---:|---|---:|---|

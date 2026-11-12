@@ -1,0 +1,10 @@
+base: avance 7.529 m, deriva 0.036 m, roll 1.47°, pitch 0.96°, coxas 0.98°
+OK semilla_401  2400000 pasos  avance 7.538  deriva 0.245  roll 1.18  pitch 1.31  incl.máx 3.00  coxas 0.82  suav 1.07  punt 4.70
+OK semilla_409  2400000 pasos  avance 7.538  deriva 0.245  roll 1.18  pitch 1.31  incl.máx 3.00  coxas 0.82  suav 1.07  punt 4.70
+OK semilla_419  2400000 pasos  avance 7.538  deriva 0.245  roll 1.18  pitch 1.31  incl.máx 3.00  coxas 0.82  suav 1.07  punt 4.70
+OK semilla_421  2400000 pasos  avance 7.538  deriva 0.245  roll 1.18  pitch 1.31  incl.máx 3.00  coxas 0.82  suav 1.07  punt 4.70
+OK semilla_401  2200000 pasos  avance 7.551  deriva 0.372  roll 1.22  pitch 1.38  incl.máx 3.30  coxas 0.82  suav 1.06  punt 6.07
+OK semilla_409  2200000 pasos  avance 7.551  deriva 0.372  roll 1.22  pitch 1.38  incl.máx 3.30  coxas 0.82  suav 1.06  punt 6.07
+OK semilla_419  2200000 pasos  avance 7.551  deriva 0.372  roll 1.22  pitch 1.38  incl.máx 3.30  coxas 0.82  suav 1.06  punt 6.07
+OK semilla_421  2200000 pasos  avance 7.551  deriva 0.372  roll 1.22  pitch 1.38  incl.máx 3.30  coxas 0.82  suav 1.06  punt 6.07
+Elegida: /home/pavilion/Documentos/Cuadrupedo/Experimentos/entrenamiento_real_20261016/ppo_v10_robot/ppo_ciclo2_gateo_semilla_401_2400k

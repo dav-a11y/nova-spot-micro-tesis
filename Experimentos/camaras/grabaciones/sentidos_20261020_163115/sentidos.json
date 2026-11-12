@@ -1,0 +1,42 @@
+{
+  "femur1": {
+    "r_horizontal": -0.78,
+    "r_vertical": 0.56,
+    "conclusion": "ADELANTE (correcto)"
+  },
+  "femur2": {
+    "r_horizontal": 0.97,
+    "r_vertical": -0.84,
+    "conclusion": "ADELANTE (correcto)"
+  },
+  "femur3": {
+    "r_horizontal": -0.91,
+    "r_vertical": -0.88,
+    "conclusion": "ADELANTE (correcto)"
+  },
+  "femur4": {
+    "r_horizontal": 0.94,
+    "r_vertical": -0.62,
+    "conclusion": "ADELANTE (correcto)"
+  },
+  "tibia1": {
+    "r_horizontal": -0.19,
+    "r_vertical": 0.07,
+    "conclusion": "no concluyente"
+  },
+  "tibia2": {
+    "r_horizontal": -0.85,
+    "r_vertical": 0.27,
+    "conclusion": "no concluyente"
+  },
+  "tibia3": {
+    "r_horizontal": -0.49,
+    "r_vertical": -0.45,
+    "conclusion": "SUBE (correcto)"
+  },
+  "tibia4": {
+    "r_horizontal": -0.64,
+    "r_vertical": 0.16,
+    "conclusion": "no concluyente"
+  }
+}

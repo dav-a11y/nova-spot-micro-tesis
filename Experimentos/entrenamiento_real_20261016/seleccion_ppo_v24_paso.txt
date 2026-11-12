@@ -1,0 +1,9 @@
+base: avance 6.817 m, deriva 1.493 m, roll 2.11°, pitch 1.70°, coxas 1.02°
+-- semilla_4109  3000320 pasos  avance 5.510  deriva 0.037  roll 1.65  pitch 1.31  incl.máx 2.61  coxas 0.78  suav 1.88  punt 3.93
+-- semilla_4101  1200000 pasos  avance 5.320  deriva 0.165  roll 1.48  pitch 1.34  incl.máx 2.51  coxas 0.84  suav 0.93  punt 4.27
+-- semilla_4109  3000000 pasos  avance 5.514  deriva 0.079  roll 1.64  pitch 1.30  incl.máx 2.61  coxas 0.78  suav 1.88  punt 4.33
+-- semilla_4109  2700000 pasos  avance 5.619  deriva 0.086  roll 1.65  pitch 1.32  incl.máx 2.48  coxas 0.79  suav 1.90  punt 4.44
+-- semilla_4101  1400000 pasos  avance 5.414  deriva 0.183  roll 1.50  pitch 1.36  incl.máx 2.52  coxas 0.84  suav 0.93  punt 4.47
+-- semilla_4101  1300000 pasos  avance 5.469  deriva 0.204  roll 1.47  pitch 1.31  incl.máx 2.51  coxas 0.84  suav 0.92  punt 4.59
+-- semilla_4107  2000000 pasos  avance 4.547  deriva 0.080  roll 1.74  pitch 1.27  incl.máx 2.77  coxas 0.81  suav 1.89  punt 4.63
+-- semilla_4107  2300000 pasos  avance 4.658  deriva 0.112  roll 1.63  pitch 1.19  incl.máx 2.74  coxas 0.82  suav 1.90  punt 4.76

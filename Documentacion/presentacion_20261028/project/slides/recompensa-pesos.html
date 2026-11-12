@@ -1,0 +1,17 @@
+<section id="recompensa-pesos" data-transition="fade" style="background:#F6F5F0;color:#2A3442;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:30px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4521C">El agente</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#15233B">Pesos de la recompensa y de dónde salen</h2>
+<table style="font-size:25px;color:#2A3442">
+<tr><th style="width:18%">Término</th><th style="width:30%">Peso</th><th style="width:52%">Por qué</th></tr>
+<tr><td>Avance wav</td><td>10 gateo, trote, carrera; 20 paso; 30 galope; 40 último gateo</td><td>Se subió en las marchas que avanzaban menos que la base</td></tr>
+<tr><td>Actitud wact</td><td>30</td><td>Castigo más fuerte: inclinarse lleva a caerse</td></tr>
+<tr><td>Lateral wlat</td><td>20 (30 galope)</td><td>Las marchas se desviaban de la línea recta</td></tr>
+<tr><td>Giro wgiro</td><td>10</td><td>Mantener el rumbo</td></tr>
+<tr><td>Giro por ciclo wgc</td><td>5</td><td>19-oct: el robot se curvaba en caminatas largas</td></tr>
+<tr><td>Suavidad wsuav</td><td>0,3</td><td>20-oct: correcciones bruscas que los servos no seguían</td></tr>
+<tr><td>Coxas wcox</td><td>1,0</td><td>20-oct: la PPO sacudía el cuerpo y desviaba las coxas</td></tr>
+<tr><td>Fijos</td><td>+1; 25; 0,25; 0,04</td><td>Supervivencia, altura, cercanía a la base, tamaño de la corrección</td></tr>
+</table>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6A7383">Nova Spot Micro · El agente · Pesos de las campañas v24 a v28</p>
+<aside>Los pesos no se eligieron de una vez: cada uno responde a un problema observado en la simulación o en el robot, y quedó documentado con su fecha. Por ejemplo, el peso del avance del gateo pasó de 10 a 40 porque las políticas aprendían a ir muy derechas pero avanzaban menos del 90 por ciento de la marcha base.</aside>
+</section>

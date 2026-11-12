@@ -1,0 +1,27 @@
+
+===== BUS PCIPAL (todos los canales cerrados) =====
+  0x40
+
+FIN
+NCIPAL (todos los canales cerrados) =====
+  0x40
+
+FIN
+
+===== BUS PRINCIPAL (todos los canales cerrados) =====
+  0x40
+
+FIN
+
+Reposo: SDA(A4)=1 SCL(A5)=1
+PCA MODE1 antes=0x10 despues=0x10 (ALLCALL desactivado)
+
+===== BUS PRINCIPAL (todos los canales cerrados) =====
+  0x40
+
+FIN
+
+===== BUS PRINCIPAL (todos los canales cerrados) =====
+  0x40
+
+FIN

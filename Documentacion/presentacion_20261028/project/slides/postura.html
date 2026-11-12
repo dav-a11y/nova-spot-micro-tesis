@@ -1,0 +1,17 @@
+<section id="postura" data-transition="fade" style="background:#F6F5F0;color:#2A3442;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:30px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4521C">Postura de trabajo</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#15233B">Del modelo al servo: postura base, signos y ganancias</h2>
+<div style="background:#FFFFFF;padding:28px 44px;border-radius:16px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:38px;color:#15233B">θservo,ⱼ = Bⱼ + sⱼ · (180/π) · ( qⱼ − q*ⱼ )      tibia levantada:  qt = q*t − h · gtibia(pata)</p>
+</div>
+<table style="font-size:25px;color:#2A3442">
+<tr><th style="width:16%">Pata</th><th style="width:14%">Coxa B</th><th style="width:14%">Fémur B</th><th style="width:14%">Tibia B</th><th style="width:14%">Signo tibia</th><th style="width:14%">g tibia</th><th style="width:14%">g coxa</th></tr>
+<tr><td>1 · DD</td><td>159°</td><td>110°</td><td>100°</td><td>−1</td><td>2,0</td><td>0</td></tr>
+<tr><td>2 · DI</td><td>42°</td><td>100°</td><td>166°</td><td>+1</td><td>1,4</td><td>0</td></tr>
+<tr><td>3 · TD</td><td>64°</td><td>100°</td><td>100°</td><td>−1</td><td>1,6</td><td>0,5</td></tr>
+<tr><td>4 · TI</td><td>82°</td><td>100°</td><td>144°</td><td>+1</td><td>1,8</td><td>0,5</td></tr>
+</table>
+<p style="font-size:26px;line-height:1.4">27-oct: tibias 2 y 4 con base 166° y 144° y movimiento invertido; más recorrido en las cuatro tibias. 28-oct: coxa 2 ajustada en vivo de 48° a 42° (se caía hacia adentro). Las ganancias se aplican dentro de la marcha, así la simulación ejecuta lo mismo que el robot.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6A7383">Nova Spot Micro · Actuador y marchas · DD/DI/TD/TI: delantera o trasera, derecha o izquierda</p>
+<aside>θservo = B + s·(180/π)·(q - q*): convierte el ángulo del simulador (radianes) al ángulo que se manda al servo (grados).<br>- q - q*: cuánto se aparta la articulación de la postura de pie.<br>- 180/π: pasa de radianes a grados (1 rad son unos 57,3 grados).<br>- s: el signo, +1 o -1, porque unas patas están en espejo.<br>- B: el ángulo del servo en la postura de pie, el de la tabla (por ejemplo tibia 2 = 166 grados).<br>Ejemplo: la tibia 2 (B = 166, s = +1) debe apartarse 0,1 rad: 166 + 57,3 x 0,1 = 171,7 grados.<br><br>qt = q*t - h·gtibia: cuando la pata se levanta, la tibia se dobla una cantidad h. En el robot, cada tibia necesita moverse distinto para levantar el pie lo mismo: gtibia (2,0 / 1,4 / 1,6 / 1,8) es ese multiplicador por pata. Desde la versión v24 se aplica dentro de la marcha, así la simulación y el robot reciben exactamente la misma orden.<br><br>Tabla: base, signo de tibia y ganancias de cada pata (DD delantera derecha, DI delantera izquierda, TD trasera derecha, TI trasera izquierda). 27-oct: tibias 2 y 4 con base 166 y 144 y movimiento invertido; más recorrido en las cuatro tibias. 28-oct: coxa 2 ajustada en vivo de 48 a 42 grados porque se caía hacia adentro. g coxa: en el galope las coxas traseras se mueven la mitad de la amplitud (4 grados) y las delanteras quedan fijas.</aside>
+</section>

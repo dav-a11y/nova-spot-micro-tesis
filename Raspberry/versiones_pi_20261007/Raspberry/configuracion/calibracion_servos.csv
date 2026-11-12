@@ -1,0 +1,13 @@
+canal,pata,articulacion,nombre_ros2,centro_pwm_us,min_pwm_us,max_pwm_us,direccion,velocidad_max_rad_s,torque_limite_nm,calibrado
+0,FR,coxa,front_right_coxa_joint,,,,-1,,,no
+1,FL,coxa,front_left_coxa_joint,,,,,,,no
+2,RR,coxa,rear_right_coxa_joint,,,,,,,no
+3,RL,coxa,rear_left_coxa_joint,,,,,,,no
+4,FR,femur,front_right_femur_joint,,,,-1,,,no
+5,FL,femur,front_left_femur_joint,,,,,,,no
+6,RR,femur,rear_right_femur_joint,,,,,,,no
+7,RL,femur,rear_left_femur_joint,,,,,,,no
+8,FR,tibia,front_right_tibia_joint,,,,-1,,,no
+9,FL,tibia,front_left_tibia_joint,,,,,,,no
+10,RR,tibia,rear_right_tibia_joint,,,,,,,no
+11,RL,tibia,rear_left_tibia_joint,,,,,,,no

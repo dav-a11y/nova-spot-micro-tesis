@@ -1,0 +1,298 @@
+\chapter{Modelo matemático implementado}
+\label{cap:modelo}
+
+\section{Alcance e hipótesis}
+
+Se implementó un modelo nominal computable con dos niveles. El modelo global
+representó una base flotante de seis grados de libertad, doce coordenadas
+articulares y fuerzas de contacto. El modelo reducido representó cada pata como
+una cadena serial de tres grados de libertad para calcular cinemática,
+jacobianos, dinámica local y trayectorias cartesianas. El vector general y el
+vector de una pata se definieron como
+
+\begin{equation}
+\mathbf q=
+\begin{bmatrix}\mathbf r_B^{\mathsf T}&\boldsymbol\eta_B^{\mathsf T}&
+\mathbf q_J^{\mathsf T}\end{bmatrix}^{\mathsf T}\in\mathbb R^{18},
+\qquad
+\mathbf q_i=\begin{bmatrix}q_{c,i}&q_{f,i}&q_{t,i}\end{bmatrix}^{\mathsf T}.
+\label{eq:model-levels}
+\end{equation}
+
+Se asumieron eslabones rígidos, suelo plano nominal, contacto unilateral,
+servos controlados en posición y locomoción suficientemente lenta para analizar
+el gateo con un criterio cuasiestático. La holgura, flexibilidad, fricción y
+dispersión de fabricación no se consideraron parámetros identificados. Por
+ello, la concordancia entre ecuaciones, URDF y simuladores verificó la
+implementación, pero no validó físicamente el ejemplar.
+
+Se utilizó la convención REP--103: $x$ hacia delante, $y$ hacia la izquierda y
+$z$ hacia arriba. FL, FR, RL y RR identificaron las patas. El factor
+$s_i=+1$ se empleó para las patas izquierdas y $s_i=-1$ para las derechas.
+
+\section{Transformaciones y cinemática directa}
+
+La transformación entre dos marcos se representó mediante
+
+\begin{equation}
+{}^A\mathbf T_B=
+\begin{bmatrix}
+{}^A\mathbf R_B & {}^A\mathbf p_B\\
+0&0&0&1
+\end{bmatrix}.
+\label{eq:homogeneous-nova}
+\end{equation}
+
+Para una pata, $l_c$, $l_f$ y $l_t$ designaron las longitudes de coxa, fémur y
+tibia. Sea $a=s_iq_c$ y $Q=q_f+q_t$. La posición del pie respecto de la cadera
+se obtuvo como
+
+\begin{align}
+x &= -l_f\sin q_f-l_t\sin Q,\label{eq:nova-fkx}\\
+z_p &= -l_f\cos q_f-l_t\cos Q,\label{eq:nova-fkzp}\\
+y &= \cos(a)s_il_c-\sin(a)z_p,\label{eq:nova-fky}\\
+z &= \sin(a)s_il_c+\cos(a)z_p.\label{eq:nova-fkz}
+\end{align}
+
+Estas expresiones se implementaron en \texttt{forward\_leg}. Para la postura
+nominal $[q_c,q_f,q_t]=[0,10,0,42,-0,84]$ rad, con
+$[l_c,l_f,l_t]=[0,090,0,105,0,132]$ m, la pata delantera izquierda produjo
+
+\begin{equation}
+{}^{H_{FL}}\mathbf p_{FL}=
+\begin{bmatrix}0,0110095&0,1111545&-0,2063360\end{bmatrix}^{\mathsf T}\text{ m}.
+\label{eq:nova-fk-example}
+\end{equation}
+
+Este punto fue la posición neutral usada para construir las trayectorias
+cartesianas nominales. Su coincidencia con el código no convirtió las
+longitudes nominales en mediciones físicas.
+
+\section{Cinemática inversa y dominio}
+
+Para una referencia cartesiana $\mathbf p=[x,y,z]^{\mathsf T}$ se eliminó
+primero la rotación de coxa:
+
+\begin{align}
+z_p&=-\sqrt{y^2+z^2-l_c^2},\label{eq:nova-ikzp}\\
+a&=\operatorname{atan2}(z,y)-\operatorname{atan2}(z_p,s_il_c),
+&q_c&=s_ia.\label{eq:nova-ikcoxa}
+\end{align}
+
+Con $d=-z_p$, $b=-x$ y $r^2=b^2+d^2$, el triángulo fémur--tibia se resolvió
+mediante
+
+\begin{align}
+D&=\frac{r^2-l_f^2-l_t^2}{2l_fl_t},&-1\leq D\leq1,\\
+q_t&=-\arccos D,\label{eq:nova-knee}\\
+q_f&=\operatorname{atan2}(b,d)-
+\operatorname{atan2}\left(l_t\sin q_t,l_f+l_t\cos q_t\right).
+\label{eq:nova-ikfemur}
+\end{align}
+
+La rama negativa de $q_t$ conservó la rodilla flexionada compatible con el
+URDF. El controlador rechazó referencias sin solución real, fuera de límites o
+discontinuas; no las saturó silenciosamente. La prueba de ida y vuelta FK--IK
+recuperó la postura nominal con error numérico inferior a $10^{-12}$ rad.
+
+\section{Jacobiano y singularidades}
+
+La relación diferencial se definió mediante
+
+\begin{equation}
+\dot{\mathbf p}_i=\mathbf J_i(\mathbf q_i)\dot{\mathbf q}_i,
+\qquad
+\mathbf J_i=\frac{\partial\mathbf p_i}{\partial\mathbf q_i}.
+\label{eq:nova-jacobian-definition}
+\end{equation}
+
+Con $A=l_f\sin q_f+l_t\sin Q$, $B=l_t\sin Q$ y $L=s_il_c$, se implementó
+
+\begin{equation}
+\mathbf J_i=
+\begin{bmatrix}
+0&z_p&-l_t\cos Q\\
+s_i[-\sin(a)L-\cos(a)z_p]&-\sin(a)A&-\sin(a)B\\
+s_i[\cos(a)L-\sin(a)z_p]&\cos(a)A&\cos(a)B
+\end{bmatrix}.
+\label{eq:nova-jacobian}
+\end{equation}
+
+El principio de potencia virtual produjo
+$\boldsymbol\tau_i=\mathbf J_i^{\mathsf T}\mathbf f_i$. En la postura nominal
+FL se obtuvieron valores singulares
+$(0,252836,0,232233,0,038037)$ m/rad y número de condición $6,647$. La postura
+no fue singular, aunque presentó una dirección de menor manipulabilidad. El
+jacobiano analítico se contrastó con diferencias centrales y la conversión
+fuerza--par conservó potencia virtual dentro de la tolerancia numérica.
+
+La Figura~\ref{fig:workspace-singularidades} resume una exploración uniforme
+de 52.111 configuraciones dentro de los límites articulares de una pata. El
+color representa el menor valor singular del jacobiano; las configuraciones
+próximas a cero son las más cercanas a una pérdida de manipulabilidad. Con el
+umbral exploratorio $\sigma_{\min}<0{,}005$~m/rad, el 11,600~\% de la malla
+quedó próximo a singularidad; el 5,889~\% presentó $\kappa>100$. La postura
+nominal, con $\sigma_{\min}=0{,}038037$~m/rad y $\kappa=6{,}647$, no pertenece
+a esas regiones. El workspace describe alcance por límites articulares, no
+espacio libre de colisiones ni una envolvente físicamente calibrada.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=0.98\textwidth]{Resultados/workspace_singularidades.png}
+\caption{Workspace cinemático, localización de configuraciones próximas a
+singularidad y distribución del número de condición del Jacobiano para una
+pata izquierda. Fuente: elaboración propia.}
+\label{fig:workspace-singularidades}
+\end{figure}
+
+\section{Dinámica nominal}
+
+El modelo de base flotante se escribió como
+
+\begin{equation}
+\mathbf M(\mathbf q)\ddot{\mathbf q}+
+\mathbf C(\mathbf q,\dot{\mathbf q})\dot{\mathbf q}+
+\mathbf g(\mathbf q)+\boldsymbol\tau_f=
+\mathbf S^{\mathsf T}\boldsymbol\tau+
+\mathbf J_c^{\mathsf T}\boldsymbol\lambda.
+\label{eq:nova-dynamics}
+\end{equation}
+
+La matriz $\mathbf S$ seleccionó las doce articulaciones actuadas. La matriz de
+masa y el vector gravitacional se obtuvieron a partir de energía cinética y
+potencial:
+
+\begin{align}
+K&=\frac12\sum_k\left[m_k\mathbf v_{C_k}^{\mathsf T}\mathbf v_{C_k}+
+\boldsymbol\omega_k^{\mathsf T}\mathbf R_k\mathbf I_k
+\mathbf R_k^{\mathsf T}\boldsymbol\omega_k\right],\\
+U&=\sum_km_kgz_{C_k},\\
+M_{ab}&=\frac{\partial^2K}{\partial\dot q_a\partial\dot q_b},&
+g_a&=\frac{\partial U}{\partial q_a}.
+\end{align}
+
+Para una pata se implementó la dinámica inversa
+
+\begin{equation}
+\boldsymbol\tau_i=\mathbf M_i\ddot{\mathbf q}_i+
+\mathbf c_i+\mathbf g_i+\boldsymbol\tau_{f,i}-
+\mathbf J_i^{\mathsf T}\mathbf f_i.
+\label{eq:nova-inverse-dynamics}
+\end{equation}
+
+En el ejemplo nominal, los autovalores de $\mathbf M_i$ fueron
+$(0,00226642,0,00758520,0,00910534)$ kg m$^2$, todos positivos. Las pruebas
+automatizadas comprobaron simetría, definición positiva, términos de Coriolis
+nulos a velocidad cero y pares finitos. Estos resultados verificaron
+propiedades internas del modelo, no la exactitud de los pares físicos.
+
+\section{Actuador, contacto y estabilidad}
+
+La ficha suministrada para los doce MG996R-360 declara 9,4~kgf,cm y
+0,19~s/60 grados a 4,8~V, y 11~kgf,cm y 0,15~s/60 grados a 6,0~V. El modelo
+interpola entre esos dos puntos mediante una envolvente nominal lineal de
+par--velocidad:
+
+Las velocidades de las referencias nominales se obtuvieron por diferencias
+finitas hacia adelante entre muestras consecutivas, incluido el cierre del
+ciclo. La Figura~\ref{fig:velocidades-articulares} muestra máximos de
+0,944520~rad/s para gateo (4,32~s/ciclo) y 0,372327~rad/s para paso
+(5,76~s/ciclo), ambos por debajo del límite provisional del URDF
+(6,981~rad/s). Es una verificación de las referencias discretas, no una
+caracterización del servo bajo carga.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=0.95\textwidth]{Resultados/velocidades_articulares.png}
+\caption{Envolventes de velocidad de coxa, fémur y tibia, y máximo entre las
+doce articulaciones, para las referencias nominales de gateo y paso. La línea
+discontinua indica el límite provisional del URDF.}
+\label{fig:velocidades-articulares}
+\end{figure}
+
+\begin{equation}
+|\tau_{\max}(\omega,V)|=\tau_{\mathrm{stall}}(V)
+\max\left(0,1-\frac{|\omega|}{\omega_0(V)}\right).
+\label{eq:nova-actuator}
+\end{equation}
+
+El par de bloqueo de catálogo no se interpretó como par continuo seguro. La
+misma ficha contradice el rango angular al anunciar 360 grados y describir un
+giro de 60 grados, y no publica corriente. Por ello no se cambió el modelo a
+rotación continua y los límites eléctricos siguen siendo provisionales. Cada
+servo requiere medición individual de centro, extremos, sentido, corriente,
+velocidad, temperatura y respuesta bajo carga.
+
+Para el contacto unilateral se emplearon las condiciones
+
+\begin{align}
+\phi_i&\geq0,&\lambda_{n,i}&\geq0,&\phi_i\lambda_{n,i}&=0,\\
+\sqrt{\lambda_{x,i}^2+\lambda_{y,i}^2}&\leq\mu\lambda_{z,i}.
+\label{eq:nova-contact}
+\end{align}
+
+Gazebo y MuJoCo resolvieron estas interacciones mediante sus propios algoritmos;
+el modelo penalizado del proyecto no se presentó como reproducción exacta de
+los solucionadores.
+
+El centro de masa nominal se calculó como promedio ponderado de cuerpo y
+eslabones. Para un polígono de contacto ordenado antihorariamente, la distancia
+firmada a cada arista fue
+
+\begin{equation}
+d_j=\frac{e_{x,j}(c_y-p_{y,j})-e_{y,j}(c_x-p_{x,j})}
+{\|\mathbf e_j\|},
+\qquad m_s=\min_jd_j.
+\label{eq:nova-static-margin}
+\end{equation}
+
+Un margen $m_s>0$ indicó que la proyección del centro de masa estaba dentro del
+polígono. En postura nominal con cuatro apoyos se obtuvo
+$m_s=0,073126$ m. Durante la marcha, el cálculo utilizó contactos medidos y se
+declaró no disponible con menos de tres puntos no colineales.
+
+\section{Trazabilidad y estado de validez}
+
+La Tabla~\ref{tab:model-traceability} relaciona las familias matemáticas con su
+implementación y comprobación.
+
+\begin{table}[H]
+\centering
+\caption{Trazabilidad resumida del modelo matemático implementado.}
+\label{tab:model-traceability}
+\footnotesize
+\begin{tabular}{>{\raggedright\arraybackslash}p{2.3cm}
+>{\raggedright\arraybackslash}p{3.8cm}
+>{\raggedright\arraybackslash}p{5.2cm}}
+\toprule
+Componente & Implementación & Evidencia de verificación \\
+\midrule
+FK e IK & \texttt{kinematics.py} & Ida y vuelta, dominio, continuidad y
+alcanzabilidad de las marchas \\
+Jacobiano & modelo matemático & Diferencias centrales y potencia
+virtual \\
+Dinámica & modelo matemático & Simetría, autovalores positivos,
+Coriolis y pares finitos \\
+Modelo físico & URDF/SDF y MJCF & Consistencia de geometría, masas, límites,
+nombres y ejes \\
+Contacto y margen & monitores de contacto y estabilidad & Sensores Gazebo,
+pruebas unitarias y bolsas
+de contacto \\
+Marchas & generadores cartesianos de gateo y paso &
+Alcanzabilidad, periodicidad, líneas base y repetición \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La suite alcanzó 79 pruebas Python aprobadas. Además de las comprobaciones
+numéricas anteriores, se automatizó la coincidencia de límites de las doce
+articulaciones entre URDF, MJCF y supervisor; el rechazo de referencias no
+finitas o fuera de rango; la detección de saltos mayores que 0,35 rad y tiempos
+no monótonos; la pérdida de un contacto esperado; y los umbrales de altura,
+roll y pitch. Un flujo de integración continua compila los dos paquetes ROS 2
+y ejecuta la suite en cada envío y solicitud de integración. Estas pruebas son
+deterministas y no sustituyen campañas dinámicas de caída o contacto ni la
+validación física. El modelo detallado y sus ejemplos reproducibles se
+conservaron además en \texttt{Documentacion/MODELO\_MATEMATICO\_LATEX}. El OE2
+quedó avanzado en modelado y verificación computacional, pero permaneció
+parcial hasta medir y contrastar el ejemplar físico completo.

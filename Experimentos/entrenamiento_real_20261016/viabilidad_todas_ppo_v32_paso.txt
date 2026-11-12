@@ -1,0 +1,45 @@
+100.0 % viable | ppo_v10_robot/ppo_v24_paso_semilla_4109_200k/policy.zip | avance 0.91 (nominal 0.61) m, deriva 0.31 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 5.06°
+100.0 % viable | ppo_v32_paso/semilla_9101/intermedias/policy_250000_steps.zip | avance 0.83 (nominal 0.61) m, deriva 0.02 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 4.69°
+ 85.0 % viable | ppo_v32_paso/semilla_9101/intermedias/policy_300000_steps.zip | avance 0.60 (nominal 0.61) m, deriva 0.07 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 4.61°
+ 20.0 % viable | ppo_v32_paso/semilla_9101/intermedias/policy_350000_steps.zip | avance 0.51 (nominal 0.61) m, deriva 0.09 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 4.96°
+ 25.0 % viable | ppo_v32_paso/semilla_9101/intermedias/policy_400000_steps.zip | avance 0.52 (nominal 0.61) m, deriva 0.08 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 5.14°
+ 70.0 % viable | ppo_v32_paso/semilla_9101/intermedias/policy_450000_steps.zip | avance 0.57 (nominal 0.61) m, deriva 0.03 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 5.28°
+ 85.0 % viable | ppo_v32_paso/semilla_9101/intermedias/policy_500000_steps.zip | avance 0.62 (nominal 0.61) m, deriva 0.03 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 5.13°
+ 95.0 % viable | ppo_v32_paso/semilla_9101/intermedias/policy_550000_steps.zip | avance 0.65 (nominal 0.61) m, deriva 0.11 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 4.91°
+ 95.0 % viable | ppo_v32_paso/semilla_9101/intermedias/policy_600000_steps.zip | avance 0.66 (nominal 0.61) m, deriva 0.14 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 4.67°
+ 95.0 % viable | ppo_v32_paso/semilla_9101/intermedias/policy_650000_steps.zip | avance 0.67 (nominal 0.61) m, deriva 0.12 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 4.29°
+ 95.0 % viable | ppo_v32_paso/semilla_9101/intermedias/policy_700000_steps.zip | avance 0.64 (nominal 0.61) m, deriva 0.07 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 4.5°
+100.0 % viable | ppo_v32_paso/semilla_9103/intermedias/policy_250000_steps.zip | avance 0.81 (nominal 0.61) m, deriva 0.02 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 4.26°
+100.0 % viable | ppo_v32_paso/semilla_9103/intermedias/policy_300000_steps.zip | avance 0.73 (nominal 0.61) m, deriva 0.06 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 3.65°
+100.0 % viable | ppo_v32_paso/semilla_9103/intermedias/policy_350000_steps.zip | avance 0.69 (nominal 0.61) m, deriva 0.07 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 3.63°
+ 85.0 % viable | ppo_v32_paso/semilla_9103/intermedias/policy_400000_steps.zip | avance 0.61 (nominal 0.61) m, deriva 0.09 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 3.57°
+ 15.0 % viable | ppo_v32_paso/semilla_9103/intermedias/policy_450000_steps.zip | avance 0.51 (nominal 0.61) m, deriva 0.06 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 3.88°
+  0.0 % viable | ppo_v32_paso/semilla_9103/intermedias/policy_500000_steps.zip | avance 0.42 (nominal 0.61) m, deriva 0.07 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 4.08°
+  0.0 % viable | ppo_v32_paso/semilla_9103/intermedias/policy_550000_steps.zip | avance 0.39 (nominal 0.61) m, deriva 0.07 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 4.43°
+  0.0 % viable | ppo_v32_paso/semilla_9103/intermedias/policy_600000_steps.zip | avance 0.43 (nominal 0.61) m, deriva 0.06 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 5.75°
+ 15.0 % viable | ppo_v32_paso/semilla_9103/intermedias/policy_650000_steps.zip | avance 0.52 (nominal 0.61) m, deriva 0.09 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 7.37°
+ 20.0 % viable | ppo_v32_paso/semilla_9103/intermedias/policy_700000_steps.zip | avance 0.53 (nominal 0.61) m, deriva 0.07 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 7.16°
+100.0 % viable | ppo_v32_paso/semilla_9107/intermedias/policy_250000_steps.zip | avance 0.99 (nominal 0.61) m, deriva 0.07 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 4.93°
+100.0 % viable | ppo_v32_paso/semilla_9107/intermedias/policy_300000_steps.zip | avance 0.90 (nominal 0.61) m, deriva 0.09 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 4.37°
+100.0 % viable | ppo_v32_paso/semilla_9107/intermedias/policy_350000_steps.zip | avance 0.73 (nominal 0.61) m, deriva 0.10 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 3.7°
+ 75.0 % viable | ppo_v32_paso/semilla_9107/intermedias/policy_400000_steps.zip | avance 0.57 (nominal 0.61) m, deriva 0.09 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 3.73°
+  0.0 % viable | ppo_v32_paso/semilla_9107/intermedias/policy_450000_steps.zip | avance 0.42 (nominal 0.61) m, deriva 0.08 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 3.58°
+  0.0 % viable | ppo_v32_paso/semilla_9107/intermedias/policy_500000_steps.zip | avance 0.34 (nominal 0.61) m, deriva 0.07 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 3.75°
+  0.0 % viable | ppo_v32_paso/semilla_9107/intermedias/policy_550000_steps.zip | avance 0.33 (nominal 0.61) m, deriva 0.01 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 4.07°
+  0.0 % viable | ppo_v32_paso/semilla_9107/intermedias/policy_600000_steps.zip | avance 0.34 (nominal 0.61) m, deriva 0.01 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 5.34°
+  0.0 % viable | ppo_v32_paso/semilla_9107/intermedias/policy_650000_steps.zip | avance 0.36 (nominal 0.61) m, deriva 0.01 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 5.96°
+  0.0 % viable | ppo_v32_paso/semilla_9107/intermedias/policy_700000_steps.zip | avance 0.35 (nominal 0.61) m, deriva 0.01 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 5.95°
+100.0 % viable | ppo_v32_paso/semilla_9109/intermedias/policy_250000_steps.zip | avance 0.87 (nominal 0.61) m, deriva 0.12 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 4.79°
+100.0 % viable | ppo_v32_paso/semilla_9109/intermedias/policy_300000_steps.zip | avance 0.78 (nominal 0.61) m, deriva 0.05 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 3.9°
+100.0 % viable | ppo_v32_paso/semilla_9109/intermedias/policy_350000_steps.zip | avance 0.69 (nominal 0.61) m, deriva 0.09 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 3.55°
+ 55.0 % viable | ppo_v32_paso/semilla_9109/intermedias/policy_400000_steps.zip | avance 0.55 (nominal 0.61) m, deriva 0.14 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 3.38°
+ 15.0 % viable | ppo_v32_paso/semilla_9109/intermedias/policy_450000_steps.zip | avance 0.50 (nominal 0.61) m, deriva 0.06 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 3.71°
+ 35.0 % viable | ppo_v32_paso/semilla_9109/intermedias/policy_500000_steps.zip | avance 0.53 (nominal 0.61) m, deriva 0.01 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 4.72°
+ 10.0 % viable | ppo_v32_paso/semilla_9109/intermedias/policy_550000_steps.zip | avance 0.49 (nominal 0.61) m, deriva 0.01 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 5.39°
+ 15.0 % viable | ppo_v32_paso/semilla_9109/intermedias/policy_600000_steps.zip | avance 0.51 (nominal 0.61) m, deriva 0.01 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 5.45°
+  5.0 % viable | ppo_v32_paso/semilla_9109/intermedias/policy_650000_steps.zip | avance 0.48 (nominal 0.61) m, deriva 0.02 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 5.75°
+  0.0 % viable | ppo_v32_paso/semilla_9109/intermedias/policy_700000_steps.zip | avance 0.47 (nominal 0.61) m, deriva 0.05 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 6.11°
+ 95.0 % viable | ppo_v32_paso/semilla_9101/policy.zip | avance 0.65 (nominal 0.61) m, deriva 0.07 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 4.51°
+ 25.0 % viable | ppo_v32_paso/semilla_9103/policy.zip | avance 0.53 (nominal 0.61) m, deriva 0.07 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 7.0°
+  0.0 % viable | ppo_v32_paso/semilla_9107/policy.zip | avance 0.35 (nominal 0.61) m, deriva 0.01 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 5.93°
+  0.0 % viable | ppo_v32_paso/semilla_9109/policy.zip | avance 0.47 (nominal 0.61) m, deriva 0.04 (nominal 0.62) m, caídas 0/20 (nominal 0), incl.máx 6.16°

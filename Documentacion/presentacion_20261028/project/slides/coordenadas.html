@@ -1,0 +1,22 @@
+<section id="coordenadas" data-transition="fade" style="background:#EAEEF2;color:#2A3442;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4521C">Modelo matemático</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#15233B">Dos niveles de modelo: cuerpo flotante y pata serial</h2>
+<div style="background:#FFFFFF;padding:40px 48px;border-radius:16px;display:flex;flex-direction:column;gap:24px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:44px;color:#15233B"><b>q</b> = [ <b>r</b>Bᵀ   <b>η</b>Bᵀ   <b>q</b>Jᵀ ]ᵀ ∈ ℝ¹⁸        <b>q</b>ᵢ = [ qcᵢ   qfᵢ   qtᵢ ]ᵀ</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:44px;color:#15233B">ᴬ<b>T</b>B = [ ᴬ<b>R</b>B    ᴬ<b>p</b>B  ;  0  0  0  1 ]</p>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:40px">
+<ul style="font-size:27px;line-height:1.5">
+<li><b>r</b>B: posición del cuerpo; <b>η</b>B: orientación (6 GDL)</li>
+<li><b>q</b>J: los 12 ángulos articulares</li>
+<li>Por pata i: coxa (qc), fémur (qf), tibia (qt)</li>
+</ul>
+<ul style="font-size:27px;line-height:1.5">
+<li>Convención REP-103: x adelante, y izquierda, z arriba</li>
+<li>Patas FL, FR, RL, RR; sᵢ = +1 izquierdas, −1 derechas</li>
+<li>Eslabones rígidos, suelo plano, contacto unilateral</li>
+</ul>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6A7383">Nova Spot Micro · Modelo matemático · Capítulo «Modelo matemático implementado»</p>
+<aside>La diapositiva dice que el robot se describe de dos formas, según lo que se quiera calcular.<br><br>Cuerpo flotante (el robot completo): se le dice flotante porque el cuerpo no está pegado a nada. Un brazo robótico de fábrica está atornillado a una mesa, pero el cuadrúpedo se mueve libre: avanza, sube, baja, se inclina y gira. Para describirlo hacen falta 6 números para el cuerpo (3 de posición y 3 de orientación) más los 12 ángulos de las articulaciones: 18 números. Sirve para la física completa: caídas, contacto con el suelo, equilibrio.<br><br>Pata serial (una sola pata): serial significa que las piezas van una detrás de otra, en cadena: la coxa sostiene al fémur y el fémur a la tibia, como tu brazo (hombro, codo, muñeca). Cada pata se estudia sola con 3 ángulos. Sirve para calcular dónde queda el pie, qué ángulos poner y cuánta fuerza hace cada motor. Es como estudiar un carro: para saber si se vuelca miras el carro completo; para saber cómo gira una rueda, basta esa rueda.<br><br>Primera ecuación, q = [rB ηB qJ] en R18: lista de 18 números que describe todo el robot. rB: 3 números, dónde está el cuerpo. ηB: 3 números, cómo está inclinado o girado. qJ: los 12 ángulos. La letra T (transpuesta) solo indica que se escriben en columna. «en R18» significa 18 números reales.<br><br>Segunda ecuación, qi = [qc qf qt]: los 3 ángulos de la pata i: coxa, fémur y tibia. Con 4 patas salen los 12.<br><br>Tercera ecuación, ATB = [R p; 0 0 0 1]: la transformación homogénea. Sirve para pasar la posición de un punto de un sistema de referencia A a otro B, por ejemplo de «visto desde la cadera» a «visto desde el centro del cuerpo». R es la rotación (cuánto está girado) y p el desplazamiento (cuánto está corrido). La fila 0 0 0 1 es un truco para hacer giro y desplazamiento en una sola multiplicación.<br><br>Texto de abajo:<br>- GDL = grados de libertad: de cuántas formas independientes se puede mover algo. El cuerpo libre tiene 6 (tres desplazamientos y tres giros).<br>- Convención REP-103: una norma de ROS que fija los ejes: x adelante, y a la izquierda, z arriba.<br>- FL delantera izquierda, FR delantera derecha, RL trasera izquierda, RR trasera derecha.<br>- si = +1 izquierdas, -1 derechas: las patas de un lado son el reflejo de las del otro; este signo voltea las cuentas para usar la misma fórmula en las cuatro.<br>- Eslabones rígidos (las piezas no se doblan), suelo plano (piso parejo), contacto unilateral (el suelo empuja el pie hacia arriba pero nunca lo jala).</aside>
+</section>

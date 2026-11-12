@@ -1,0 +1,71 @@
+{
+  "seed": "semilla_5409",
+  "timesteps": 50000,
+  "continuado_desde": null,
+  "ciclos_episodio": 12,
+  "ppo": {
+    "lr": 0.0001,
+    "target_kl": 0.03,
+    "n_steps": 2048
+  },
+  "eval_seeds": [
+    801,
+    802,
+    803,
+    804,
+    805
+  ],
+  "control_dt": 0.03,
+  "marcha": {
+    "tipo": "galope",
+    "femur_deg": 18.0,
+    "tibia_deg": 7.0,
+    "fase_s": 0.5,
+    "ciclo_paso_s": 2.4,
+    "ciclo_trote_s": 0.8,
+    "apertura_deg": 5.0,
+    "coxa_deg": 8.0
+  },
+  "pesos": {
+    "avance": 15.0,
+    "actitud": 30.0,
+    "lateral": 30.0,
+    "giro": 10.0,
+    "giro_ciclo": 5.0,
+    "suavidad": 0.3,
+    "coxas": 1.0
+  },
+  "hardware_transfer": false,
+  "observacion": [
+    "front_left_femur_joint",
+    "front_left_tibia_joint",
+    "front_right_femur_joint",
+    "front_right_tibia_joint",
+    "rear_left_femur_joint",
+    "rear_left_tibia_joint",
+    "rear_right_femur_joint",
+    "rear_right_tibia_joint",
+    "sin_fase",
+    "cos_fase",
+    "residual_previo x12"
+  ],
+  "sin_residual": [
+    "front_left_coxa_joint",
+    "front_right_coxa_joint",
+    "rear_left_coxa_joint",
+    "rear_right_coxa_joint"
+  ],
+  "aleatorizar_actuador": true,
+  "limite_cambio_grados": 3.0000000000000004,
+  "nota": "Simulación ajustada al robot real del 16-oct; no transferida al robot.",
+  "origen": "ppo_v25_galope/semilla_5409/intermedias/policy_50000_steps.zip",
+  "evaluacion_3min": {
+    "avance_m": 5.0708,
+    "deriva_m": 0.4114,
+    "roll_rms_deg": 1.1143,
+    "pitch_rms_deg": 2.8354,
+    "inclinacion_max_deg": 6.5928,
+    "coxas_rms_deg": 1.4257,
+    "suavidad": 0.0104
+  }
+}

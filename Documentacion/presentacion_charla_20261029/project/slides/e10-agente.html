@@ -1,0 +1,20 @@
+<section id="e10-agente" data-transition="fade" style="background:#EAEEF2;color:#2A3442;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:row;align-items:center;gap:32px"><p style="font-family:'Source Serif 4', Georgia, serif;font-size:96px;font-weight:600;line-height:1;color:#B4521C">10</p><div style="display:flex;flex-direction:column;gap:4px"><p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4521C">Desde el 16 de octubre de 2026 · El agente (1/2)</p><h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#15233B">Estado, acción y red</h2></div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+<div style="background:#FFFFFF;padding:32px 40px;border-radius:16px;display:flex;flex-direction:column;gap:16px">
+<h3 style="font-size:30px;font-weight:600;color:#2F5D8C">Estado y acción</h3>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;color:#15233B">sₜ = [ q̃ₜ − q*, sin 2πφₜ, cos 2πφₜ, Δqₜ₋₁/0,08 ] ∈ ℝ²²</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;color:#15233B">aₜ ∈ [−1, 1]¹²</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;color:#15233B">objetivo = 0,08·clip(aₜ ⊙ m, −1, 1)</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;color:#15233B">Δqₜ = Δqₜ₋₁ + clip(objetivo − Δqₜ₋₁, ±0,02)</p>
+</div>
+<div style="background:#FFFFFF;padding:32px 40px;border-radius:16px;display:flex;flex-direction:column;gap:16px">
+<h3 style="font-size:30px;font-weight:600;color:#2F5D8C">Red actor-crítico</h3>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;color:#15233B">Actor: 22 → 64 → 64 → 12</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;color:#15233B">Crítico: 22 → 64 → 64 → 1</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;color:#15233B">h₁ = tanh(W₁s + b₁) ,  h₂ = tanh(W₂h₁ + b₂)</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;color:#15233B">μ = W₃h₂ + b₃</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6A7383">Nova Spot Micro · Paso 10 de 13 · Un solo agente centralizado · residual · acciones continuas · ≈ 12 100 parámetros</p>
+</section>

@@ -1,0 +1,2 @@
+ 90.0 % viable | ppo_v10_robot/ppo_v21_galope_semilla_827_100k/policy.zip | avance 1.94 (nominal 1.90) m, deriva 0.33 (nominal 0.34) m, caídas 0/20 (nominal 0), incl.máx 7.64°
+  0.0 % viable | ppo_v21_galope/semilla_829/intermedias/policy_500000_steps.zip | avance 1.26 (nominal 1.90) m, deriva 0.21 (nominal 0.34) m, caídas 0/20 (nominal 0), incl.máx 6.56°

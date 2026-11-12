@@ -50,14 +50,39 @@ class PCA9685Seguro:
         self._write(MODE1, old_mode | 0xA1)
 
     def all_off(self):
-        self._write(ALL_LED_OFF_H, FULL_OFF)
         if hasattr(self, "_gpio"):
             self._gpio.output(self._oe_pin, self._gpio.HIGH)
         self.armed = False
+        # Latch FULL_OFF on every channel, not only ALL_LED_OFF. Individual
+        # channel state survives GPIO cleanup/restart and prevents a stale
+        # pulse from reappearing if the global register is not retained.
+        self._set_all_channels_off()
+        self._write(ALL_LED_OFF_H, FULL_OFF)
+
+    def _set_channel_off(self, channel):
+        if not 0 <= int(channel) <= 15:
+            raise ValueError("Canal PCA9685 fuera de 0..15")
+        off_h = LED0_ON_L + 4 * int(channel) + 3
+        value = self._bus.read_byte_data(self.address, off_h)
+        self._write(off_h, value | FULL_OFF)
+
+    def _set_all_channels_off(self):
+        for channel in range(16):
+            self._set_channel_off(channel)
+
+    def prepare_channel_off(self, channel):
+        """Deja un canal individual en FULL_OFF antes de armar el PWM."""
+        self._set_channel_off(channel)
+
+    def set_channel_off(self, channel):
+        """Apaga un canal sin alterar los pulsos de los demás canales."""
+        self._set_channel_off(channel)
 
     def arm(self):
-        # Quita FULL_OFF antes de bajar OE. La llamada debe estar protegida por
-        # calibración, parada física y confirmación en la capa superior.
+        # Mantén OE alto mientras se apagan todos los canales. Solo los canales
+        # que reciban una referencia posterior podrán emitir un pulso.
+        self._gpio.output(self._oe_pin, self._gpio.HIGH)
+        self._set_all_channels_off()
         self._write(ALL_LED_OFF_H, 0x00)
         self._gpio.output(self._oe_pin, self._gpio.LOW)
         self.armed = True
@@ -92,5 +117,4 @@ class PCA9685Seguro:
     def close(self):
         self.all_off()
         self._bus.close()
-        self._gpio.cleanup(self._oe_pin)
-
+        # No liberar OE al cerrar: es activo-bajo y debe permanecer en HIGH.

@@ -1,0 +1,10 @@
+base: avance 4.155 m, deriva 0.451 m, roll 3.63°, pitch 2.32°, coxas 1.13°
+OK semilla_4209   200000 pasos  avance 4.266  deriva 0.474  roll 2.93  pitch 1.75  incl.máx 4.58  coxas 1.13  suav 0.21  punt 8.59
+OK semilla_4209   100000 pasos  avance 4.295  deriva 0.427  roll 3.44  pitch 2.12  incl.máx 5.60  coxas 1.13  suav 0.04  punt 8.83
+-- semilla_4209   700000 pasos  avance 3.794  deriva 0.029  roll 2.69  pitch 1.94  incl.máx 4.38  coxas 1.05  suav 1.57  punt 5.43
+-- semilla_4207   700000 pasos  avance 3.115  deriva 0.025  roll 2.36  pitch 1.48  incl.máx 3.95  coxas 0.90  suav 3.01  punt 5.93
+-- semilla_4203   900000 pasos  avance 3.264  deriva 0.108  roll 2.48  pitch 1.20  incl.máx 4.19  coxas 0.89  suav 3.84  punt 7.37
+-- semilla_4201   900000 pasos  avance 2.615  deriva 0.021  roll 2.59  pitch 1.87  incl.máx 3.71  coxas 0.91  suav 3.81  punt 7.45
+-- semilla_4201   500000 pasos  avance 3.013  deriva 0.156  roll 2.05  pitch 1.55  incl.máx 3.03  coxas 0.94  suav 3.44  punt 7.53
+-- semilla_4203   800000 pasos  avance 3.069  deriva 0.130  roll 2.43  pitch 1.14  incl.máx 4.00  coxas 0.90  suav 3.85  punt 7.56
+Elegida: /home/pavilion/Documentos/Cuadrupedo/Experimentos/entrenamiento_real_20261016/ppo_v10_robot/ppo_v24_trote_semilla_4209_200k

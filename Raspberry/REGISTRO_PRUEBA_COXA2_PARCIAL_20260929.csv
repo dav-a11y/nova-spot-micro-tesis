@@ -1,0 +1,6 @@
+timestamp_ns,pata,articulacion,canal_pca,tca,canal_tca,fase,pulso_us,raw,angulo_absoluto_deg,status_hex,magnet_detected,magnet_low,magnet_high,lectura_valida
+1790691952693419072,2,coxa 2,1,0x71,6,referencia,1500,1789,157.2363,0x27,1,0,0,1
+1790691952897716984,2,coxa 2,1,0x71,6,referencia,1500,1820,159.9609,0x27,1,0,0,1
+1790691953100055046,2,coxa 2,1,0x71,6,referencia,1500,1584,139.2188,0x27,1,0,0,1
+1790691953302085704,2,coxa 2,1,0x71,6,referencia,1500,1623,142.6465,0x27,1,0,0,1
+1790691953505144686,2,coxa 2,1,0x71,6,referencia,1500,1796,157.8516,0x27,1,0,0,1

@@ -1,0 +1,1 @@
+Command '['ffprobe', '-v', 'error', '-select_streams', 'v', '-show_entries', 'packet=pts_time', '-read_intervals', '%+#1', '-of', 'json', '/home/pavilion/Documentos/Cuadrupedo/Experimentos/camaras/grabaciones/rep_ciclo1_gateo_base_r2/extra_windows/video.mkv']' returned non-zero exit status 1.

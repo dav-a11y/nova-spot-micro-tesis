@@ -223,7 +223,7 @@ def cartesian_crawl(stand, samples=24, step_length=0.018, step_height=0.014,
     return poses
 
 
-def cartesian_step_walk(stand, samples=32, step_length=0.016,
+def cartesian_step_walk(stand, samples=48, step_length=0.016,
                         step_height=0.008, weight_shift=0.004,
                         fore_aft_shift=0.0):
     """Generate a conservative walk with explicit lateral weight transfer.

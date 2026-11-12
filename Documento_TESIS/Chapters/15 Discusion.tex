@@ -1,0 +1,146 @@
+\chapter{Análisis y discusión}
+
+Los ensayos demostraron que una trayectoria puede producir avance repetible y
+mantener inclinaciones acotadas sin ejecutar el patrón de apoyo supuesto. Esta
+diferencia es relevante porque el desplazamiento visual, por sí solo, habría
+permitido aceptar incorrectamente el gateo. La publicación sincronizada de
+fase y contacto permitió contrastar la intención del controlador con la
+interacción pie--suelo.
+
+El debounce no mejoró mecánicamente la marcha. Su función fue exigir
+persistencia antes de declarar vuelo. Por ello redujo la coincidencia temporal
+global y añadió aproximadamente el retardo configurado a los despegues
+delanteros. En las patas traseras, los eventos crudos duraron alrededor de
+0,074~s y desaparecieron al aplicar el criterio de 0,12~s. La interpretación
+defendible es que estos eventos correspondieron a interrupciones breves del
+contacto de Gazebo, no a una fase de vuelo sostenida.
+
+La corrección del temporizador sí produjo una mejora verificable de ejecución:
+la cadencia pasó de ciclos cercanos a 4,80~s a ciclos de 4,32~s coherentes con
+la configuración. Debido a que esta modificación cambió la velocidad real, las
+bolsas anteriores y posteriores se analizaron como versiones experimentales
+separadas.
+
+La comparación Gazebo--MuJoCo utilizó finalmente el mismo contrato de pose,
+IMU, contacto y estado articular. Esto permitió contrastar todas las variables
+sin imputarlas, pero reveló diferencias materiales: MuJoCo avanzó mucho menos y
+no produjo los despegues previstos. Se demostró equivalencia de interfaz y
+procedimiento, no equivalencia dinámica ni física.
+
+Los márgenes de estabilidad y las posiciones de pie dependen todavía de una
+geometría y centro de masa nominales. Asimismo, los modelos de contacto no
+representan directamente los futuros sensores físicos. Los resultados de
+simulación respaldan el desarrollo del controlador y el protocolo, pero no
+sustituyen la validación del robot real.
+
+La capa correctiva se entrenó con cinco semillas y se conectó a Gazebo, pero
+ninguna escala residual positiva cumplió simultáneamente los criterios de
+avance y postura. La escala cero reprodujo el nominal, lo que descartó un fallo
+del bypass, mientras las escalas positivas mostraron interferencia con la
+marcha. En consecuencia, el resultado válido es negativo: la política se
+rechaza para transferencia. La comparación fue descriptiva y no completamente
+emparejada; no sustituye la campaña final prevista después de rediseñar el
+entrenamiento.
+
+Las pruebas provocadas demostraron que el supervisor recibe estímulos de pose,
+contacto, estabilidad y trayectoria y ordena \texttt{stand}. Sin embargo,
+\texttt{stand} es una orden lógica, no un corte de energía. En hardware deberá
+existir una ruta independiente por OE, además de un rearme explícito y una
+medición de falsos positivos antes de habilitar por defecto los watchdogs de
+contacto, margen y telemetría.
+
+\section{De la simulación al robot físico}
+
+El cambio que hizo posible ejecutar PPO en el robot no fue el algoritmo, que se
+mantuvo, sino el entorno de entrenamiento. Las primeras políticas se rechazaron
+porque su escala correctiva interfería con la marcha; las posteriores se
+entrenaron con la marcha que ejecuta el robot, una observación limitada a lo que
+el robot mide y un modelo del actuador identificado con sus propios sensores.
+Con esa formulación, las correcciones aprendidas fueron pequeñas y compatibles
+con los servos, y la política de gateo redujo el error de seguimiento y la
+desviación de las coxas frente a la marcha nominal de forma repetida.
+
+La comparación entre robot y simulación mostró que los mayores errores no
+estaban en la dinámica, sino en la interfaz entre ambos: el sentido invertido de
+dos tibias, una postura base con las rodillas $\approx48^\circ$ más rectas que en
+el modelo, topes que impedían alcanzar la postura pedida y una escala de los
+sensores que cambió con la postura. Ninguno de estos errores podía compensarse
+entrenando más, porque la política habría aprendido sobre un robot distinto del
+real. Las cámaras resultaron decisivas para detectarlos, porque ofrecieron una
+medida independiente de los sensores articulares.
+
+\section{Fallos de instrumentación y validez de los resultados}
+
+Varios ensayos que inicialmente parecían un empeoramiento del robot tenían otra
+causa. Dos trotes con seguimiento bajo coincidieron con cientos de pasos de
+control retrasados por la carga del PC; repetidos con el PC libre, el
+seguimiento fue normal. Saltos simultáneos en todos los potenciómetros se
+debieron a una masa común degradada, y varias interrupciones, a fallos del bus
+I$^2$C. Si estos casos se hubieran tratado como resultados de las políticas, las
+conclusiones habrían sido erróneas. Por ello cada caminata pasó una comprobación
+de salud, los ensayos inválidos se conservaron con su causa documentada, y la
+temporización se incorporó como una variable más del diagnóstico. A la vez, la
+degradación observada al final de una jornada de unas doce horas, sin carga del
+PC, indica que la fatiga de los servos es un factor real que conviene limitar
+en campañas largas.
+
+\section{Alcance de la evaluación en el robot suspendido}
+
+La recompensa de las políticas premia avanzar recto sin inclinar el cuerpo,
+pero con el robot suspendido no hay avance ni inclinación que medir. La métrica
+física disponible, el seguimiento de las órdenes y la estabilidad de las coxas,
+es necesaria para una buena locomoción pero no suficiente: una política podría
+seguir bien sus órdenes y aun así caminar peor sobre el suelo. Las mejoras
+obtenidas deben leerse, por tanto, como evidencia de que las correcciones
+aprendidas son ejecutables por el hardware y no lo perturban, y no como una
+demostración de mejor locomoción. La diferencia entre días en el nivel de error
+(del orden de $0{,}5^\circ$ en las coxas) refuerza que las comparaciones deben
+hacerse dentro de una misma sesión, con orden alternado y varias repeticiones.
+
+\section{Elección de marchas}\label{sec:eleccion-marchas}
+
+El paso, con las coxas fijas, resultó en la práctica un gateo continuo: una pata
+en el aire cada vez, sin el desplazamiento lateral del cuerpo que lo distinguía
+en el diseño. Por eso se añadió el trote, de pares diagonales, que sí es
+una marcha distinta, y más tarde la carrera y el galope. El paso se retomó después con el
+actuador medido, pero no debe contarse como una marcha realmente distinta del gateo. El trote resultó más exigente para el hardware: sus picos
+de corriente coincidieron con el único reinicio de la interfaz de E/S y con la
+mayor parte de los problemas de seguimiento, lo que hace de la alimentación de
+los servos un requisito previo para ensayarlo sobre el suelo.
+
+\section{Qué significan la convergencia y la viabilidad}
+
+La convergencia de la recompensa no equivale a una política mejor para el robot. En
+las cinco marchas, mientras la recompensa se estabilizaba, el avance por episodio
+bajaba (sección~\ref{sec:convergencia-marchas}): la recompensa total sube sobre todo
+porque bajan los castigos. Esto explica un resultado llamativo de la
+Tabla~\ref{tab:viabilidad}: tres de las políticas elegidas tienen solo 0,2~M de pasos,
+mucho antes de converger. Las copias tempranas conservan el avance de la marcha nominal;
+las tardías derivan menos, pero avanzan menos y dejan de cumplir el criterio. Por
+ejemplo, en el paso v24 semilla 4109 la copia de 0,2~M avanza 1,16~m con 0,07~m de
+deriva, y la final, 0,87~m con 0,03~m. El gateo necesitó lo contrario, un peso de avance de 40 y 4,1~M de pasos,
+para no perder avance. El peso de avance decide, por tanto, cuánto de cada cosa se
+obtiene, y no hay un valor único válido para todas las marchas.
+
+También hay que matizar lo que PPO aporta en simulación. Ninguna política se cayó,
+pero la marcha nominal tampoco. La mejora de las políticas elegidas es de pocos puntos
+de avance o de menos deriva, según la marcha, no un cambio cualitativo. La viabilidad
+indica que la política no empeora a la marcha nominal cuando cambian las condiciones;
+no que sea mucho mejor que ella.
+
+\section{Parecido entre el robot y la simulación}
+
+El parecido del 66 al 83~\% (Tabla~\ref{tab:parecido}) se debe a la amplitud, no a la
+forma: las correlaciones casi siempre superan 0,86, de modo que el modelo del actuador
+reproduce bien cuándo se mueve cada articulación, pero no cuánto. Además, la diferencia
+crece en los ciclos cortos, ya que la carrera y el galope, de ciclo de 0,8~s, se mueven hasta 1,8 veces lo simulado, mientras que el gateo, el más lento, llega al 90~\% sin la tibia de sensor averiado.
+Esto importa, porque una política entrenada con una amplitud distinta de la real
+corrige sobre un movimiento diferente. El modelo del actuador se identificó sobre todo
+con marchas lentas, por lo que conviene repetir la identificación con la carrera y el
+galope antes de ensayarlas apoyadas.
+
+Corregir una sola escala de sensor cambió el parecido en 7 puntos, lo que confirma lo
+visto el 21 de octubre: buena parte de la brecha entre simulación y robot está en
+la interfaz y no en la dinámica. Por otra parte, en estos ensayos la simulación
+también está colgada, de modo que el parecido no dice nada sobre el contacto con el
+suelo, donde se espera la mayor diferencia.

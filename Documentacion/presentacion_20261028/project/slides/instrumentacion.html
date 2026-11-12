@@ -1,0 +1,28 @@
+<section id="instrumentacion" data-transition="fade" style="background:#F6F5F0;color:#2A3442;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4521C">Plataforma física</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#15233B">Instrumentación articular: dos sensores por articulación</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:48px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<h3 style="font-size:32px;font-weight:600;color:#2F5D8C">Potenciómetros</h3>
+<p style="font-size:26px;line-height:1.4">Acoplados al eje, leídos con 10 bits por el MUX (C0–C15). Lineales: error RMS 0,4–1,1°, histéresis 0,6–1,5°. C0 sirve de referencia para restar el desplazamiento común.</p>
+<h3 style="font-size:32px;font-weight:600;color:#2F5D8C">Encoders AS5600</h3>
+<p style="font-size:26px;line-height:1.4">Magnéticos de 12 bits. El firmware reporta el estado del imán (MD, ML, MH, AGC, MAG) para detectar imanes débiles.</p>
+<h3 style="font-size:32px;font-weight:600;color:#2F5D8C">Calibración</h3>
+<p style="font-size:26px;line-height:1.4">Escala y retardo por regresión orden–lectura en las propias caminatas. Sin sensor válido: se usa la orden retrasada 99 ms.</p>
+</div>
+<table style="font-size:25px;color:#2A3442">
+<tr><th style="width:30%">Articulación</th><th style="width:40%">Sensor útil (28-oct)</th><th style="width:30%">Estado</th></tr>
+<tr><td>Fémur 1</td><td>Pot. C8 + AS5600 0x70/1</td><td>Operativo</td></tr>
+<tr><td>Fémur 2</td><td>Pot. + AS5600 0x70/4</td><td>Operativo</td></tr>
+<tr><td>Fémur 3</td><td>Pot. C9</td><td>Operativo</td></tr>
+<tr><td>Fémur 4</td><td>Pot. C6</td><td>Operativo</td></tr>
+<tr><td>Tibia 1</td><td>Ninguno</td><td>Orden retrasada</td></tr>
+<tr><td>Tibia 2</td><td>AS5600 0x70/3</td><td>Operativo</td></tr>
+<tr><td>Tibia 3</td><td>Pot. M12</td><td>Responde; falta enviarlo</td></tr>
+<tr><td>Tibia 4</td><td>Pot. C10</td><td>Operativo</td></tr>
+<tr><td>Coxa 2</td><td>Pot. C1</td><td>No sigue la coxa</td></tr>
+</table>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6A7383">Nova Spot Micro · Plataforma física · Revisión completa de sensores del 28-oct</p>
+<aside>Estado de la revisión del 28 de octubre, en la que se movió cada articulación por separado y se buscó qué sensor la sigue. El potenciómetro de la tibia 3 responde en el canal M12, pero el firmware todavía no lo transmite durante las caminatas. El de la coxa 2 no cambia aunque la coxa se mueva 18 grados.</aside>
+</section>

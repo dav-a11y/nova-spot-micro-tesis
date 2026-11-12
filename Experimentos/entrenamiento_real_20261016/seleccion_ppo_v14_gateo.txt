@@ -1,0 +1,10 @@
+base: avance 7.529 m, deriva 0.036 m, roll 1.47°, pitch 0.96°, coxas 0.98°
+OK semilla_43  1700000 pasos  avance 7.795  deriva 0.139  roll 1.26  pitch 1.48  incl.máx 3.80  coxas 0.83  suav 1.06  punt 3.86
+-- semilla_13  2900000 pasos  avance 5.887  deriva 0.039  roll 1.98  pitch 1.10  incl.máx 2.98  coxas 0.77  suav 1.43  punt 3.70
+-- semilla_43  2400000 pasos  avance 7.357  deriva 0.146  roll 1.28  pitch 1.36  incl.máx 3.16  coxas 0.83  suav 1.07  punt 3.90
+-- semilla_41  2200000 pasos  avance 5.343  deriva 0.037  roll 2.14  pitch 1.28  incl.máx 2.78  coxas 0.82  suav 1.43  punt 4.18
+-- semilla_29  2100000 pasos  avance 6.954  deriva 0.122  roll 1.99  pitch 1.18  incl.máx 3.42  coxas 0.78  suav 1.43  punt 4.50
+-- semilla_41  1100000 pasos  avance 5.276  deriva 0.062  roll 2.24  pitch 1.21  incl.máx 3.19  coxas 0.84  suav 1.43  punt 4.51
+-- semilla_67  2600000 pasos  avance 6.964  deriva 0.210  roll 1.42  pitch 0.97  incl.máx 3.62  coxas 0.84  suav 1.43  punt 4.71
+-- semilla_29  2900000 pasos  avance 6.967  deriva 0.168  roll 1.95  pitch 1.25  incl.máx 3.16  coxas 0.78  suav 1.44  punt 4.99
+Elegida: /home/pavilion/Documentos/Cuadrupedo/Experimentos/entrenamiento_real_20261016/ppo_v10_robot/ppo_v14_gateo_semilla_43_1700k

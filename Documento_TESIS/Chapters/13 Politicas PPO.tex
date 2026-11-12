@@ -1,0 +1,632 @@
+\chapter{Entrenamiento de las políticas PPO para el robot físico}
+\label{cap:ppo-fisico}
+
+Este capítulo describe cómo se formuló, entrenó, seleccionó y ejecutó la capa
+correctiva PPO en el robot real entre el 16 de octubre y el 3 de noviembre de 2026. Completa
+el contrato de corrección residual (sección~\ref{sec:contrato-residual}) y las
+campañas preparatorias en Gazebo y MuJoCo del capítulo de resultados: aquellas usaban un
+modelo nominal del actuador, mientras que las de este capítulo se entrenan con
+un modelo del actuador identificado con datos del propio robot. La base teórica
+de PPO está en la sección de aprendizaje por refuerzo del marco teórico.
+
+\section{Evolución de los entornos de entrenamiento}
+
+La capa correctiva pasó por cuatro entornos, cada uno más cercano al robot:
+\begin{enumerate}
+    \item \textbf{Banco cinemático en NumPy} (septiembre): observaciones,
+    saturaciones y terminaciones sin dinámica ni contacto. Sirvió para validar
+    la integración con cinco semillas (11, 23, 37, 53 y 71).
+    \item \textbf{Gazebo} (septiembre): la política se conectó al modelo
+    dinámico con contacto; ninguna escala de corrección superó a la marcha
+    nominal en el criterio conjunto.
+    \item \textbf{MuJoCo con modelo nominal} (septiembre y octubre):
+    reentrenamiento extendido, con mejora de avance en simulación pero sin
+    modelo identificado del actuador.
+    \item \textbf{MuJoCo con el actuador real} (desde el 16 de octubre): entorno
+    \texttt{NovaRealEnv} (programa \path{entrenar_ppo_real.py}).
+    La marcha nominal es la misma que ejecuta el robot, el actuador se
+    identifica con sus sensores y la observación se limita a lo que el robot
+    puede medir. Es el entorno de todas las campañas de este capítulo.
+\end{enumerate}
+
+\section{Entorno de entrenamiento con el actuador real}
+
+\subsection{Modelo físico y temporización}
+
+El simulador es MuJoCo con paso de integración de 2~ms. La política actúa cada
+30~ms (15 pasos de integración por paso de control), el mismo periodo que el
+bucle de control del robot (33~ms medidos). Desde el 20 de octubre el modelo usa
+la geometría medida en el robot (archivo \path{nova_sm3_real.xml}),
+Tabla~\ref{tab:geometria-real}. Masas e inercias siguen siendo las del modelo de
+referencia NovaSM3.
+
+\begin{table}[H]
+\centering
+\caption{Geometría medida del robot e incorporada al modelo de entrenamiento.}
+\label{tab:geometria-real}
+\small
+\begin{tabular}{lrr}
+\toprule
+Magnitud & Robot real (mm) & Modelo anterior (mm) \\
+\midrule
+Fémur (eje de cadera a eje de rodilla) & 108 & 107,95 \\
+Tibia hasta la punta del pie & 155 & 153,89 \\
+Desplazamiento lateral de la coxa & 35 & 38,1 \\
+Separación de caderas delante--detrás & 190 & 180 \\
+Separación de caderas izquierda--derecha & 77 & 120 \\
+Largo del cuerpo & 265 & 230 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Marchas nominales}
+
+La marcha nominal $\mathbf{q}^{\text{nom}}(\phi)$ de la ecuación~\eqref{eq:residual}
+es una de las cinco de la Tabla~\ref{tab:marchas-nominales}:
+\begin{itemize}
+    \item \textbf{Gateo}: una pata en el aire cada vez, en el orden delantera
+    izquierda, trasera derecha, delantera derecha, trasera izquierda, con una
+    pausa entre fases.
+    \item \textbf{Paso}: igual secuencia pero continua. Se dejó el 20 de octubre
+    porque, con las coxas fijas, resultaba un gateo continuo visualmente
+    indistinguible del gateo; se retomó el 22 de octubre (v16) con el actuador
+    medido.
+    \item \textbf{Trote}: patas diagonales a la vez, dos en el aire y dos apoyadas.
+    \item \textbf{Carrera} (desde el 27 de octubre): también por pares diagonales,
+    con un ciclo más corto y una fracción de apoyo de 0,45, de modo que en la
+    referencia hay un breve instante sin pies apoyados.
+    \item \textbf{Galope transverso} (desde el 27 de octubre): las patas de cada eje
+    casi a la vez, con fases trasera izquierda 0, trasera derecha 0,1, delantera
+    derecha 0,5 y delantera izquierda 0,6, y fracción de apoyo de 0,40. Es la única
+    marcha que mueve coxas: las traseras se abren $4^\circ$ al levantar, y las
+    delanteras quedan fijas, porque con la coxa 2 en movimiento la pata cedía y
+    con una sola delantera moviéndose el galope retrocedía en simulación.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\caption{Parámetros de las marchas nominales actuales.}
+\label{tab:marchas-nominales}
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Marcha & Ciclo (s) & Fémur & Tibia & Apertura & Peso de avance $w_{\text{av}}$ \\
+\midrule
+Gateo & 2,64 & $\pm15^\circ$ & $10^\circ$ & $8^\circ$ & 40 \\
+Paso & 2,0 & $\pm15^\circ$ & $10^\circ$ & $8^\circ$ & 20 \\
+Trote & 1,0 & $\pm12^\circ$ & $12^\circ$ & $5^\circ$ & 10 \\
+Carrera & 0,8 & $\pm12^\circ$ & $12^\circ$ & $5^\circ$ & 10 \\
+Galope & 0,8 & $\pm18^\circ$ & $7^\circ$ & $5^\circ$ & 30 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Desde el 20 de octubre las marchas usan una \emph{postura abierta}: el punto
+neutro de los fémures delanteros se adelanta y el de los traseros se atrasa según la
+columna de apertura. Con la geometría real, las patas de
+un mismo lado se acercaban hasta 69~mm bajo el centro del cuerpo y llegaban a
+chocar; con la apertura el hueco mínimo entre pies sube a 133~mm.
+
+Desde el 27 de octubre la tibia de cada pata amplía su movimiento con una ganancia
+propia (tibias 1 a 4: 2,0; 1,4; 1,6 y 1,8), y las tibias 2 y 4 se mueven en sentido
+de servo contrario a las 1 y 3. Es la postura de trabajo aprobada por el operador. Estas
+ganancias se incorporaron a la simulación desde la campaña v24; la lectura de los
+sensores se divide por la misma ganancia, de modo que la política ve el ángulo del
+modelo. Con ellas, el galope anterior (fémur $16^\circ$, tibia $14^\circ$) se caía
+siempre, y su marcha base se reajustó a los valores de la tabla
+(sección~\ref{sec:viabilidad-resultados}).
+
+\subsection{Acción}
+
+La acción es un vector de 12 componentes, una por articulación. Las cuatro
+coxas están enmascaradas (corrección cero), por lo que la política corrige
+ocho articulaciones: los cuatro fémures y las cuatro tibias. La salida de la
+red se recorta a $[-1,1]$ y se escala a $\pm0{,}08$~rad ($\pm4{,}6^\circ$); la
+corrección aplicada no puede cambiar más de $0{,}02$~rad ($1{,}15^\circ$) por
+paso respecto a la anterior. Además, como el firmware del robot, la orden total
+no puede variar más de $3^\circ$ por paso y se recorta a los topes medidos de
+cada servo.
+
+\subsection{Observación}
+
+La observación incluye solo magnitudes medibles en el robot suspendido, sin IMU. Desde la versión 6 tiene 22 componentes:
+\begin{itemize}
+    \item desviación de las ocho articulaciones de fémur y tibia respecto a su
+    postura de referencia (8), con ruido gaussiano de $1^\circ$ y un sesgo
+    aleatorio de hasta $\pm1^\circ$ por episodio, como los potenciómetros;
+    \item fase de la marcha codificada como $\sin(2\pi\phi)$ y $\cos(2\pi\phi)$ (2);
+    \item corrección del paso anterior normalizada por $0{,}08$~rad (12).
+\end{itemize}
+Las versiones 2 a 5 observaban solo tres articulaciones (fémures izquierdos y
+tibia delantera izquierda), las únicas con sensor fiable en esa fecha, con 17
+componentes.
+
+\subsection{Recompensa}
+
+La recompensa por paso es
+\begin{multline}
+    r_t = 1 + w_{\text{av}}\,\Delta x - w_{\text{act}}\,(\varphi^2+\vartheta^2)
+    - 25\,(h-0{,}235)^2 - 0{,}25\,\lVert\mathbf{e}_q\rVert^2 - 0{,}04\,\lVert\Delta\mathbf{q}\rVert^2 \\
+    - w_{\text{lat}}\,y^2 - w_{\text{giro}}\,\psi^2
+    - w_{\text{suav}}\sum_j\Big(\frac{\Delta\mathbf{q}_{t,j}-\Delta\mathbf{q}_{t-1,j}}{0{,}02}\Big)^2
+    - w_{\text{cox}}\,\overline{e_{\text{coxa}}^2},
+    \label{eq:recompensa-real}
+\end{multline}
+donde $\Delta x$ es el avance del cuerpo en el paso (m); $\varphi$ y $\vartheta$,
+el alabeo y el cabeceo (rad); $h$, la altura del cuerpo (m); $\mathbf{e}_q$, el
+error articular respecto a la marcha nominal; $\Delta\mathbf{q}$, la corrección;
+$y$ y $\psi$, el desvío lateral (m) y el giro (rad) acumulados desde el inicio;
+y $\overline{e_{\text{coxa}}^2}$, la media del cuadrado de la desviación de las
+coxas respecto a su orden (en grados). Además, al completar cada ciclo se resta
+$w_{\text{gc}}\,(\Delta\psi_{\text{ciclo}})^2$, con el giro del ciclo en grados,
+porque sin IMU la política no observa el rumbo y tendía a curvarse en caminatas
+largas. Los pesos de cada versión están en las
+tablas~\ref{tab:campanas-ppo} y~\ref{tab:campanas-ppo-2}.
+
+El término de suavidad (versión 11 en adelante) se añadió porque en el robot la
+primera PPO del paso daba correcciones más rápidas de lo que los servos podían
+seguir; el término de coxas, porque esa misma política sacudía el cuerpo y las
+coxas, fijas en la simulación pero flexibles en el robot, se desviaban el doble
+que con la marcha nominal.
+
+\subsection{Terminación y duración de los episodios}
+
+Un episodio termina si la altura del cuerpo sale de $[0{,}12;\,0{,}40]$~m, si
+el alabeo o el cabeceo superan $0{,}6$~rad o si la observación deja de ser
+finita. Si no, se trunca al completar 6 ciclos de marcha (12 en el trote, por
+su ciclo más corto). Cada episodio comienza con una rampa desde la postura de
+reposo hasta la postura de la marcha, durante la cual la política no actúa.
+
+\subsection{Modelo del actuador y aleatorización}
+
+Entre la orden y la simulación se interpone el modelo del actuador
+identificado en el robot: un retardo puro (cola de 3 pasos, $\approx$99~ms), una
+ganancia por articulación, una zona muerta ($\approx0{,}4^\circ$) y el límite de
+$3^\circ$ por paso. Se identificó por primera vez el 16 de octubre con las
+caminatas nominales registradas por los sensores del robot (retardo de 65 a
+100~ms, ganancia de 0,88 a 1,0, histéresis de 0,6 a $1{,}5^\circ$) y se
+actualizó después con escalones, senoides y barridos de rango.
+
+En cada episodio se aleatorizan el retardo (2 a 4 pasos; desde el 21 de
+octubre, el intervalo medido en el robot, que en las políticas elegidas es de 1 a 4
+pasos, es decir, de 30 a 120~ms), la ganancia de cada servo
+($\pm5$~\%) y el sesgo de los sensores ($\pm1^\circ$), según la estrategia de
+aleatorización del dominio descrita en el marco teórico.
+
+\section{Red neuronal e hiperparámetros}
+
+Se usó la implementación de PPO de Stable-Baselines3~2.3.2~\cite{raffin2021sb3}
+sobre PyTorch~2.3.1, con la política \texttt{MlpPolicy}: actor y crítico son
+redes independientes, cada una con dos capas ocultas de 64 neuronas y activación
+$\tanh$. El actor da la media de la gaussiana; las desviaciones son parámetros
+aprendidos independientes del estado. La Tabla~\ref{tab:hiperparametros-ppo}
+resume los hiperparámetros de las campañas desde la versión 10; en las versiones
+2 a 6 no se registró la configuración de PPO en los metadatos.
+
+\begin{table}[H]
+\centering
+\caption{Hiperparámetros de PPO en las campañas con el actuador real (versión 10 en adelante).}
+\label{tab:hiperparametros-ppo}
+\small
+\begin{tabular}{lll}
+\toprule
+Hiperparámetro & Valor & Significado \\
+\midrule
+Tasa de aprendizaje & $1\cdot10^{-4}$ & paso del optimizador Adam \\
+Pasos por recolección $N$ & 2048 & datos por actualización \\
+Tamaño de minilote & 256 & muestras por paso de gradiente \\
+Épocas por actualización $K$ & 10 & pasadas sobre cada recolección \\
+Factor de descuento $\gamma$ & 0,99 & horizonte de $\approx$100 pasos (3~s) \\
+Parámetro GAE $\lambda$ & 0,95 & compromiso sesgo--varianza \\
+Recorte $\epsilon$ & 0,2 & cambio máximo de la razón $\rho_t$ \\
+Coeficiente del crítico $c_1$ & 0,5 & peso del error de valor \\
+Coeficiente de entropía $c_2$ & 0 & sin bonificación de exploración \\
+Norma máxima del gradiente & 0,5 & recorte del gradiente \\
+KL objetivo & 0,03 & corta las épocas si la política cambia mucho \\
+Copias intermedias & cada $10^5$ pasos & para la selección; más densas en campañas cortas \\
+Evaluación final & semillas 801--805 & 5 episodios deterministas \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Campañas de entrenamiento y semillas}
+
+La Tabla~\ref{tab:campanas-ppo} recoge las primeras campañas con el actuador real.
+Cada fila es una configuración entrenada con varias semillas independientes; la
+columna de pasos indica el máximo alcanzado (en las continuaciones, contando los
+pasos de la política de partida). Las semillas 11, 23, 37, 53 y 71 son las
+congeladas en el protocolo; las demás se añadieron para ampliar la muestra. Las
+tablas~\ref{tab:campanas-ppo} y~\ref{tab:campanas-ppo-2} dividen las campañas en
+dos periodos. Las continuaciones parten de la mejor política de una campaña anterior y siguen
+entrenando con la configuración nueva.
+
+\begin{table}[H]
+\centering
+\caption{Campañas PPO con el actuador real, 16 a 22 de octubre de 2026.}
+\label{tab:campanas-ppo}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{p{0.1\textwidth}p{0.06\textwidth}p{0.07\textwidth}p{0.19\textwidth}p{0.08\textwidth}p{0.4\textwidth}}
+\toprule
+Versión & Fecha & Marcha & Semillas & Pasos & Cambio principal y resultado \\
+\midrule
+v2, v3 & 16/10 & gateo & 11, 23, 37, 53, 71 & 0,15 M & Primer entorno con el actuador real; 3 articulaciones observadas. Todas superan el avance nominal en simulación. \\
+v4 & 16/10 & gateo & 11, 23, 37, 53, 71 & 0,2 M & Recompensa de estabilidad ($w_{\text{av}}=10$, $w_{\text{act}}=30$, $w_{\text{lat}}=20$, $w_{\text{giro}}=10$). Semilla 37: $-54$~\% de deriva y $-31$~\% de inclinación en simulación; primera ejecutada en el robot. \\
+v5 & 16/10 & gateo & 11, 23, 37, 53, 71 & 0,2 M & Actuador v4 (barrido de rango). No mejora la base. \\
+v6 & 19/10 & gateo & 11, 23, 37, 53, 71 & 0,2 M & Observación de las 8 articulaciones (22 componentes). \\
+v10 & 19/10 & gateo, paso & 11, 23, 37, 53, 71 & 3,0--3,2 M & Aleatorización del actuador, $w_{\text{gc}}=5$, tasa $10^{-4}$. Elegidas: gateo semilla 11 (0,3 M) y paso semilla 71 (2,3 M). \\
+v11 & 20/10 & paso & 11, 23, 37, 53, 61, 71, 83, 97 & 5,3 M & Suavidad ($w_{\text{suav}}=0{,}3$) y coxas ($w_{\text{cox}}=1$). Mejora a la v10, pero no a la base en el robot. \\
+v12 & 20/10 & gateo & 11, 37, 41, 59 & 4,8 M & Geometría real. Elegida: semilla 41 (0,5 M). \\
+trote & 20/10 & trote & 11, 23, 37, 53, 61, 71, 83, 97 & 3,0 M & Primera PPO del trote, recompensa de la v11. \\
+v13 & 20/10 & gateo & 73, 89, 107, 127, 149, 163, 181, 199, 223, 251 & 3,0 M & Postura abierta $8^\circ$ y tibia $14^\circ$; pesos por defecto ($w_{\text{av}}=18$, $w_{\text{act}}=8$, sin $w_{\text{lat}}$ ni $w_{\text{giro}}$). Evaluadas solo en simulación. \\
+v14 & 21/10 & gateo, trote & gateo 13, 29, 41, 43, 67; trote 19, 31, 37, 47, 89 & 3,0 M & Postura abierta; continúan copias de 0,9 M. Elegida gateo: semilla 43 (1,7 M). Ninguna de trote supera la base. \\
+v15 & 21/10 & trote & 19, 211, 223, 241, 263, 281, 307 & 3--5 M & $w_{\text{av}}=20$, $w_{\text{suav}}=0{,}1$. Elegida: semilla 307 (0,1 M). \\
+ciclo 1 & 21/10 & gateo, trote & 401$^{\dagger}$ & +1 M & Continúan las ganadoras en el robot. Elegida gateo: copia de 2,7 M. \\
+ciclo 2 & 21/10 & gateo, trote & 401$^{\dagger}$ & +1 M & Actuador medido en el robot en la vuelta anterior. Elegida gateo: copia de 2,4 M. \\
+v16 & 22/10 & paso & continuación: 503, 509, 521, 523; desde cero: 541, 547, 557, 563 & 6,4 M / 3,0 M & Retoma el paso con el actuador medido (ciclo 2) y la postura corregida ($8^\circ$); las continuaciones parten de la v11 semilla 71 (4,9 M). Elegida: semilla 563 (1,6 M); en simulación, deriva de 0,021 m frente a 0,391 m de la nominal y avance $-12$~\%. \\
+\bottomrule
+\multicolumn{6}{p{0.95\textwidth}}{\footnotesize $^{\dagger}$ Se lanzaron con las semillas 401, 409, 419 y 421, pero las cuatro ejecuciones resultaron idénticas: al continuar desde una política guardada, la biblioteca restaura la semilla almacenada en ella e ignora la indicada. Cada una de estas campañas equivale a una sola ejecución. El error se corrigió el 22 de octubre de 2026 (se impone la semilla pedida tras cargar la política).}
+\end{tabular}
+\end{table}
+
+Se observaron tres patrones. Primero, la variabilidad entre semillas fue grande:
+en la campaña v15 del trote, la recompensa media final de las siete semillas
+osciló entre $-60$ y $+64$ con la misma configuración, lo que confirma la
+necesidad de entrenar varias semillas. Segundo, la mejor copia de una campaña no
+siempre es la última: varias de las elegidas tienen entre $0{,}1$ y $0{,}5$~M de
+pasos, porque al seguir entrenando la política ganaba avance a costa de
+inclinación o de suavidad. Tercero, las continuaciones heredan lo aprendido: las
+semillas que partían de una política previa alcanzaban en pocos cientos de miles
+de pasos una recompensa que las semillas nuevas tardaban millones de pasos en
+lograr. La Figura~\ref{fig:curvas-semillas} muestra estos patrones en tres
+campañas.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Resultados/ppo_curvas_semillas.png}
+\caption{Recompensa media por episodio durante el entrenamiento, una línea por
+semilla, en tres campañas: gateo v14 (continuación desde copias de 0,9~M pasos),
+trote v15 (la semilla 19 continúa una política previa hasta 5~M pasos) y primer
+trote (8 semillas desde cero). Cada panel tiene su propia escala vertical, porque
+los pesos de la recompensa difieren entre campañas. Curvas suavizadas con una
+media móvil de 15 puntos.}
+\label{fig:curvas-semillas}
+\end{figure}
+
+Del 26 de octubre en adelante, las campañas se dedicaron a añadir la carrera y el
+galope, a incorporar la postura de trabajo nueva y a elegir las políticas por
+viabilidad (sección de selección de copias), Tabla~\ref{tab:campanas-ppo-2}. Los
+pesos de la recompensa son los de la v4 con suavidad 0,3 y coxas 1, cambiando el
+peso de avance $w_{\text{av}}$ y, en el galope, $w_{\text{lat}}=30$.
+
+\begin{table}[H]
+\centering
+\caption{Campañas PPO con el actuador real, 26 de octubre a 3 de noviembre de 2026.}
+\label{tab:campanas-ppo-2}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{p{0.07\textwidth}p{0.07\textwidth}p{0.16\textwidth}p{0.11\textwidth}p{0.49\textwidth}}
+\toprule
+Versión & Fecha & Marcha & Semillas & Cambio principal y resultado \\
+\midrule
+v17 & 26/10 & paso & 4 & Continúan la v16 semilla 563; ninguna la supera (mejor puntuación 2,50 frente a 2,45). \\
+v18 & 27/10 & carrera, galope & 4 y 4 & Primeras campañas de ambas marchas, desde cero. \\
+v19--v21 & 27/10 & galope & 4 cada una & Pruebas de coxas en movimiento. Mejor: v21 semilla 827 (0,1~M), 90~\% de viabilidad. \\
+v22 & 27/10 & gateo, paso, trote, carrera & 4, 6, 4, 4 & Primera selección por viabilidad; 100~\% en las cuatro, aún sin las ganancias de tibia en la simulación. Paso con $w_{\text{av}}=20$. \\
+v23 & 27/10 & galope & 8 & Detenida antes de su política final; no se usó. \\
+v24 & 27--28/10 & gateo, paso, trote, carrera, galope & 4 cada una & Ganancias de tibia en la simulación. 100~\%: paso semilla 4109, trote 4209 y carrera 4309, las tres a 0,2~M. Gateo $\leq$55~\%. La marcha base del galope se cae en todos los episodios. \\
+v25 & 28/10 & gateo, galope & 4 y 4 & $w_{\text{av}}=25$ y 15; galope con fémur $18^\circ$ y tibia $7^\circ$. Galope 65~\%, gateo $\leq$55~\%. \\
+v26 & 28/10 & gateo, galope & 4 y 4 & $w_{\text{av}}=40$ y 30. Galope 85~\%, gateo $\leq$55~\%. \\
+v27 & 28/10 & gateo, galope & 4 y 6 & Elegida gateo: semilla 7013 (4,1~M), 100~\%; continúa la v22. Galope 90~\%. \\
+v28 & 28/10 & galope & 8 & Continúan copias de la v27. Elegida: semilla 8417 (0,175~M), 90~\%. \\
+v29, v30 & 29/10 & trote; las cinco & 3; 1 cada una & Solo para registrar pérdidas y recompensa por episodio, 1~M de pasos. Políticas no usadas. \\
+v31 & 3/11 & las cinco & 1 cada una & Solo para medir la convergencia (sección~\ref{sec:convergencia-marchas}); 3~M de pasos, galope 5~M. Políticas no usadas. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Convergencia del entrenamiento por marcha}
+\label{sec:convergencia-marchas}
+
+Para medir cuándo deja de mejorar cada marcha se realizó el 3 de noviembre de 2026
+una campaña específica (v31): las cinco marchas se entrenaron desde cero en MuJoCo,
+con los hiperparámetros de la Tabla~\ref{tab:hiperparametros-ppo}, durante 3~M de pasos
+(5~M en el galope, que a 1~M aún no se había estabilizado). Se usó una sola semilla por
+marcha. Las políticas de esta campaña no se probaron en el robot: la campaña se
+hizo únicamente para observar la convergencia. Además de la recompensa total, se
+registró en cada episodio el valor de cada término de la
+ecuación~\eqref{eq:recompensa-real}.
+
+\subsection{Composición de la recompensa}
+
+La recompensa tiene dos premios y nueve castigos. Los premios corresponden a lo que se
+quiere aumentar: seguir de pie (el término constante $+1$ por paso, que se pierde al
+caer porque el episodio termina) y avanzar. Los castigos corresponden a lo que se quiere
+llevar a cero: inclinación, variación de altura, alejamiento de la marcha nominal, tamaño
+de la corrección, desvío lateral, giro, giro por ciclo, brusquedad y desviación de las
+coxas. Los pesos se ajustaron a mano entre campañas a partir de los problemas observados
+en la simulación y en el robot; no proceden de una deducción analítica.
+
+Escribir un objetivo como premio o como castigo es equivalente para el aprendizaje,
+porque la política se ajusta según la diferencia entre acciones y no según el signo
+absoluto de la recompensa. Por ello, el valor negativo de la recompensa total no indica
+por sí solo un mal comportamiento: lo que se interpreta es su evolución. La
+Tabla~\ref{tab:terminos-recompensa} muestra que, al final del entrenamiento, los castigos
+siguen superando a los premios en todas las marchas.
+
+\begin{table}[H]
+\centering
+\caption{Principales términos de la recompensa por episodio al final del entrenamiento (media del último 10~\% de los episodios, en puntos).}
+\label{tab:terminos-recompensa}
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Marcha & Seguir de pie & Avance & Brusquedad & Coxas & Giro por ciclo \\
+\midrule
+Gateo & $+561$ & $+24$ & $-239$ & $-383$ & $-9$ \\
+Paso & $+435$ & $+10$ & $-234$ & $-283$ & $-15$ \\
+Carrera & $+357$ & $+3$ & $-125$ & $-313$ & $-10$ \\
+Trote & $+429$ & $+6$ & $-461$ & $-315$ & $-13$ \\
+Galope & $+357$ & $+5$ & $-116$ & $-729$ & $-114$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Lectura de las gráficas}
+
+Las Figuras~\ref{fig:convergencia-gateo} a~\ref{fig:convergencia-galope} tienen los mismos
+seis paneles. Los dos primeros muestran la recompensa total frente a los pasos de
+entrenamiento y frente a las épocas; los dos siguientes, la suma de los castigos con
+los mismos ejes, en valor positivo, de modo que en ellos una curva más baja es mejor. Un
+paso es una decisión de la política (cada 30~ms) y una época es una pasada de
+optimización sobre los 2048 pasos de una recolección. El quinto panel relaciona ambas
+escalas: es una recta porque cada recolección usó sus 10 épocas y el umbral de divergencia
+KL no interrumpió ninguna, de modo que 1~M de pasos equivale a unas 4880 épocas. El sexto
+panel separa los castigos de mayor peso y permite ver cuáles reduce la política y cuáles
+apenas cambian.
+
+Se adoptó el siguiente criterio de convergencia: sobre la media móvil de 100
+episodios, es el primer punto a partir del cual la curva ya no sale de una banda de
+$\pm2$~\% de su recorrido total alrededor de su valor final (media del último 10~\% de
+los episodios). Una curva cuyo punto cayera en el último 20~\% del entrenamiento se
+consideraría no convergida; es el caso del galope. Una primera versión del criterio usaba una
+banda de $\pm5$~\%, pero situaba el punto cuando la curva aún subía de forma visible: como
+la banda se mide sobre todo el recorrido, que empieza muy abajo, quedaba demasiado ancha.
+El criterio es una convención de este trabajo, y los puntos obtenidos corresponden a una sola semilla.
+
+\begin{table}[H]
+\centering
+\caption{Punto de convergencia de la recompensa y evolución de la recompensa, el castigo y el ruido por episodio (desviación típica del primer y del último 10~\% de los episodios; recompensa y castigo inicial: primer 1~\%).}
+\label{tab:convergencia-marchas}
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Marcha & Pasos (M) & Épocas & Recompensa & Castigo & Ruido \\
+\midrule
+Gateo & 0,89 & 4353 & $-1438 \to -103$ & $2028 \to 688$ & $242 \to 16$ \\
+Paso & 0,95 & 4641 & $-1214 \to -127$ & $1663 \to 572$ & $182 \to 18$ \\
+Carrera & 1,23 & 5989 & $-1740 \to -215$ & $2103 \to 574$ & $365 \to 14$ \\
+Trote & 2,06 & 10\,030 & $-1750 \to -439$ & $2186 \to 874$ & $321 \to 16$ \\
+Galope & no converge & --- & $-4699 \to -742$ & $5072 \to 1104$ & $1281 \to 281$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Resultados}
+
+La Tabla~\ref{tab:convergencia-marchas} resume los puntos de convergencia. La recompensa
+y el castigo convergen en el mismo punto o muy cerca (en el gateo, el castigo a 0,80~M), porque los premios apenas varían
+durante el entrenamiento: la recompensa sube, sobre todo, porque bajan los castigos. El
+gateo y el paso convergen antes de 1~M de pasos, la carrera hacia 1,2~M y el trote hacia
+2,1~M. El galope no converge en 5~M de pasos: aprende en dos etapas, con una meseta entre
+1 y 2~M de pasos y un salto hacia los 2~M, tras el cual sigue mejorando lentamente hasta
+casi el final (su curva solo queda dentro de la banda a partir de 4,8~M), y es la marcha que conserva más ruido al final; también es la única con caídas durante el
+entrenamiento (7 en 14\,010 episodios).
+
+Por término, el giro por ciclo y la brusquedad son los castigos que más disminuyen. El
+castigo de las coxas baja menos en las cuatro primeras marchas, y en el galope prácticamente no
+cambia. La política no comanda las coxas: solo influye en ellas de forma indirecta,
+a través de las sacudidas del cuerpo.
+
+La convergencia indica que la recompensa dejó de mejorar, no que la marcha sea
+mejor para el objetivo de avanzar. El avance por episodio \emph{disminuyó} durante el
+entrenamiento en todas las marchas: de 0,74 a 0,60~m en el gateo, de 0,67 a 0,51~m en el
+paso, de 0,73 a 0,62~m en el trote, de 0,58 a 0,27~m en la carrera y de 0,57 a 0,15~m en el
+galope (primer 1~\% frente a último 10~\% de los episodios). El peso del avance es pequeño frente
+al de los castigos, de modo que la política aprende a moverse con más suavidad y con
+menos desvío a costa de avanzar menos. Este resultado es coherente con el hecho de que la mejor copia
+de una campaña no siempre sea la última, y justifica la selección que se describe a
+continuación.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth,height=0.86\textheight,keepaspectratio]{Resultados/ppo_convergencia_gateo.png}
+\caption{Convergencia del entrenamiento. Gateo (semilla 4009, 3~M de pasos). Tono claro: valor de cada episodio; tono oscuro: media móvil de 100 episodios; línea discontinua: punto de convergencia. Ejes verticales recortados al percentil 0,5--99,5.}
+\label{fig:convergencia-gateo}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth,height=0.86\textheight,keepaspectratio]{Resultados/ppo_convergencia_paso.png}
+\caption{Convergencia del entrenamiento. Paso (semilla 4109, 3~M de pasos). Tono claro: valor de cada episodio; tono oscuro: media móvil de 100 episodios; línea discontinua: punto de convergencia. Ejes verticales recortados al percentil 0,5--99,5.}
+\label{fig:convergencia-paso}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth,height=0.86\textheight,keepaspectratio]{Resultados/ppo_convergencia_carrera.png}
+\caption{Convergencia del entrenamiento. Carrera (semilla 4309, 3~M de pasos). Tono claro: valor de cada episodio; tono oscuro: media móvil de 100 episodios; línea discontinua: punto de convergencia. Ejes verticales recortados al percentil 0,5--99,5.}
+\label{fig:convergencia-carrera}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth,height=0.86\textheight,keepaspectratio]{Resultados/ppo_convergencia_trote.png}
+\caption{Convergencia del entrenamiento. Trote (semilla 4207, 3~M de pasos). Tono claro: valor de cada episodio; tono oscuro: media móvil de 100 episodios; línea discontinua: punto de convergencia. Ejes verticales recortados al percentil 0,5--99,5.}
+\label{fig:convergencia-trote}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth,height=0.86\textheight,keepaspectratio]{Resultados/ppo_convergencia_galope.png}
+\caption{Convergencia del entrenamiento. Galope (semilla 6403, 5~M de pasos). Tono claro: valor de cada episodio; tono oscuro: media móvil de 100 episodios. Sin línea discontinua, porque no converge con el criterio usado. Ejes verticales recortados al percentil 0,5--99,5.}
+\label{fig:convergencia-galope}
+\end{figure}
+
+\section{Selección de copias}
+
+Cada campaña deja una copia de la política cada $10^5$ pasos. La recompensa de
+entrenamiento no basta para elegir entre ellas, porque los episodios son cortos
+(6 ciclos) y sus valores dependen de los pesos de cada versión. Por eso todas
+las copias se evalúan con el script \path{seleccionar_copias.py} en caminatas
+simuladas largas de 60 ciclos ($\approx$3~min), con dos semillas de evaluación
+(901 y 902) y en las mismas condiciones que la marcha nominal. Una copia es
+\emph{válida} si avanza más que la marcha nominal, no se desvía más del límite
+fijado y no se cae. Entre las válidas se elige la de menor puntuación
+\begin{equation}
+    P = \frac{d_y}{0{,}1\,\text{m}} + \varphi_{\text{rms}} + \vartheta_{\text{rms}}
+    - \frac{x}{x_{\text{nom}}} + 2\left(\frac{c_{\text{rms}}}{c_{\text{rms,nom}}}-1\right) + S,
+    \label{eq:puntuacion-seleccion}
+\end{equation}
+con $d_y$ el desvío lateral final, $\varphi_{\text{rms}}$ y $\vartheta_{\text{rms}}$
+el alabeo y el cabeceo RMS en grados, $x$ el avance, $c_{\text{rms}}$ la
+desviación RMS de las coxas y $S$ el cambio cuadrático medio de la corrección
+(suavidad); el subíndice nom indica la marcha nominal. La copia ganadora se
+guarda en \path{ppo_v10_robot/} junto con sus metadatos (marcha, amplitudes,
+apertura, versión del actuador y resultado de la evaluación), que el programa
+del robot lee para reproducir exactamente la misma configuración.
+
+Desde el 27 de octubre, esta selección se completa con un criterio más directo, la
+\emph{viabilidad} (\path{evaluar_viabilidad.py}), que mide si la copia puede
+sustituir a la marcha nominal cuando cambian las condiciones. Sobre 20 episodios con
+semillas 1001 a 1020, aleatorización del dominio y del actuador, un episodio $i$ es
+viable si cumple a la vez
+\begin{equation}
+    \text{sin caída},\quad
+    x_i \geq 0{,}9\,x_{\text{nom}},\quad
+    \left(d_i \leq d_{\text{nom}} \ \text{o}\ d_i < 0{,}5~\text{m}\right),\quad
+    \theta_i < 15^\circ,
+    \label{eq:viabilidad}
+\end{equation}
+con $x_i$ el avance, $d_i$ la deriva lateral y $\theta_i$ la inclinación máxima del
+episodio. La viabilidad es el porcentaje de episodios que lo cumplen. Sus resultados
+están en la sección~\ref{sec:viabilidad-resultados}.
+
+\section{Ejecución en el robot}
+
+\subsection{Programa de control y realimentación}
+
+En el robot, la política se ejecuta con el programa de control
+\path{ejecutar_politica_robot.py} (en el PC durante los ensayos de octubre). En cada paso de 30~ms el programa calcula la
+referencia nominal, construye la observación con los sensores, evalúa la red
+(media de la gaussiana, sin muestreo), aplica las saturaciones, convierte los
+ángulos del modelo a grados de servo con la calibración de cada articulación y
+envía las doce órdenes a la interfaz de E/S (modo de transmisión continua del
+firmware), que responde con todas las lecturas de sensores.
+
+Cada articulación usa una cadena de fuentes de realimentación: su sensor
+principal (potenciómetro leído a través del multiplexor analógico, o encoder
+magnético AS5600); si falla, su sensor de respaldo; y si tampoco hay, la orden
+retrasada 99~ms como estimación, Tabla~\ref{tab:sensores-articulaciones}. Las
+cámaras, que identifican cada pieza de la pata por el color de su cinta (fémur
+rojo, tibia verde, pie amarillo), se usan como tercera fuente, aunque solo en el
+análisis posterior.
+
+\begin{table}[H]
+\centering
+\caption{Fuentes de realimentación por articulación según la revisión del 28 de octubre de 2026.}
+\label{tab:sensores-articulaciones}
+\footnotesize
+\begin{tabular}{llll}
+\toprule
+Articulación & Principal & Respaldo & Estado \\
+\midrule
+Fémur 1 (delantera derecha) & potenciómetro C8 & encoder ENC\_F1 & operativo \\
+Fémur 2 (delantera izquierda) & potenciómetro C5 & encoder en 0x70/4 & operativo \\
+Fémur 3 (trasera derecha) & potenciómetro C9 & --- & operativo \\
+Fémur 4 (trasera izquierda) & potenciómetro C6 & encoder ENC\_F4 & operativo \\
+Tibia 1 & --- & --- & sin sensor: orden retrasada \\
+Tibia 2 & encoder ENC\_T2 (0x70/3) & --- & operativo; escala corregida \\
+Tibia 3 & potenciómetro C12 & --- & responde, sin transmitir: orden retrasada \\
+Tibia 4 & potenciómetro C10 & --- & operativo hasta el 5 de noviembre \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Las coxas se miden con los potenciómetros C0 a C3; el de la coxa 2 (C1) no sigue a
+la coxa, por lo que su lectura no se considera fiable, y por eso el firmware no
+corregía su caída.
+
+\subsection{Correcciones necesarias para que el robot reproduzca la simulación}
+
+Comparar el robot con la simulación mediante las cámaras reveló diferencias que
+ningún entrenamiento podía compensar y que se corrigieron en la interfaz
+robot--modelo:
+\begin{itemize}
+    \item \textbf{Signo de las tibias izquierdas.} Las tibias 2 y 4 están
+    montadas en espejo: al pedirles levantar el pie lo bajaban. Se invirtió su
+    signo; afectaba a todas las caminatas anteriores al 21 de octubre.
+    \item \textbf{Postura base.} En la postura de reposo, la simulación tenía las
+    rodillas dobladas unos $48^\circ$ y el robot casi rectas. Un ajuste
+    automático en bucle, que mide con las cámaras el eje de la cinta de cada
+    fémur y cada tibia y corrige el 70~\% de la diferencia por vuelta, dejó los
+    fémures a menos de $2^\circ$ de la simulación y las tibias a unos $10^\circ$
+    (antes, hasta $50^\circ$).
+    \item \textbf{Topes del firmware.} Las correcciones de postura llevaban a
+    las tibias 2 y 4 más allá de sus topes de seguridad, donde quedaban fijas.
+    El programa respeta ahora esos topes y reserva margen para levantar el pie.
+    \item \textbf{Escala de los sensores.} En la postura nueva los
+    potenciómetros daban $3{,}2$ a $3{,}7$ cuentas por grado frente a las
+    $2{,}5$ de la calibración anterior; la cámara confirmó que el motor sí se
+    movía lo ordenado (ganancia $\approx1{,}08$), de modo que se recalibró la
+    escala de los sensores y se mantuvo la ganancia del actuador en 1.
+    \item \textbf{Temporización.} Con el PC cargado por el análisis de video y
+    los entrenamientos, hasta 714 pasos de una caminata de 3~min llegaban con más
+    de 40~ms de retraso. Se reservaron dos núcleos para el bucle de control, la
+    red se evalúa con un único hilo y los análisis corren con prioridad mínima;
+    con el PC entrenando a la vez, el número de pasos tardíos bajó a cero.
+    \item \textbf{Postura de trabajo} (27 de octubre). El operador aprobó una postura
+    nueva, con otras posiciones de apoyo y el movimiento de las tibias 2 y 4 invertido
+    (sección de marchas nominales). Las comparaciones anteriores se repitieron por
+    ello (sección~\ref{sec:postura27}). Ese día se detectó también que las políticas
+    de gateo v14 y trote v15 se habían ejecutado sin la apertura de los fémures, porque
+    un programa de selección dañó sus metadatos; se corrigió y se repararon los archivos.
+    \item \textbf{Coxa 2} (28 de octubre). Se caía hacia adentro al caminar. Se ajustó
+    en vivo con el operador hasta que dejó de caer: su base pasó de $48^\circ$ a
+    $42^\circ$ en el firmware y en el programa de control.
+    \item \textbf{Escala de la tibia 2} (28 de octubre). La escala de su encoder
+    duplicaba la amplitud medida. Una regresión de la lectura frente a la orden en tres
+    caminatas ($r\approx0{,}97$) la cambió de $-0{,}59$ a $-1{,}15$.
+\end{itemize}
+
+\section{Ciclo de mejora en la plataforma física}
+
+Para que el robot no solo evaluara las políticas sino que también mejorara la
+simulación, se implementó un ciclo automático (\path{ciclo_mejora.py}) con
+cuatro pasos por vuelta:
+\begin{enumerate}
+    \item \textbf{Prueba en el robot}: la marcha nominal y las políticas
+    candidatas de gateo y trote, dos repeticiones de 3~min cada una, en orden
+    alternado entre rondas y con pausas de 2~min para enfriar los servos.
+    \item \textbf{Puntuación con los sensores}: para cada condición se promedia
+    el error RMS de seguimiento de fémures y tibias y la desviación media de las
+    coxas, en grados. Gana la de menor puntuación.
+    \item \textbf{Actualización del modelo}: con las caminatas de la vuelta se
+    vuelven a medir, por articulación, el retardo, la histéresis y el error que
+    el modelo no explica (\path{actualizar_modelo_real.py}). Se genera un modelo
+    del actuador nuevo, con el intervalo de retardo medido para la
+    aleatorización.
+    \item \textbf{Reentrenamiento}: la política ganadora de cada marcha se sigue
+    entrenando durante $10^6$ pasos con ese modelo, y su mejor copia se
+    convierte en candidata de la vuelta siguiente. Se previeron cuatro semillas
+    por marcha (401, 409, 419 y 421), pero por el error descrito en la
+    Tabla~\ref{tab:campanas-ppo} las cuatro dieron la misma ejecución, de modo
+    que en las vueltas realizadas cada marcha se reentrenó, en la práctica, con
+    una sola semilla.
+\end{enumerate}
+De este modo la selección se decide con el robot real y no con la simulación, y
+las discrepancias medidas en el robot se trasladan al entrenamiento. Una
+limitación de este método es que la puntuación no mide la locomoción
+propiamente dicha: el robot está suspendido, por lo que se evalúan el
+seguimiento de las órdenes y la estabilidad de las coxas, no el avance ni la
+inclinación del cuerpo sobre el suelo.

@@ -1,0 +1,12 @@
+[Unit]
+Description=Apagar las salidas de los servos del cuadrupedo al apagar el PC
+DefaultDependencies=no
+Before=shutdown.target reboot.target halt.target poweroff.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/apagar-cuadrupedo
+TimeoutStartSec=10
+
+[Install]
+WantedBy=halt.target reboot.target shutdown.target poweroff.target

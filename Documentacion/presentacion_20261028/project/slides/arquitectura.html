@@ -1,0 +1,48 @@
+<section id="arquitectura" data-transition="fade" style="background:#F6F5F0;color:#2A3442;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4521C">Plataforma física</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#15233B">Arquitectura de control y medición</h2>
+<div style="position:relative;height:560px">
+<div style="position:absolute;left:0px;top:40px;width:340px;height:170px;background:#15233B;border-radius:16px;padding:24px;display:flex;flex-direction:column;justify-content:center">
+<p style="font-size:28px;font-weight:600;color:#F6F5F0">Controlador</p>
+<p style="font-size:24px;color:#C9D3E0">Raspberry Pi 4 · bucle de 30 ms, política PPO, registro</p>
+</div>
+<div style="position:absolute;left:440px;top:40px;width:340px;height:170px;background:#FFFFFF;border:2px solid #2F5D8C;border-radius:16px;padding:24px;display:flex;flex-direction:column;justify-content:center">
+<p style="font-size:28px;font-weight:600;color:#15233B">Interfaz de E/S</p>
+<p style="font-size:24px;color:#4A5568">Topes, límite de 3°/orden, telemetría</p>
+</div>
+<div style="position:absolute;left:880px;top:40px;width:340px;height:170px;background:#FFFFFF;border:2px solid #2F5D8C;border-radius:16px;padding:24px;display:flex;flex-direction:column;justify-content:center">
+<p style="font-size:28px;font-weight:600;color:#15233B">PCA9685</p>
+<p style="font-size:24px;color:#4A5568">I²C 0x40 · PWM a 50 Hz</p>
+</div>
+<div style="position:absolute;left:1320px;top:40px;width:340px;height:170px;background:#FFFFFF;border:2px solid #2F5D8C;border-radius:16px;padding:24px;display:flex;flex-direction:column;justify-content:center">
+<p style="font-size:28px;font-weight:600;color:#15233B">12 servos MG996R</p>
+<p style="font-size:24px;color:#4A5568">Coxa, fémur y tibia × 4</p>
+</div>
+<div style="position:absolute;left:440px;top:340px;width:340px;height:170px;background:#FBF1E8;border:2px solid #B4521C;border-radius:16px;padding:24px;display:flex;flex-direction:column;justify-content:center">
+<p style="font-size:28px;font-weight:600;color:#15233B">MUX analógico</p>
+<p style="font-size:24px;color:#4A5568">CD74HC4067 · 16 potenciómetros</p>
+</div>
+<div style="position:absolute;left:880px;top:340px;width:340px;height:170px;background:#FBF1E8;border:2px solid #B4521C;border-radius:16px;padding:24px;display:flex;flex-direction:column;justify-content:center">
+<p style="font-size:28px;font-weight:600;color:#15233B">TCA9548A × 2</p>
+<p style="font-size:24px;color:#4A5568">0x70 y 0x71 · 16 canales I²C</p>
+</div>
+<div style="position:absolute;left:1320px;top:340px;width:340px;height:170px;background:#FBF1E8;border:2px solid #B4521C;border-radius:16px;padding:24px;display:flex;flex-direction:column;justify-content:center">
+<p style="font-size:28px;font-weight:600;color:#15233B">Encoders AS5600</p>
+<p style="font-size:24px;color:#4A5568">12 bits · dirección 0x36</p>
+</div>
+<div style="position:absolute;left:0px;top:340px;width:340px;height:170px;background:#FBF1E8;border:2px solid #B4521C;border-radius:16px;padding:24px;display:flex;flex-direction:column;justify-content:center">
+<p style="font-size:28px;font-weight:600;color:#15233B">5 cámaras</p>
+<p style="font-size:24px;color:#4A5568">Solo registro y análisis</p>
+</div>
+<x-connector x1="340" y1="125" x2="440" y2="125" head="end" style="color:#2F5D8C;border-width:4px"></x-connector>
+<x-connector x1="780" y1="125" x2="880" y2="125" head="end" style="color:#2F5D8C;border-width:4px"></x-connector>
+<x-connector x1="1220" y1="125" x2="1320" y2="125" head="end" style="color:#2F5D8C;border-width:4px"></x-connector>
+<x-connector x1="610" y1="340" x2="610" y2="210" head="end" style="color:#B4521C;border-width:4px"></x-connector>
+<x-connector x1="1320" y1="425" x2="1220" y2="425" head="end" style="color:#B4521C;border-width:4px"></x-connector>
+<x-connector x1="880" y1="380" x2="780" y2="210" head="end" style="color:#B4521C;border-width:4px"></x-connector>
+<x-connector x1="170" y1="340" x2="170" y2="210" head="end" style="color:#B4521C;border-width:4px;border-style:dashed"></x-connector>
+</div>
+<p style="font-size:26px;line-height:1.4;color:#4A5568">Ensayos de octubre: por depuración, el bucle corrió en un PC con Ubuntu y la interfaz de E/S por USB serie a 115 200 baudios. La migración a la Raspberry está preparada (política exportada a NumPy, diferencia ±0,5°).</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6A7383">Nova Spot Micro · Plataforma física</p>
+<aside>Azul: cadena de actuación. Naranja: cadena de medición. Los potenciómetros entran por un multiplexor analógico; los encoders magnéticos AS5600 tienen todos la misma dirección I2C (0x36), por eso pasan por dos multiplexores I2C TCA9548A. Para la migración completa a la Raspberry faltan un ADS1115 (la Raspberry no tiene entradas analógicas) y una fuente de 5,1 V y 3 A.</aside>
+</section>

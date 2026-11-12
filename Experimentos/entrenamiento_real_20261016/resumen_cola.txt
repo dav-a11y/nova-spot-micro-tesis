@@ -1,0 +1,36 @@
+== ppo_v24_gateo (14:15)
+base: avance 7.880 m, deriva 1.202 m, roll 1.98°, pitch 1.53°, coxas 0.99°
+  0.0 % viable | ppo_v24_gateo/semilla_4009/intermedias/policy_2700000_steps.zip | avance 0.61 (nominal 1.03) m, deriva 0.03 (nominal 0.14) m, caídas 0/20 (nominal 0), incl.máx 3.01°
+  0.0 % viable | ppo_v24_gateo/semilla_4009/intermedias/policy_2500000_steps.zip | avance 0.59 (nominal 1.03) m, deriva 0.04 (nominal 0.14) m, caídas 0/20 (nominal 0), incl.máx 3.0°
+  0.0 % viable | ppo_v24_gateo/semilla_4009/intermedias/policy_2800000_steps.zip | avance 0.61 (nominal 1.03) m, deriva 0.03 (nominal 0.14) m, caídas 0/20 (nominal 0), incl.máx 3.04°
+  0.0 % viable | ppo_v24_gateo/semilla_4009/intermedias/policy_2900000_steps.zip | avance 0.61 (nominal 1.03) m, deriva 0.03 (nominal 0.14) m, caídas 0/20 (nominal 0), incl.máx 3.03°
+  0.0 % viable | ppo_v24_gateo/semilla_4003/intermedias/policy_3000000_steps.zip | avance 0.87 (nominal 1.03) m, deriva 0.03 (nominal 0.14) m, caídas 0/20 (nominal 0), incl.máx 4.24°
+== ppo_v24_paso (14:18)
+base: avance 6.817 m, deriva 1.493 m, roll 2.11°, pitch 1.70°, coxas 1.02°
+  0.0 % viable | ppo_v24_paso/semilla_4109/policy.zip | avance 0.87 (nominal 1.10) m, deriva 0.03 (nominal 0.22) m, caídas 0/20 (nominal 0), incl.máx 3.26°
+  0.0 % viable | ppo_v24_paso/semilla_4101/intermedias/policy_1200000_steps.zip | avance 0.85 (nominal 1.10) m, deriva 0.09 (nominal 0.22) m, caídas 0/20 (nominal 0), incl.máx 2.91°
+  0.0 % viable | ppo_v24_paso/semilla_4109/intermedias/policy_3000000_steps.zip | avance 0.87 (nominal 1.10) m, deriva 0.03 (nominal 0.22) m, caídas 0/20 (nominal 0), incl.máx 3.24°
+  0.0 % viable | ppo_v24_paso/semilla_4109/intermedias/policy_2700000_steps.zip | avance 0.90 (nominal 1.10) m, deriva 0.03 (nominal 0.22) m, caídas 0/20 (nominal 0), incl.máx 3.07°
+  0.0 % viable | ppo_v24_paso/semilla_4101/intermedias/policy_1400000_steps.zip | avance 0.86 (nominal 1.10) m, deriva 0.08 (nominal 0.22) m, caídas 0/20 (nominal 0), incl.máx 3.25°
+== ppo_v24_trote (14:50)
+base: avance 4.155 m, deriva 0.451 m, roll 3.63°, pitch 2.32°, coxas 1.13°
+100.0 % viable | ppo_v24_trote/semilla_4209/intermedias/policy_200000_steps.zip | avance 1.35 (nominal 1.25) m, deriva 0.24 (nominal 0.20) m, caídas 0/20 (nominal 0), incl.máx 5.57°
+100.0 % viable | ppo_v24_trote/semilla_4209/intermedias/policy_100000_steps.zip | avance 1.30 (nominal 1.25) m, deriva 0.10 (nominal 0.20) m, caídas 0/20 (nominal 0), incl.máx 6.58°
+ 60.0 % viable | ppo_v24_trote/semilla_4209/intermedias/policy_700000_steps.zip | avance 1.14 (nominal 1.25) m, deriva 0.06 (nominal 0.20) m, caídas 0/20 (nominal 0), incl.máx 4.62°
+  0.0 % viable | ppo_v24_trote/semilla_4207/intermedias/policy_700000_steps.zip | avance 1.03 (nominal 1.25) m, deriva 0.03 (nominal 0.20) m, caídas 0/20 (nominal 0), incl.máx 4.81°
+ 10.0 % viable | ppo_v24_trote/semilla_4203/intermedias/policy_900000_steps.zip | avance 1.07 (nominal 1.25) m, deriva 0.02 (nominal 0.20) m, caídas 0/20 (nominal 0), incl.máx 5.22°
+== ppo_v24_carrera (14:56)
+base: avance 2.566 m, deriva 0.238 m, roll 3.48°, pitch 2.18°, coxas 1.16°
+ 90.0 % viable | ppo_v24_carrera/semilla_4303/intermedias/policy_2100000_steps.zip | avance 1.07 (nominal 1.14) m, deriva 0.04 (nominal 0.11) m, caídas 0/20 (nominal 0), incl.máx 5.36°
+ 95.0 % viable | ppo_v24_carrera/semilla_4303/intermedias/policy_2300000_steps.zip | avance 1.09 (nominal 1.14) m, deriva 0.03 (nominal 0.11) m, caídas 0/20 (nominal 0), incl.máx 5.46°
+ 95.0 % viable | ppo_v24_carrera/semilla_4303/intermedias/policy_2200000_steps.zip | avance 1.08 (nominal 1.14) m, deriva 0.03 (nominal 0.11) m, caídas 0/20 (nominal 0), incl.máx 5.44°
+ 95.0 % viable | ppo_v24_carrera/semilla_4303/intermedias/policy_2400000_steps.zip | avance 1.09 (nominal 1.14) m, deriva 0.03 (nominal 0.11) m, caídas 0/20 (nominal 0), incl.máx 5.46°
+ 90.0 % viable | ppo_v24_carrera/semilla_4301/intermedias/policy_2700000_steps.zip | avance 1.07 (nominal 1.14) m, deriva 0.05 (nominal 0.11) m, caídas 0/20 (nominal 0), incl.máx 5.23°
+== ppo_v24_galope (15:11)
+base: avance -0.114 m, deriva 0.040 m, roll 4.16°, pitch 12.78°, coxas 1.33°
+  0.0 % viable | ppo_v24_galope/semilla_4407/intermedias/policy_700000_steps.zip | avance -0.08 (nominal -0.12) m, deriva 0.04 (nominal 0.04) m, caídas 20/20 (nominal 20), incl.máx 41.42°
+  0.0 % viable | ppo_v24_galope/semilla_4403/intermedias/policy_700000_steps.zip | avance -0.12 (nominal -0.12) m, deriva 0.04 (nominal 0.04) m, caídas 20/20 (nominal 20), incl.máx 41.43°
+  0.0 % viable | ppo_v24_galope/semilla_4403/intermedias/policy_800000_steps.zip | avance -0.12 (nominal -0.12) m, deriva 0.04 (nominal 0.04) m, caídas 20/20 (nominal 20), incl.máx 40.52°
+  0.0 % viable | ppo_v24_galope/semilla_4403/intermedias/policy_600000_steps.zip | avance -0.12 (nominal -0.12) m, deriva 0.04 (nominal 0.04) m, caídas 20/20 (nominal 20), incl.máx 41.43°
+  0.0 % viable | ppo_v24_galope/semilla_4401/intermedias/policy_400000_steps.zip | avance -0.11 (nominal -0.12) m, deriva 0.04 (nominal 0.04) m, caídas 20/20 (nominal 20), incl.máx 41.06°
+FIN 15:11

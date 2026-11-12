@@ -25,6 +25,7 @@ from typing import Optional
 TCA_1 = 0x70
 TCA_2 = 0x71
 AS5600_ADDRESS = 0x36
+MAGNET_STATUS_REGISTER = 0x0B
 RAW_ANGLE_REGISTER = 0x0C
 
 
@@ -54,6 +55,27 @@ SENSORS = (
     Sensor(TCA_2, 5, "femur 2", "front_left_femur_joint"),
     Sensor(TCA_2, 6, "coxa 2", "front_left_coxa_joint"),
 )
+
+
+def decode_magnet_status(status: int) -> dict:
+    """Decodifica el registro STATUS del AS5600 sin inferir posición articular.
+
+    ``MD`` indica detección de imán; ``ML`` y ``MH`` indican, respectivamente,
+    campo demasiado débil o fuerte. Una lectura angular solo se marca como
+    magnéticamente válida cuando MD=1, ML=0 y MH=0. Esta condición no sustituye
+    la calibración mecánica ni valida la estabilidad de la señal.
+    """
+    status = int(status) & 0xFF
+    magnet_detected = bool((status >> 5) & 1)
+    magnet_low = bool((status >> 4) & 1)
+    magnet_high = bool((status >> 3) & 1)
+    return {
+        "magnet_status": f"0x{status:02X}",
+        "magnet_detected": magnet_detected,
+        "magnet_low": magnet_low,
+        "magnet_high": magnet_high,
+        "magnetically_valid": magnet_detected and not magnet_low and not magnet_high,
+    }
 
 
 class AS5600Reader:
@@ -100,13 +122,15 @@ class AS5600Reader:
         }
         try:
             self.select_channel(sensor.tca, sensor.channel)
+            magnet_status = self.bus.read_byte_data(
+                AS5600_ADDRESS, MAGNET_STATUS_REGISTER)
             data = self.bus.read_i2c_block_data(
                 AS5600_ADDRESS, RAW_ANGLE_REGISTER, 2)
             if len(data) != 2:
                 raise OSError(f"AS5600 devolvió {len(data)} bytes")
             raw = ((int(data[0]) << 8) | int(data[1])) & 0x0FFF
             result.update(raw=raw, angle_deg=raw * 360.0 / 4096.0,
-                          status="ok")
+                          status="ok", **decode_magnet_status(magnet_status))
         except (OSError, ValueError) as error:
             result["error"] = str(error)
         finally:
@@ -126,8 +150,10 @@ def print_scan(scan: dict) -> None:
     for item in scan["readings"]:
         name = item["joint"] or item["label"]
         if item["status"] == "ok":
+            quality = "válido" if item["magnetically_valid"] else "NO válido"
             print(f"  {item['tca']} ch{item['channel']}: {name}: "
-                  f"raw={item['raw']:4d}, {item['angle_deg']:7.3f} deg")
+                  f"raw={item['raw']:4d}, {item['angle_deg']:7.3f} deg; "
+                  f"imán={item['magnet_status']} ({quality})")
         else:
             print(f"  {item['tca']} ch{item['channel']}: {name}: "
                   f"ERROR: {item.get('error', 'desconocido')}")

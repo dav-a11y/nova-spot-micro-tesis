@@ -1,0 +1,10 @@
+base: avance 4.904 m, deriva 0.089 m, roll 1.15°, pitch 3.20°, coxas 1.42°
+OK semilla_5409    50000 pasos  avance 5.071  deriva 0.411  roll 1.11  pitch 2.84  incl.máx 6.59  coxas 1.43  suav 0.01  punt 7.05
+OK semilla_5409   200000 pasos  avance 4.977  deriva 0.491  roll 1.12  pitch 2.42  incl.máx 6.71  coxas 1.42  suav 0.06  punt 7.50
+-- semilla_5409   300000 pasos  avance 4.426  deriva 0.098  roll 1.06  pitch 2.36  incl.máx 5.85  coxas 1.42  suav 0.11  punt 3.61
+-- semilla_5407   100000 pasos  avance 4.774  deriva 0.098  roll 1.16  pitch 2.50  incl.máx 6.89  coxas 1.42  suav 0.05  punt 3.72
+-- semilla_5409   350000 pasos  avance 3.868  deriva 0.126  roll 1.09  pitch 2.19  incl.máx 5.82  coxas 1.44  suav 0.15  punt 3.92
+-- semilla_5401   250000 pasos  avance 2.675  deriva 0.126  roll 0.96  pitch 2.29  incl.máx 7.12  coxas 1.47  suav 0.14  punt 4.18
+-- semilla_5401   600000 pasos  avance 0.493  deriva 0.060  roll 0.84  pitch 2.31  incl.máx 6.87  coxas 1.49  suav 0.53  punt 4.27
+-- semilla_5409   550000 pasos  avance 0.431  deriva 0.043  roll 1.17  pitch 2.02  incl.máx 6.78  coxas 1.51  suav 0.62  punt 4.28
+Elegida: /home/pavilion/Documentos/Cuadrupedo/Experimentos/entrenamiento_real_20261016/ppo_v10_robot/ppo_v25_galope_semilla_5409_50k

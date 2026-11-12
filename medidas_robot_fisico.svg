@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="820" viewBox="0 0 1200 820" role="img" aria-labelledby="title desc">
+  <title id="title">Cómo medir el cuadrúpedo físico</title>
+  <desc id="desc">Vista superior para la caja y separación entre centros de cadera; esquema lateral para medir coxa, fémur, tibia y radio del pie entre ejes.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto-start-reverse" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#155e75"/>
+    </marker>
+    <marker id="smallArrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto-start-reverse" markerUnits="strokeWidth">
+      <path d="M 0 0 L 8 4 L 0 8 z" fill="#b45309"/>
+    </marker>
+    <style>
+      text { font-family: sans-serif; fill: #172554; }
+      .title { font-size: 30px; font-weight: 700; }
+      .subtitle { font-size: 19px; font-weight: 700; }
+      .label { font-size: 16px; }
+      .small { font-size: 14px; fill: #334155; }
+      .dim { stroke: #155e75; stroke-width: 2.5; fill: none; marker-start: url(#arrow); marker-end: url(#arrow); }
+      .ext { stroke: #64748b; stroke-width: 1.5; stroke-dasharray: 5 5; }
+      .joint { fill: #f97316; stroke: #9a3412; stroke-width: 2; }
+      .leg { stroke: #475569; stroke-width: 13; stroke-linecap: round; }
+      .linkdim { stroke: #b45309; stroke-width: 2; fill: none; marker-start: url(#smallArrow); marker-end: url(#smallArrow); }
+    </style>
+  </defs>
+  <rect width="1200" height="820" fill="#f8fafc"/>
+  <text x="600" y="48" text-anchor="middle" class="title">Medidas del cuadrúpedo físico: dónde apoyar la regla</text>
+
+  <rect x="35" y="78" width="555" height="690" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="312" y="116" text-anchor="middle" class="subtitle">VISTA DESDE ARRIBA</text>
+  <text x="312" y="143" text-anchor="middle" class="small">Frente arriba · mide centros de ejes, no bordes de piezas</text>
+
+  <!-- Main body housing: 230 x 120 proportion -->
+  <rect x="192" y="215" width="240" height="460" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="3"/>
+  <text x="312" y="420" text-anchor="middle" class="subtitle">CAJA DEL</text>
+  <text x="312" y="448" text-anchor="middle" class="subtitle">CUERPO</text>
+  <text x="312" y="481" text-anchor="middle" class="label">230 × 120 mm</text>
+  <text x="312" y="507" text-anchor="middle" class="small">largo × ancho exteriores</text>
+
+  <!-- Four hip axes, viewer right is robot right -->
+  <line x1="192" y1="265" x2="116" y2="265" class="leg"/>
+  <line x1="432" y1="265" x2="508" y2="265" class="leg"/>
+  <line x1="192" y1="625" x2="116" y2="625" class="leg"/>
+  <line x1="432" y1="625" x2="508" y2="625" class="leg"/>
+  <circle cx="192" cy="265" r="12" class="joint"/><circle cx="432" cy="265" r="12" class="joint"/>
+  <circle cx="192" cy="625" r="12" class="joint"/><circle cx="432" cy="625" r="12" class="joint"/>
+  <text x="48" y="239" class="small">P2 delantera izq.</text>
+  <text x="436" y="239" class="small">P1 delantera der.</text>
+  <text x="48" y="659" class="small">P4 trasera izq.</text>
+  <text x="436" y="659" class="small">P3 trasera der.</text>
+  <text x="312" y="178" text-anchor="middle" class="label" font-weight="700">FRENTE</text>
+  <path d="M312 185 L312 197" stroke="#172554" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="312" y="722" text-anchor="middle" class="label" font-weight="700">ATRÁS</text>
+
+  <!-- Hip-to-hip dimensions -->
+  <line x1="192" y1="265" x2="104" y2="265" class="ext"/>
+  <line x1="192" y1="625" x2="104" y2="625" class="ext"/>
+  <line x1="112" y1="265" x2="112" y2="625" class="dim"/>
+  <text x="94" y="445" text-anchor="middle" class="label" transform="rotate(-90 94 445)">180 mm entre ejes de cadera (mismo lado)</text>
+
+  <line x1="192" y1="265" x2="192" y2="168" class="ext"/>
+  <line x1="432" y1="265" x2="432" y2="168" class="ext"/>
+  <line x1="192" y1="174" x2="432" y2="174" class="dim"/>
+  <text x="312" y="163" text-anchor="middle" class="small">120 mm entre ejes izq.–der. (misma fila)</text>
+
+  <line x1="312" y1="445" x2="432" y2="445" stroke="#7c3aed" stroke-width="2" stroke-dasharray="6 5"/>
+  <circle cx="312" cy="445" r="5" fill="#7c3aed"/>
+  <text x="357" y="435" text-anchor="middle" class="small" fill="#6d28d9">centro del cuerpo</text>
+  <text x="312" y="750" text-anchor="middle" class="small">Cadera delante/atrás: ±90 mm del centro · lado a lado: ±60 mm</text>
+
+  <rect x="610" y="78" width="555" height="690" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="887" y="116" text-anchor="middle" class="subtitle">VISTA LATERAL / CADENA DE UNA PATA</text>
+  <text x="887" y="143" text-anchor="middle" class="small">Mide de centro de eje a centro de eje</text>
+
+  <!-- Body side silhouette -->
+  <rect x="750" y="190" width="300" height="98" rx="8" fill="#dbeafe" stroke="#1d4ed8" stroke-width="3"/>
+  <text x="900" y="229" text-anchor="middle" class="subtitle">CUERPO</text>
+  <text x="900" y="257" text-anchor="middle" class="label">alto = 75 mm</text>
+
+  <!-- Coxa shown as lateral offset in inset top/frontal orientation -->
+  <circle cx="790" cy="315" r="11" class="joint"/>
+  <line x1="790" y1="315" x2="865" y2="315" stroke="#475569" stroke-width="11" stroke-linecap="round"/>
+  <circle cx="865" cy="315" r="10" class="joint"/>
+  <line x1="790" y1="300" x2="790" y2="345" class="ext"/>
+  <line x1="865" y1="300" x2="865" y2="345" class="ext"/>
+  <line x1="798" y1="339" x2="857" y2="339" class="linkdim"/>
+  <text x="827" y="370" text-anchor="middle" class="label">Coxa: 38,1 mm</text>
+  <text x="827" y="391" text-anchor="middle" class="small">eje de cadera → eje del fémur</text>
+
+  <!-- Femur and tibia center-to-center -->
+  <circle cx="900" cy="430" r="13" class="joint"/>
+  <line x1="865" y1="315" x2="900" y2="430" class="leg"/>
+  <circle cx="1012" cy="570" r="13" class="joint"/>
+  <line x1="900" y1="430" x2="1012" y2="570" class="leg"/>
+  <circle cx="1037" cy="600" r="25" fill="#fde68a" stroke="#b45309" stroke-width="3"/>
+  <circle cx="1037" cy="600" r="4" fill="#7c2d12"/>
+
+  <line x1="875" y1="325" x2="911" y2="313" class="linkdim"/>
+  <text x="935" y="348" class="label">Fémur: 107,95 mm</text>
+  <text x="935" y="369" class="small">eje del fémur → eje de rodilla</text>
+  <line x1="911" y1="442" x2="1023" y2="426" class="linkdim"/>
+  <text x="940" y="463" class="label">Tibia: 135,89 mm</text>
+  <text x="940" y="484" class="small">eje de rodilla → centro del pie</text>
+  <line x1="1037" y1="600" x2="1062" y2="600" class="linkdim"/>
+  <text x="1080" y="594" class="label">radio 18 mm</text>
+  <text x="1080" y="616" class="small">centro a superficie</text>
+
+  <!-- Measurement guidance -->
+  <rect x="645" y="660" width="485" height="75" rx="10" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
+  <text x="665" y="688" class="label" font-weight="700">No midas los extremos de la carcasa de los servos.</text>
+  <text x="665" y="714" class="small">Localiza el centro del eje; si no se ve, alinea su centro con una escuadra.</text>
+</svg>

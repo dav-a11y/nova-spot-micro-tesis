@@ -1,0 +1,16 @@
+100.0 % viable | ppo_v24_carrera/semilla_4301/intermedias/policy_1300000_steps.zip | avance 1.19 (nominal 1.14) m, deriva 0.06 (nominal 0.11) m, caídas 0/20 (nominal 0), incl.máx 6.11°
+100.0 % viable | ppo_v24_carrera/semilla_4301/intermedias/policy_1400000_steps.zip | avance 1.18 (nominal 1.14) m, deriva 0.06 (nominal 0.11) m, caídas 0/20 (nominal 0), incl.máx 6.14°
+100.0 % viable | ppo_v24_carrera/semilla_4301/intermedias/policy_1500000_steps.zip | avance 1.19 (nominal 1.14) m, deriva 0.07 (nominal 0.11) m, caídas 0/20 (nominal 0), incl.máx 5.91°
+100.0 % viable | ppo_v24_carrera/semilla_4301/intermedias/policy_1600000_steps.zip | avance 1.18 (nominal 1.14) m, deriva 0.07 (nominal 0.11) m, caídas 0/20 (nominal 0), incl.máx 5.88°
+100.0 % viable | ppo_v24_carrera/semilla_4303/intermedias/policy_1300000_steps.zip | avance 1.19 (nominal 1.14) m, deriva 0.07 (nominal 0.11) m, caídas 0/20 (nominal 0), incl.máx 6.16°
+100.0 % viable | ppo_v24_carrera/semilla_4303/intermedias/policy_1400000_steps.zip | avance 1.20 (nominal 1.14) m, deriva 0.08 (nominal 0.11) m, caídas 0/20 (nominal 0), incl.máx 6.09°
+100.0 % viable | ppo_v24_carrera/semilla_4303/intermedias/policy_1500000_steps.zip | avance 1.17 (nominal 1.14) m, deriva 0.12 (nominal 0.11) m, caídas 0/20 (nominal 0), incl.máx 5.98°
+100.0 % viable | ppo_v24_carrera/semilla_4303/intermedias/policy_1600000_steps.zip | avance 1.17 (nominal 1.14) m, deriva 0.06 (nominal 0.11) m, caídas 0/20 (nominal 0), incl.máx 5.85°
+100.0 % viable | ppo_v24_carrera/semilla_4307/intermedias/policy_100000_steps.zip | avance 1.11 (nominal 1.14) m, deriva 0.38 (nominal 0.11) m, caídas 0/20 (nominal 0), incl.máx 5.89°
+ 95.0 % viable | ppo_v24_carrera/semilla_4307/intermedias/policy_200000_steps.zip | avance 1.12 (nominal 1.14) m, deriva 0.34 (nominal 0.11) m, caídas 0/20 (nominal 0), incl.máx 5.23°
+ 85.0 % viable | ppo_v24_carrera/semilla_4307/intermedias/policy_300000_steps.zip | avance 1.10 (nominal 1.14) m, deriva 0.33 (nominal 0.11) m, caídas 0/20 (nominal 0), incl.máx 4.56°
+100.0 % viable | ppo_v24_carrera/semilla_4307/intermedias/policy_500000_steps.zip | avance 1.42 (nominal 1.14) m, deriva 0.19 (nominal 0.11) m, caídas 0/20 (nominal 0), incl.máx 5.3°
+100.0 % viable | ppo_v24_carrera/semilla_4309/intermedias/policy_100000_steps.zip | avance 1.11 (nominal 1.14) m, deriva 0.19 (nominal 0.11) m, caídas 0/20 (nominal 0), incl.máx 5.78°
+100.0 % viable | ppo_v24_carrera/semilla_4309/intermedias/policy_200000_steps.zip | avance 1.20 (nominal 1.14) m, deriva 0.12 (nominal 0.11) m, caídas 0/20 (nominal 0), incl.máx 4.81°
+100.0 % viable | ppo_v24_carrera/semilla_4309/intermedias/policy_300000_steps.zip | avance 1.25 (nominal 1.14) m, deriva 0.38 (nominal 0.11) m, caídas 0/20 (nominal 0), incl.máx 4.93°
+  0.0 % viable | ppo_v24_carrera/semilla_4309/intermedias/policy_500000_steps.zip | avance 0.79 (nominal 1.14) m, deriva 0.03 (nominal 0.11) m, caídas 0/20 (nominal 0), incl.máx 3.68°

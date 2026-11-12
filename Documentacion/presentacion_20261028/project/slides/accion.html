@@ -1,0 +1,26 @@
+<section id="accion" data-transition="fade" style="background:#F6F5F0;color:#2A3442;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4521C">El agente</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#15233B">Espacio de acciones: continuo, 12 dimensiones, acotado</h2>
+<div style="background:#FFFFFF;padding:32px 48px;border-radius:16px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:38px;color:#15233B">aₜ ∈ [−1, 1]¹²  ,   objetivo = 0,08 · clip(aₜ ⊙ m, −1, 1)</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:38px;color:#15233B">Δqₜ = Δqₜ₋₁ + clip( objetivo − Δqₜ₋₁ , −0,02 , 0,02 )</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:38px;color:#15233B">m = máscara: 0 en las 4 coxas, 1 en fémures y tibias</p>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:28px">
+<div style="background:#FBF1E8;padding:28px 32px;border-radius:16px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:48px;font-weight:600;color:#B4521C">±4,6°</p>
+<p style="font-size:26px">Corrección máxima (0,08 rad)</p>
+</div>
+<div style="background:#FBF1E8;padding:28px 32px;border-radius:16px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:48px;font-weight:600;color:#B4521C">1,15°</p>
+<p style="font-size:26px">Cambio máximo por paso (0,02 rad)</p>
+</div>
+<div style="background:#FBF1E8;padding:28px 32px;border-radius:16px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:48px;font-weight:600;color:#B4521C">8 de 12</p>
+<p style="font-size:26px">Articulaciones corregidas</p>
+</div>
+</div>
+<p style="font-size:26px;line-height:1.4;color:#4A5568">Continuas porque los ángulos del servo lo son. Al entrenar se muestrea de la gaussiana; en el robot se usa la media (determinista). Después se suman la referencia y los límites del firmware.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6A7383">Nova Spot Micro · El agente</p>
+<aside>Muestra cómo la salida de la red se convierte en la corrección que se aplica a las patas, con límites de seguridad.<br><br>at en [-1, 1]^12: lo que entrega la red, 12 números entre -1 y 1. Escala sin unidades: +1 máxima corrección a un lado, -1 al otro, 0 nada, 0,5 la mitad. Son continuas (cualquier valor como 0,37 o -0,82); por eso es un espacio de acciones continuo. Uno discreto sería elegir solo entre «subir», «bajar» o «nada».<br><br>objetivo = 0,08·clip(at ⊙ m, -1, 1), de adentro hacia afuera:<br>1. at ⊙ m: m es la máscara, 12 números que valen 0 para las 4 coxas y 1 para fémures y tibias; ⊙ multiplica posición por posición. Las coxas siempre quedan en 0: la red solo corrige 8 de 12.<br>2. clip(..., -1, 1): si la red da un número fuera de -1 y 1 (por ejemplo 1,3) se recorta a 1. Un seguro.<br>3. 0,08·(...): convierte a radianes; 0,08 rad = 4,6 grados es el máximo. Si la red da 0,5: 0,04 rad = 2,3 grados.<br><br>Δq nuevo = Δq anterior + clip(objetivo - Δq anterior, -0,02, 0,02): la corrección no salta de golpe; se acerca poco a poco. objetivo - anterior es cuánto falta; clip limita el avance a 0,02 rad (1,15 grados) por paso.<br>Ejemplo, la corrección venía en 0 y la red pide 4 grados:<br>Paso 1: falta 4, avanza 1,15 (tope): 1,15.<br>Paso 2: falta 2,85, avanza 1,15: 2,30.<br>Paso 3: falta 1,70, avanza 1,15: 3,45.<br>Paso 4: falta 0,55, avanza 0,55: 4,00.<br>Llega en 4 pasos (120 ms). Los servos tienen retraso y no siguen cambios bruscos: si saltara 4 grados de golpe se atrasaría, el cuerpo se sacudiría y los servos sufren.<br><br>Tarjetas: ±4,6 grados (la corrección más grande posible), 1,15 grados (lo máximo que cambia en un paso de 30 ms), 8 de 12 (fémures y tibias; las coxas no).<br><br>Texto de abajo: continuas porque un servo puede ir a 100, 100,5 o 100,37 grados. Al entrenar, at se sortea alrededor de lo que la red cree mejor (exploración); en el robot se usa directamente lo que cree mejor. Después esta corrección se suma a la marcha base y pasa por el límite de 3 grados por orden del firmware y los topes de cada servo.<br><br>Recorrido completo: la red da un número entre -1 y 1, la máscara apaga las coxas, se convierte a máximo ±4,6 grados, se acerca suave (máximo 1,15 por paso), se suma a la marcha base, el firmware la limita a 3 grados por orden y llega al servo.</aside>
+</section>

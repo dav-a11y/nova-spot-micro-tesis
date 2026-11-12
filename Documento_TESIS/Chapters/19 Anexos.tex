@@ -1,0 +1,265 @@
+\chapter{Anexos de trazabilidad y reproducibilidad}
+\begingroup
+\sloppy
+
+\section{Matriz objetivo--evidencia}
+
+La Tabla~\ref{tab:matriz-objetivos-anexo} resume el estado verificable con los cuatro objetivos suministrados el 7 de
+septiembre de 2026, actualizado con la fase física hasta el 21 de octubre de 2026. ``Parcial'' no significa incumplimiento oculto: identifica
+el producto disponible y la evidencia que todavía falta para cerrar el
+objetivo en el prototipo físico.
+
+\begin{longtable}{p{0.09\textwidth}p{0.27\textwidth}p{0.31\textwidth}p{0.22\textwidth}}
+\caption{Matriz resumida de objetivos, evidencia y estado.}\label{tab:matriz-objetivos-anexo}\\
+\toprule
+Objetivo & Resultado demostrable & Evidencia principal & Estado y faltante \\
+\midrule
+\endfirsthead
+\toprule
+Objetivo & Resultado demostrable & Evidencia principal & Estado y faltante \\
+\midrule
+\endhead
+OE1 & Doce articulaciones ejecutadas en el robot suspendido, con topes, límite de cambio y realimentación de nueve. & Capítulo~\ref{cap:plataforma-fisica}, registros de caminatas, firmware y nueve escenarios del supervisor. & Parcial; seguridad eléctrica, alimentación separada y migración del bucle a la Raspberry~Pi. \\
+OE2 & Modelo nominal con geometría medida y actuador identificado. & Capítulo~\ref{cap:modelo}, \path{nova_sm3_real.xml} y modelos del actuador. & Parcial; identificar masas, inercias y fricción. \\
+OE3 & Políticas PPO residuales para cinco marchas, con el actuador real; mejora del 15--19~\% en gateo en el robot y viabilidad del 90--100~\% en simulación. & Capítulo~\ref{cap:ppo-fisico}, tablas~\ref{tab:ciclo-mejora} y~\ref{tab:viabilidad} y políticas en \path{ppo_v10_robot/}. & Parcial; efecto sobre la locomoción apoyada sin medir; políticas elegidas sin comparar con la marcha nominal en el robot. \\
+OE4 & Seguimiento articular, repetibilidad y parecido con la simulación medidos en el robot suspendido; margen nominal en simulación. & Diagnósticos por caminata, tablas~\ref{tab:repetibilidad-fisica} y~\ref{tab:parecido}. & Parcial; margen de estabilidad físico con el robot apoyado e IMU. \\
+\bottomrule
+\end{longtable}
+
+La matriz viva, con criterio de cierre y rutas completas, se conserva en
+\path{Documento_TESIS/MATRIZ_OBJETIVO_EVIDENCIA.md}.
+
+\section{Protocolos aplicables}
+
+Los procedimientos no se transcriben de forma abreviada para evitar dos
+versiones divergentes. Las fuentes versionadas son:
+
+\begin{itemize}
+\item \path{Documentacion/PROTOCOLO_EXPERIMENTAL_BORRADOR.md}: ensayo, ciclo,
+fallo, intervención, métricas y criterios provisionales;
+\item \path{Documentacion/PROTOCOLO_CARACTERIZACION_FISICA.md}: fotografías,
+geometría, masas y mapa de canales;
+\item \path{Documentacion/PROTOCOLOS_FISICOS/}: puesta en marcha, calibración,
+identificación y progresión de la marcha;
+\item \path{Experimentos/PROTOCOLO_NODO_PRUEBAS_SEGURIDAD.md}: estímulos
+aislados del supervisor;
+\item \path{Experimentos/PROTOCOLO_PERTURBACIONES_GAZEBO.md}: condiciones para
+fricción, empujes, ruido y retardos;
+\item \path{Experimentos/PROTOCOLO_PPO_RESIDUAL.md}: contrato y campaña de la
+capa aprendida;
+\item \path{Experimentos/camaras/protocolo_repetibilidad.py}: ensayos físicos
+con orden alternado, comprobación de salud y análisis tras cada caminata;
+\item \path{Experimentos/camaras/ciclo_mejora.py}: ciclo de prueba en el robot,
+actualización del modelo del actuador y reentrenamiento;
+\item \path{Experimentos/camaras/calibrar_postura_colores.py}: ajuste de la
+postura base del robot a la de la simulación con las cámaras.
+\end{itemize}
+
+\section{Lista de materiales}
+\label{sec:lista-materiales}
+
+La Tabla~\ref{tab:lista-materiales} recoge los componentes de la plataforma.
+«En uso» indica que se empleó en los ensayos de octubre de 2026; «inventario»,
+que está disponible en el laboratorio pero aún no se ha integrado; y «adquirir»,
+que se propone comprarlo para completar la arquitectura de la
+Figura~\ref{fig:esquema-propuesto}. Las especificaciones de los servomotores son
+las de la ficha suministrada; en los ensayos se comportaron como servos de
+posición de $180^\circ$.
+
+\begin{longtable}{p{0.27\textwidth}p{0.05\textwidth}p{0.42\textwidth}p{0.13\textwidth}}
+\caption{Lista de materiales de la plataforma y estado de cada componente.}\label{tab:lista-materiales}\\
+\toprule
+Componente & Cant. & Función y especificación & Estado \\
+\midrule
+\endfirsthead
+\toprule
+Componente & Cant. & Función y especificación & Estado \\
+\midrule
+\endhead
+\multicolumn{4}{l}{\textit{Control}} \\
+Raspberry~Pi~4 Model~B & 1 & Controlador embebido; Ubuntu~22.04, ROS~2, I$^2$C y GPIO a 3,3~V & en uso \\
+Microcontrolador auxiliar & 1 & Interfaz de E/S por USB durante los ensayos de octubre & en uso \\
+Controlador PWM PCA9685 & 1 & 16 canales, 12 bits, 50~Hz; dirección 0x40 & en uso \\
+\multicolumn{4}{l}{\textit{Actuación}} \\
+Servomotor MG996R & 12 & 4,8--6,6~V; 11~kgf$\cdot$cm a 6~V; 0,15~s/$60^\circ$; 55~g & en uso \\
+\multicolumn{4}{l}{\textit{Sensores}} \\
+Potenciómetro de eje & 10 & Realimentación de coxas, fémures y tibias 3 y 4 & en uso \\
+Encoder magnético AS5600 & 12 & 12 bits, dirección 0x36; varios con imán débil & en uso \\
+Multiplexor I$^2$C TCA9548A & 2 & Direcciones 0x70 y 0x71 para los AS5600 & en uso \\
+Multiplexor analógico CD74HC4067 & 1 & 16 entradas para los potenciómetros & en uso \\
+Convertidor ADS1115 & 1 & 16 bits, I$^2$C 0x48; lectura de los potenciómetros desde la Raspberry & adquirir \\
+IMU BNO055 & 1 & Orientación del cuerpo (I$^2$C 0x28) para los ensayos apoyados & inventario \\
+Monitor INA228 con derivador & 1 & Tensión, corriente y energía de los servos; dirección configurada distinta de 0x40 & adquirir \\
+\multicolumn{4}{l}{\textit{Alimentación y seguridad}} \\
+Fuente de los servos & 1 & 6~V regulada; corriente a dimensionar con el INA228 (orientativo: 20~A o más) & en uso \\
+Fuente de la Raspberry & 1 & 5,1~V y 3~A, USB-C; se registró bajo voltaje con la actual & adquirir \\
+Regulador LM2596 & 1 & Reductor para la electrónica auxiliar a 5~V & inventario \\
+Fusible y portafusible & 1 & En la línea de los servos & adquirir \\
+Parada de emergencia & 1 & Seta con contacto que corta la línea de los servos & adquirir \\
+Bornera de masa común & 1 & Punto único de masa para servos y electrónica & adquirir \\
+Conectores con traba & --- & JST-XH o similares para sensores y servos (los Dupont se soltaron en los ensayos) & adquirir \\
+\multicolumn{4}{l}{\textit{Instrumentación de ensayo}} \\
+Cámaras & 5 & Integrada del PC, Logitech C170, webcam USB y cámaras de dos portátiles & en uso \\
+Marcadores ArUco y arnés & --- & Medición de la pose del cuerpo y sujeción en los ensayos apoyados & adquirir \\
+\bottomrule
+\end{longtable}
+
+\section{Esquema eléctrico propuesto}
+
+La Figura~\ref{fig:esquema-propuesto} propone el esquema de la plataforma con la
+Raspberry~Pi como único controlador. Recoge las lecciones de los ensayos: la
+electrónica y los servos tienen fuentes separadas y una masa común en un solo
+punto; la línea de los servos lleva fusible, parada de emergencia y medición de
+corriente; los potenciómetros se alimentan a 3,3~V para quedar dentro del rango
+del ADS1115; y todos los dispositivos I$^2$C tienen direcciones distintas (el
+INA228 debe configurarse fuera de 0x40, que es la del PCA9685). Los GPIO
+indicados son una propuesta que debe confirmarse al cablear.
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+node distance=0.8cm and 1.1cm,
+bl/.style={rectangle,draw,rounded corners,fill=blue!10,text width=3.1cm,minimum height=1.0cm,align=center,font=\footnotesize},
+se/.style={rectangle,draw,rounded corners,fill=green!12,text width=3.1cm,minimum height=1.0cm,align=center,font=\footnotesize},
+pw/.style={rectangle,draw,rounded corners,fill=orange!15,text width=3.1cm,minimum height=1.0cm,align=center,font=\footnotesize},
+nu/.style={rectangle,draw,dashed,rounded corners,fill=gray!8,text width=3.1cm,minimum height=1.0cm,align=center,font=\footnotesize},
+bus/.style={-,thick,blue!60!black},
+pwr/.style={-latex,thick,orange!80!black},
+sig/.style={-latex,semithick}]
+\node[bl] (rpi) {Raspberry~Pi~4\\I$^2$C1: GPIO2 (SDA), GPIO3 (SCL)};
+\node[bl,right=2.2cm of rpi] (pca) {PCA9685 (0x40)\\OE $\leftarrow$ GPIO4};
+\node[bl,right=of pca] (servo) {12 servos MG996R};
+\node[se,below=of pca] (tca) {TCA9548A 0x70 y 0x71};
+\node[se,right=of tca] (as) {12 encoders AS5600 (0x36)};
+\node[nu,below=of tca] (ads) {ADS1115 (0x48) \textit{(adquirir)}};
+\node[se,right=of ads] (mux) {CD74HC4067\\S0--S3 $\leftarrow$ GPIO17, 27, 22, 23};
+\node[se,right=of mux] (pot) {10 potenciómetros (3,3~V)};
+\node[se,below=of ads] (imu) {IMU BNO055 (0x28)};
+\node[nu,right=of imu] (ina) {INA228 \textit{(adquirir)}, dirección $\neq$ 0x40};
+\node[pw,above=of servo] (fs) {Fuente servos 6~V};
+\node[pw,above=of pca] (fus) {Fusible + parada de emergencia};
+\node[pw,above=of rpi] (frpi) {Fuente 5,1~V / 3~A};
+\node[pw,below=of rpi] (gnd) {Masa común (punto único: electrónica y servos)};
+\draw[bus] (rpi.east) -- node[above,font=\scriptsize]{bus I$^2$C 3,3~V} (pca.west);
+\draw[bus] ([xshift=1.1cm]rpi.east) |- (tca.west);
+\draw[bus] ([xshift=1.1cm]rpi.east) |- (ads.west);
+\draw[bus] ([xshift=1.1cm]rpi.east) |- (imu.west);
+\draw[bus] (imu.east) -- (ina.west);
+\draw[sig] (pca) -- node[above,font=\scriptsize]{PWM} (servo);
+\draw[sig] (as) -- (tca);
+\draw[sig] (pot) -- (mux);
+\draw[sig] (mux) -- node[below,font=\scriptsize]{SIG$\rightarrow$A0} (ads);
+\draw[pwr] (fs) -- (fus);
+\draw[pwr] (fus.south) -- node[right,font=\scriptsize]{V+ (a través del INA228)} (fus.south |- pca.north);
+\draw[pwr] (frpi) -- (rpi);
+\draw[-,dashed] (gnd) -- (rpi);
+\end{tikzpicture}}
+\caption{Esquema eléctrico propuesto con la Raspberry~Pi como controlador
+(bloques discontinuos: componentes por adquirir). Azul: bus I$^2$C; naranja:
+alimentación; negro: señales.}
+\label{fig:esquema-propuesto}
+\end{figure}
+
+\section{Comandos mínimos de reproducción}
+
+La construcción y las pruebas deterministas se ejecutan desde la raíz:
+
+{\footnotesize
+\begin{verbatim}
+source /opt/ros/humble/setup.bash
+colcon build --packages-select \
+  nova_sm3_description nova_gait_controller
+source install/setup.bash
+python3 -m pytest -q src/nova_gait_controller/test
+\end{verbatim}
+}
+
+Los nueve escenarios dinámicos del supervisor se reproducen con:
+
+{\footnotesize
+\begin{verbatim}
+ROS_DOMAIN_ID=93 \
+Experimentos/ejecutar_pruebas_dinamicas_supervisor.sh \
+  /tmp/pruebas_dinamicas_supervisor
+\end{verbatim}
+}
+
+La línea base se lanza con \texttt{demo.launch.py}; antes de grabar se debe
+comprobar instancia única mediante \texttt{ros2 node list | sort | uniq -c} y
+confirmar los suscriptores del grabador en el tópico de órdenes. El análisis se
+realiza con \path{Experimentos/analizar_gateo_rosbag.py} y
+\path{Experimentos/analizar_contactos_rosbag.py}. La equivalencia se agrega con
+\path{Experimentos/comparar_simuladores_equivalentes.py}; en MuJoCo se reinicia
+primero el keyframe \texttt{stand}. Las rutas exactas de bolsa,
+configuración y hashes se toman del registro de cada ensayo, nunca de una bolsa
+con marca \texttt{ENSAYO\_INVALIDO.md}.
+
+\section{Comandos de la fase física}
+
+Entrenamiento de una semilla con el actuador real (ejemplo de gateo, desde
+\path{Experimentos/entrenamiento_real_20261016}):
+
+{\footnotesize
+\begin{verbatim}
+python -I entrenar_ppo_real.py --completo --aleatorizar \
+  --marcha gateo --femur 15 --tibia 10 --apertura 8 \
+  --timesteps 3000000 --lr 1e-4 --target-kl 0.03 --n-steps 2048 \
+  --actuador actuadores_reales_v5.json --dt 0.03 \
+  --w-avance 10 --w-actitud 30 --w-lateral 20 --w-giro 10 \
+  --w-giro-ciclo 5 --w-suavidad 0.3 --w-coxas 1.0 \
+  --seed 13 --output ppo_v14_gateo
+\end{verbatim}
+}
+
+Selección de la mejor copia de una campaña y prueba en el robot (desde
+\path{Experimentos/camaras}):
+
+{\footnotesize
+\begin{verbatim}
+python -I ../entrenamiento_real_20261016/seleccionar_copias.py \
+  --marcha gateo --carpeta ppo_v14_gateo --semillas 2
+python3 protocolo_repetibilidad.py --sesion <nombre> --repeticiones 3 \
+  --duracion-s 180 --pausa-s 120 \
+  --condicion "gateo_base:gateo::--apertura 8" \
+  --condicion "gateo_ppo:gateo:<política>/policy.zip"
+python3 analizar_repetibilidad.py --sesion <nombre>
+python3 ciclo_mejora.py --vueltas 2
+\end{verbatim}
+}
+
+Las figuras de la fase física se regeneran con
+\path{Documento_TESIS/generar_figuras_ppo_fisico.py}, y las tablas de inventario
+de entrenamientos y ensayos con
+\path{Documento_TESIS/generar_inventario_resultados.py}. Los videos no se versionan
+por su tamaño; los registros de sensores, diagnósticos, análisis de video y
+catálogos (\path{grabaciones/catalogo.csv} y \path{grabaciones/ciclos.csv}) sí.
+
+\section{Reglas de integridad y repetición}
+
+Cada resultado debe conservar fecha, versión, parámetros, marcadores de inicio
+y fin, número de ciclos, criterio de exclusión y SHA-256. El ciclo 1 se mantiene
+como transitorio; la unidad independiente es el ensayo. No se mezclan bolsas
+creadas con cadencias, geometrías o perfiles diferentes. Las tentativas fallidas
+se conservan con su causa y no entran en las estadísticas aceptadas.
+
+El flujo de integración continua en
+\path{.github/workflows/pruebas-automaticas.yml} compila los dos paquetes,
+ejecuta las pruebas Python y repite los escenarios dinámicos en cada
+\texttt{push} y \texttt{pull\_request}. Esto asegura regresión de software, no
+reemplaza campañas dinámicas extensas ni validación física.
+
+\section{Lista de transición al prototipo}
+
+El orden F0--F4 se conserva en el plan de validación física fechado el 2 de
+septiembre y versionado en la carpeta \path{Raspberry}. La
+secuencia prevista es: ensamble y caracterización sin energía; seguridad
+eléctrica y OE; calibración canal por canal; integración suspendida y luego con
+soporte; instrumentación y contraste del modelo. En la fase de octubre se
+ejecutaron la calibración, la integración suspendida y la instrumentación, y las
+políticas PPO se ejecutaron solo con el robot suspendido, aunque la seguridad
+eléctrica seguía abierta; esa condición la mitigaron los topes por
+articulación, el límite de cambio por paso y la orden de apagado del firmware.
+La integración con soporte y la marcha sobre el suelo requieren cerrar antes la
+seguridad eléctrica y la alimentación.
+\endgroup

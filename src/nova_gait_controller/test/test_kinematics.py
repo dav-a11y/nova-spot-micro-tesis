@@ -150,13 +150,13 @@ def test_crawl_rear_liftoff_tuning_does_not_change_front_or_descent():
 
 def test_cartesian_step_walk_is_reachable_smooth_and_periodic():
     poses = cartesian_step_walk((0.10, 0.42, -0.84))
-    assert len(poses) == 32
+    assert len(poses) == 48
     assert all(len(item) == 12 for item in poses)
     cyclic = poses + poses[:1]
     largest_jump = max(
         abs(cyclic[index][joint] - cyclic[index - 1][joint])
         for index in range(1, len(cyclic)) for joint in range(12))
-    assert largest_jump < 0.08
+    assert largest_jump <= 0.05
 
 
 def test_step_walk_weight_shift_is_bounded():

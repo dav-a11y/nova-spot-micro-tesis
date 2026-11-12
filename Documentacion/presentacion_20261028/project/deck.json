@@ -1,0 +1,31 @@
+{
+  "v": 4,
+  "createdOnFiles": {"v": 1, "at": "2026-10-29T00:10:00Z"},
+  "lists": "css",
+  "title": "Nova Spot Micro: control por aprendizaje por refuerzo",
+  "order": ["portada", "ruta", "objetivos",
+    "robot", "arquitectura", "instrumentacion", "firmware", "camaras", "etapa-sim",
+    "coordenadas", "cin-directa", "cin-inversa", "jacobiano", "dinamica", "contacto",
+    "ident-actuador", "modelo-actuador", "postura", "marchas", "galope-base",
+    "rl-mdp", "rl-gradiente", "gae", "ppo", "residual",
+    "agente", "red", "observacion", "accion", "recompensa", "recompensa-pesos", "episodio", "hiperparametros", "ciclo-entrenamiento",
+    "campanas", "curvas", "seleccion", "viabilidad",
+    "simreal-metrica", "simreal-resultados", "hallazgos", "ciclo-mejora",
+    "limitaciones", "trabajo-futuro", "conclusiones", "cierre"],
+  "sections": {
+    "s1": {"description": "Contexto, ruta de trabajo y objetivos de la tesis.", "start": "portada"},
+    "s2": {"description": "El robot real: hardware, sensores, firmware, cámaras y primera etapa en simulación.", "start": "robot"},
+    "s3": {"description": "Modelo matemático: cinemática, jacobiano, dinámica, contacto y estabilidad.", "start": "coordenadas"},
+    "s4": {"description": "Actuador identificado, postura de trabajo y las cinco marchas base.", "start": "ident-actuador"},
+    "s5": {"description": "Fundamentos de aprendizaje por refuerzo: MDP, gradiente de la política, GAE, PPO y RL residual.", "start": "rl-mdp"},
+    "s6": {"description": "Cómo se construyó el agente: red, estados, acciones, recompensa, episodios e hiperparámetros.", "start": "agente"},
+    "s7": {"description": "Entrenamiento, selección y viabilidad de las políticas.", "start": "campanas"},
+    "s8": {"description": "Pruebas en el robot físico y similitud simulación-realidad.", "start": "simreal-metrica"},
+    "s9": {"description": "Limitaciones, trabajo futuro y conclusiones.", "start": "limitaciones"}
+  },
+  "faces": {
+    "ibm-plex-sans": {"family": "IBM Plex Sans", "href": "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap"},
+    "source-serif-4": {"family": "Source Serif 4", "href": "https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap"}
+  },
+  "designSystems": []
+}

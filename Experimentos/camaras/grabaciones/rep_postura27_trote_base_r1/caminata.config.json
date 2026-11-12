@@ -1,0 +1,129 @@
+{
+  "fecha": "2026-10-27 12:13:10",
+  "argumentos": [
+    "--duracion-s",
+    "180.0",
+    "--dt",
+    "0.03",
+    "--tibia",
+    "10",
+    "--marcha",
+    "trote",
+    "--ciclo-trote",
+    "1.0",
+    "--femur",
+    "12",
+    "--tibia",
+    "12",
+    "--apertura",
+    "5",
+    "--ciclo-trote",
+    "1.0",
+    "--femur",
+    "12",
+    "--tibia",
+    "12",
+    "--salida",
+    "/home/pavilion/Documentos/Cuadrupedo/Experimentos/camaras/grabaciones/rep_postura27_trote_base_r1/caminata.csv"
+  ],
+  "marcha": "trote",
+  "ciclo_paso_s": null,
+  "femur_deg": 12.0,
+  "tibia_deg": 12.0,
+  "fase_s": 0.5,
+  "dt": 0.03,
+  "politica": null,
+  "observacion": null,
+  "base_servos": [
+    159,
+    45,
+    64,
+    82,
+    110,
+    100,
+    100,
+    100,
+    100,
+    166,
+    100,
+    144
+  ],
+  "referencias_sensores": {
+    "C5": 539,
+    "C6": 538,
+    "C9": 536,
+    "C1": 645,
+    "C3": 644,
+    "C2": 595,
+    "C10": 386,
+    "C11": 539,
+    "ENC_T2": 3045,
+    "C0": 331,
+    "C8": 511,
+    "ENC_T1": 3584,
+    "ENC_F1": 2128,
+    "ENC_F4": -1,
+    "IMU_H": -1,
+    "IMU_R": -1,
+    "IMU_P": -1,
+    "IMU_AX": -1,
+    "IMU_AY": -1,
+    "IMU_AZ": -1,
+    "IMU_CAL": -1
+  },
+  "calibracion_sensores": {
+    "nota": "Sensor de cada articulación para la observación de la PPO. k = unidades del sensor por grado de servo (cuentas/° en potenciómetros, °encoder/° en AS5600). F2, F4 y T2 del barrido de rango del 16-oct y del 19-oct; el resto se identifica con identificar_sensores_v6.py.",
+    "front_left_femur_joint": {
+      "campo": "C5",
+      "k": -3.329,
+      "respaldo": {
+        "campo": "ENC_T1",
+        "k": 1.103
+      },
+      "nota_respaldo": "26-oct: encoder del fémur 2 en TCA 0x70/4 (campo ENC_T1 del modo @); r=0,97 con la orden del canal 5."
+    },
+    "rear_left_femur_joint": {
+      "campo": "C6",
+      "k": -3.342,
+      "respaldo": {
+        "campo": "ENC_F4",
+        "k": 1.3869
+      },
+      "nota_respaldo": "26-oct: recalibrado tras reconectar (r=0,99); antes perdía el 50-99 % de lecturas."
+    },
+    "front_left_tibia_joint": {
+      "campo": "ENC_T2",
+      "k": -0.5921
+    },
+    "front_right_femur_joint": {
+      "campo": "C8",
+      "k": -3.2992,
+      "respaldo": {
+        "campo": "ENC_F1",
+        "k": 0.4845
+      }
+    },
+    "rear_right_femur_joint": {
+      "campo": "C9",
+      "k": -2.8579
+    },
+    "front_right_tibia_joint": {
+      "campo": "ENC_T1",
+      "k": -0.8981,
+      "sin_sensor": true,
+      "nota_sin_sensor": "26-oct: el encoder AS5600 de la tibia 1 está dañado (su cable funciona en el fémur 2) y el servo no se mueve con el canal 8; se estima con la orden."
+    },
+    "compensar_con": "C0",
+    "rear_right_tibia_joint": {
+      "campo": "C11",
+      "k": -2.4126,
+      "sin_sensor": true,
+      "nota_sin_sensor": "21-oct: C11 no cambia al mover la tibia 3 (el servo sí se mueve, comprobado con la cámara). Revisar el cable del potenciómetro."
+    },
+    "rear_left_tibia_joint": {
+      "campo": "C10",
+      "k": -2.9629
+    }
+  },
+  "firmware_sha1": "3a205b49a408db4e1cc9bc7d253012ce80a59fd3"
+}

@@ -1,0 +1,18 @@
+<section id="hallazgos" data-transition="fade" style="background:#F6F5F0;color:#2A3442;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:30px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4521C">Robot físico</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#15233B">La comparación encontró fallas reales del robot</h2>
+<table style="font-size:25px;color:#2A3442">
+<tr><th style="width:24%">Hallazgo</th><th style="width:40%">Evidencia</th><th style="width:36%">Corrección</th></tr>
+<tr><td>Calibración de la tibia 2</td><td>Se movía 2,2–2,5 veces más que en la simulación en las 3 marchas</td><td>Escala del encoder −0,59 → −1,15 (r ≈ 0,97 en 3 caminatas)</td></tr>
+<tr><td>Coxa 2 caída</td><td>Caía hacia adentro; su potenciómetro no cambia al moverla 18°</td><td>Base 48° → 42°, ajustada en vivo con el operador</td></tr>
+<tr><td>Bus I²C colgado</td><td>Se trababa al leer el canal 4 del multiplexor 0x70</td><td>Cable del encoder del fémur 2 revisado; bus estable</td></tr>
+<tr><td>Ganancias solo en el robot</td><td>Parecido 73–80 % por la amplitud de las tibias</td><td>Ganancias dentro de la marcha (v24)</td></tr>
+<tr><td>Signo de tibias 2 y 4</td><td>Al pedir levantar el pie, lo bajaban</td><td>Signo invertido (21-oct)</td></tr>
+</table>
+<div style="display:flex;flex-direction:row;gap:24px">
+<p style="font-size:26px;padding:16px 28px;background:#15233B;color:#F6F5F0;border-radius:12px">Antes: paso 72 % · trote 54 %</p>
+<p style="font-size:26px;padding:16px 28px;background:#B4521C;color:#FBF6F1;border-radius:12px">Después: paso 83 % · trote 70 %</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6A7383">Nova Spot Micro · Robot físico</p>
+<aside>Un resultado lateral pero valioso: la métrica de parecido funcionó como herramienta de diagnóstico. Cada diferencia sistemática entre simulación y robot apuntó a una falla concreta de calibración, de cableado o de montaje, que después se confirmó y se corrigió.</aside>
+</section>

@@ -1,0 +1,26 @@
+<section id="modelo-actuador" data-transition="fade" style="background:#F6F5F0;color:#2A3442;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4521C">Actuador identificado</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#15233B">Cómo se simula el servo real en cada paso</h2>
+<div style="background:#FFFFFF;padding:36px 48px;border-radius:16px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:38px;color:#15233B">1. Límite del firmware:  qordₜ = clip( qnomₜ + Δqₜ ,  qordₜ₋₁ ± 3° )</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:38px;color:#15233B">2. Ganancia:  qefⱼ = q*ⱼ + gⱼ · ( qordⱼ − q*ⱼ )</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:38px;color:#15233B">3. Zona muerta:  si |qefₜ − qefₜ₋₁| &lt; 0,42°  ⇒  qefₜ = qefₜ₋₁</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:38px;color:#15233B">4. Retardo:  uₜ = qefₜ₋d ,   d ∈ {1, …, 4} pasos (30–120 ms)</p>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:28px">
+<div style="background:#FBF1E8;padding:28px 32px;border-radius:16px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:26px;font-weight:600;color:#B4521C">Aleatorización: retardo</p>
+<p style="font-size:26px">d sorteado en 1–4 pasos por episodio</p>
+</div>
+<div style="background:#FBF1E8;padding:28px 32px;border-radius:16px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:26px;font-weight:600;color:#B4521C">Aleatorización: ganancia</p>
+<p style="font-size:26px">gⱼ × U(0,95; 1,05) por servo</p>
+</div>
+<div style="background:#FBF1E8;padding:28px 32px;border-radius:16px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:26px;font-weight:600;color:#B4521C">Aleatorización: sensores</p>
+<p style="font-size:26px">Sesgo U(−1°; +1°) y ruido de 1°</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6A7383">Nova Spot Micro · Actuador y marchas · q*: postura de pie; MuJoCo integra cada 2 ms (15 subpasos por decisión)</p>
+<aside>Muestra cómo el simulador imita al servo real. La orden de la red no llega directo al motor del simulador: pasa por 4 filtros que la «ensucian» igual que en el robot. Ejemplo que vamos siguiendo: un fémur con postura de pie de 100 grados.<br><br>Filtro 1, límite del firmware: qord = clip(qnom + Δq, qord anterior ± 3 grados). qnom es lo que pide la marcha base, Δq la corrección de la red, la suma es lo que se quisiera mandar; clip recorta para que la orden no se aleje más de 3 grados de la anterior, porque el firmware de la Arduino hace exactamente eso. Ejemplo: orden anterior 100, marcha base pide 105, red +2: se quisiera 107, pero solo se permite hasta 103. Orden: 103.<br><br>Filtro 2, ganancia: qef = q* + g·(qord - q*). q* es la postura de pie, qord - q* cuánto se pide mover desde ahí, g la fracción que el servo hace de verdad, qef a dónde llega realmente. Ejemplo: se pide 103 (mover 3); con g = 0,9 se mueve 2,7: llega a 102,7.<br><br>Filtro 3, zona muerta: si |qef nuevo - qef anterior| es menor que 0,42 grados, el servo no se mueve. Ejemplo: estaba en 102,5 y ahora se pide 102,7: cambio de 0,2, menor que 0,42: no se mueve. Si se pidiera 103,5 (1 grado), sí. Los servos baratos ignoran órdenes muy pequeñas.<br><br>Filtro 4, retardo: u = qef de hace d pasos, d entre 1 y 4 pasos (30 a 120 ms). El servo ejecuta ahora la orden de antes. Con d = 3, la de hace 90 ms: lo calculado en el paso 10 se aplica en el paso 13. En el programa es una cola, como la fila de un banco.<br><br>Resumen del ejemplo: la red quería 107, el firmware lo deja en 103, la ganancia en 102,7, la zona muerta puede dejarlo en 102,5, y se aplica 90 ms después. La red aprende con un servo tan imperfecto como el real.<br><br>Aleatorización (recuadros naranjas): los servos reales no son todos iguales, así que al empezar cada intento se sortea:<br>- Retardo: entre 1 y 4 pasos (30 a 120 ms).<br>- Ganancia: la de cada servo se multiplica por un número al azar entre 0,95 y 1,05 (U(0,95; 1,05) = uniforme entre esos valores).<br>- Sensores: un error fijo al azar entre -1 y +1 grado, más ruido de 1 grado en cada lectura.<br>Si la red entrenara siempre con el mismo servo exacto, dependería de él. Cambiándole las condiciones aprende a funcionar en cualquier servo parecido, y el robot real cae dentro de ese rango. Se llama aleatorización de dominio.<br><br>Nota del pie: q* es la postura de pie. MuJoCo calcula la física cada 2 ms, 15 veces por cada orden de la red (cada 30 ms), para mayor precisión.</aside>
+</section>

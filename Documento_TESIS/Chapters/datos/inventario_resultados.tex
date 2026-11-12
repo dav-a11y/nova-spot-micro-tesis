@@ -1,0 +1,59 @@
+% Generado por generar_inventario_resultados.py el 2026-11-03 20:16. No editar a mano.
+\newcommand{\InvSimulacion}{132}
+\newcommand{\InvReal}{248}
+\newcommand{\InvRealDistintas}{236}
+\newcommand{\InvTotal}{380}
+\newcommand{\InvEnCurso}{0}
+\newcommand{\InvIncompletas}{32}
+\newcommand{\InvCaminatasValidas}{103}
+\newcommand{\InvCaminatasFallo}{16}
+\newcommand{\InvGrabaciones}{217}
+\begin{table}[H]
+\centering
+\small
+\caption{Entrenamientos PPO realizados por fase y marcha.}
+\label{tab:inventario-entrenamientos}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.15\textwidth}>{\raggedright\arraybackslash}p{0.47\textwidth}rrr}
+\toprule
+Marcha & Campañas (semillas) & Semillas & Distintas & En curso \\
+\midrule
+\multicolumn{5}{l}{\textit{Fase de simulación con el modelo nominal (septiembre)}} \\
+Todas & distribuida step s23 (80), entrenamiento ppo gazebo (1), entrenamiento ppo mujoco (1), ppo residual (10), reentrenamiento ppo completo (20), reentrenamiento ppo extendido (3), reentrenamiento ppo largo (2), step estabilidad w32 (5), step estabilidad xy w32 (5), step estabilidad xy48 w32 l64 (5) & 132 & --- & 0 \\
+\multicolumn{5}{l}{\textit{Fase con el modelo del robot real (octubre y noviembre)}} \\
+Gateo & ciclo1 gateo (4), ciclo2 gateo (4), v10 gateo (5), v12 gateo (4), v13 gateo abierto (15), v14 gateo (5), v22 gateo (4), v24 gateo (4), v25 gateo (4), v26 gateo (4), v27 gateo (4), v30 gateo monitor (1), v31 gateo (1) & 59 & 53 & 0 \\
+Trote & ciclo1 trote (4), ciclo2 trote (4), trote (8), trote abierto (15), v14 trote (5), v15 trote (7), v22 trote (4), v24 trote (4), v29 trote perdidas (3), v30 trote monitor (1), v31 trote (1) & 56 & 50 & 0 \\
+Paso & v10 paso (5), v11 paso (8), v16 paso (8), v17 paso (4), v22 paso (6), v24 paso (4), v30 paso monitor (1), v31 paso (1) & 37 & 37 & 0 \\
+Carrera & v18 carrera (4), v22 carrera (4), v24 carrera (4), v30 carrera monitor (1), v31 carrera (1) & 14 & 14 & 0 \\
+Galope & v18 galope (4), v19 galope coxas (4), v20 galope (4), v21 galope (4), v23 galope (8), v24 galope (4), v25 galope (4), v26 galope (4), v27 galope (6), v28 galope (8), v30 galope monitor (1), v31 galope (1) & 52 & 52 & 0 \\
+Versiones previas del entorno & ppo (5), v2 (5), v3 (5), v4 (5), v5 (5), v6 (5) & 30 & 30 & 0 \\
+\midrule
+\textbf{Total} & & \textbf{380} & & 0 \\
+\multicolumn{5}{p{0.9\textwidth}}{\footnotesize «Distintas» descuenta las semillas que repitieron la misma ejecución (campañas del ciclo de mejora, error corregido el 22 de octubre). 32 entrenamientos de octubre se detuvieron antes de su política final y se conservan solo con copias intermedias.} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\caption{Caminatas de comparación en el robot suspendido por sesión (repeticiones por condición).}
+\label{tab:inventario-ensayos}
+\begin{tabular}{l>{\raggedright\arraybackslash}p{0.7\textwidth}}
+\toprule
+Sesión & Condiciones (repeticiones analizadas) \\
+\midrule
+20261019 & gateo\_base (3), gateo\_ppo (3), paso\_base (3), paso\_ppo (3) \\
+20261020 & gateo\_base (3), gateo\_ppo (3), paso\_base (3), paso\_ppo (3) \\
+20261020v11 & paso\_base (3), paso\_v11 (3) \\
+20261021 & gateo\_base (3), gateo\_v14 (3), trote\_base (3) \\
+ciclo1 & gateo\_base (2), gateo\_ppo1 (2), trote\_base (2), trote\_ppo1 (2), trote\_ppo2 (2) \\
+ciclo2 & gateo\_base (2), gateo\_ppo1 (2), gateo\_ppo2 (2), trote\_base (2), trote\_ppo1 (2) \\
+ciclo3 & gateo\_ppo1 (2) \\
+paso\_v16d & paso\_base (3), paso\_v16 (3) \\
+postura27 & gateo\_base (2), gateo\_v14 (2), paso\_base (2), paso\_v16 (2), trote\_base (2), trote\_v15 (2) \\
+v20 & galope\_base (2), galope\_v20 (2) \\
+\midrule
+\multicolumn{2}{p{0.9\textwidth}}{\footnotesize Caminatas de comparación grabadas: 103 válidas y 16 descartadas por la comprobación de salud; 98 grabaciones adicionales de calibración, cámaras y sincronía.} \\
+\bottomrule
+\end{tabular}
+\end{table}

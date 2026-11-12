@@ -1,0 +1,24 @@
+<section id="seleccion" data-transition="fade" style="background:#EAEEF2;color:#2A3442;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:30px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4521C">Entrenamiento</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#15233B">Selección de copias y criterio de viabilidad</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:36px">
+<div style="background:#FFFFFF;padding:32px 40px;border-radius:16px;display:flex;flex-direction:column;gap:14px">
+<h3 style="font-size:30px;font-weight:600;color:#2F5D8C">Selección (caminatas de 60 ciclos)</h3>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:32px;color:#15233B">P = dy/0,1 + φrms + ϑrms − x/xnom + 2(crms/crms,nom − 1) + S</p>
+<p style="font-size:25px;line-height:1.4">Válida si avanza más que la base, no se desvía de más y no cae. Gana la de menor P. Semillas de evaluación 901–902.</p>
+</div>
+<div style="background:#FFFFFF;padding:32px 40px;border-radius:16px;display:flex;flex-direction:column;gap:14px">
+<h3 style="font-size:30px;font-weight:600;color:#B4521C">Viabilidad (20 episodios)</h3>
+<p style="font-size:25px;line-height:1.4">Semillas 1001–1020, nunca vistas; con aleatorización; cada episodio frente a la base en la misma semilla. Es viable si:</p>
+<ol style="font-size:25px;line-height:1.45">
+<li>no cae</li>
+<li>avanza ≥ 90 % de la base</li>
+<li>desvío ≤ el de la base, o ≤ 0,5 m</li>
+<li>inclinación máxima ≤ 15°</li>
+</ol>
+</div>
+</div>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:34px;color:#15233B">Viabilidad = episodios viables / 20 × 100 %</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6A7383">Nova Spot Micro · Entrenamiento · seleccionar_copias.py y evaluar_viabilidad.py</p>
+<aside>Explica cómo se elige la mejor red. Dos filtros: selección (de las muchas copias, ¿cuál es la mejor?, con la puntuación P) y viabilidad (¿funciona en condiciones que nunca vio?, un porcentaje). La nota del entrenamiento no sirve para comparar copias: depende de los pesos de cada versión y los intentos son cortos.<br><br>Selección: cada copia hace caminatas largas en el simulador de 60 ciclos (unos 3 min), con semillas 901 y 902 nunca usadas al entrenar; la marcha base sola camina en las mismas condiciones. Primero, ¿es válida? Solo si avanza más que la base, no se desvía más del límite y no se cae. Después, entre las válidas gana la de menor P (menos es mejor):<br>P = dy/0,1 + φrms + ϑrms - x/xnom + 2·(crms/crms,nom - 1) + S<br>- dy/0,1: desvío lateral final en unidades de 10 cm (5 cm = 0,5; 20 cm = 2). Sube P.<br>- φrms: inclinación promedio de lado en grados. Sube P.<br>- ϑrms: inclinación promedio de frente. Sube P.<br>- -x/xnom: avance de la copia entre avance de la base; con signo menos, avanzar más baja P.<br>- 2·(crms/crms,nom - 1): cuánto se mueven las coxas comparado con la base; igual da 0, 30 % más suma 0,6. Vale doble porque sacudir las coxas fue un problema real.<br>- S: brusquedad, cuánto cambian las correcciones de un paso a otro. Sube P.<br>rms = raíz cuadrática media, un promedio que da más peso a los valores grandes. nom = de la marcha base.<br><br>Ejemplo con dos copias:<br>Copia A: desvío 5 cm 0,5; inclinación 2,0 + 1,5 = 3,5; avance 1,10 veces -1,10; coxas 10 % más 0,2; S 0,1. P = 3,2.<br>Copia B: desvío 15 cm 1,5; inclinación 2,2 + 1,7 = 3,9; avance 1,25 veces -1,25; coxas 30 % más 0,6; S 0,3. P = 5,05.<br>Gana A aunque B avanza más, porque B se desvía, se inclina, mueve las coxas y es más brusca. P busca el equilibrio. La ganadora se guarda en ppo_v10_robot/.<br><br>Viabilidad: la elegida hace 20 intentos con condiciones al azar, semillas 1001 a 1020 nunca vistas, cada uno comparado con la marcha base en exactamente las mismas condiciones. Un intento es viable si cumple los 4:<br>1. No se cae.<br>2. Avanza al menos el 90 % de lo que avanza la base en ese intento.<br>3. Se desvía igual o menos que la base, o menos de 0,5 m.<br>4. Su inclinación máxima no pasa de 15 grados.<br>Viabilidad = episodios viables / 20 x 100 %.<br>Ejemplos: gateo v27, 20 de 20 = 100 %. Galope v28, 18 cumplieron y 2 no (un poco menos del 90 % de avance o un poco más de desvío, sin caerse) = 90 %.<br><br>En resumen: P es la nota de selección (mejor equilibrio entre avance, estabilidad y suavidad) y la viabilidad el examen final en 20 situaciones nuevas.</aside>
+</section>

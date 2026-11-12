@@ -1,0 +1,122 @@
+[
+ {
+  "articulacion": "coxa1",
+  "servo_base": 159,
+  "recorrido": 12,
+  "sensor": "ENC_T2",
+  "unidades_por_grado": 0.25,
+  "segundo": "C2",
+  "segundo_por_grado": 0.167,
+  "esperado": "—"
+ },
+ {
+  "articulacion": "coxa2",
+  "servo_base": 45,
+  "recorrido": 12,
+  "sensor": "C6",
+  "unidades_por_grado": -0.167,
+  "segundo": "C9",
+  "segundo_por_grado": 0.125,
+  "esperado": "—"
+ },
+ {
+  "articulacion": "coxa3",
+  "servo_base": 61,
+  "recorrido": 12,
+  "sensor": "C6",
+  "unidades_por_grado": -0.208,
+  "segundo": "C0",
+  "segundo_por_grado": -0.167,
+  "esperado": "—"
+ },
+ {
+  "articulacion": "coxa4",
+  "servo_base": 82,
+  "recorrido": 12,
+  "sensor": "C2",
+  "unidades_por_grado": 0.25,
+  "segundo": "C5",
+  "segundo_por_grado": 0.208,
+  "esperado": "—"
+ },
+ {
+  "articulacion": "femur1",
+  "servo_base": 122,
+  "recorrido": 20,
+  "sensor": "ENC_F1",
+  "unidades_por_grado": 4.75,
+  "segundo": "C8",
+  "segundo_por_grado": -3.25,
+  "esperado": "C8"
+ },
+ {
+  "articulacion": "femur2",
+  "servo_base": 80,
+  "recorrido": 20,
+  "sensor": "C5",
+  "unidades_por_grado": -3.7,
+  "segundo": "C3",
+  "segundo_por_grado": -0.425,
+  "esperado": "C5"
+ },
+ {
+  "articulacion": "femur3",
+  "servo_base": 136,
+  "recorrido": 20,
+  "sensor": "C9",
+  "unidades_por_grado": -3.2,
+  "segundo": "ENC_T2",
+  "segundo_por_grado": 0.1,
+  "esperado": "C9"
+ },
+ {
+  "articulacion": "femur4",
+  "servo_base": 70,
+  "recorrido": 20,
+  "sensor": "ENC_F4",
+  "unidades_por_grado": 15.85,
+  "segundo": "C6",
+  "segundo_por_grado": -3.325,
+  "esperado": "C6"
+ },
+ {
+  "articulacion": "tibia1",
+  "servo_base": 40,
+  "recorrido": 20,
+  "sensor": "ENC_T2",
+  "unidades_por_grado": 0.125,
+  "segundo": "ENC_F4",
+  "segundo_por_grado": 0.05,
+  "esperado": "ENC_T1"
+ },
+ {
+  "articulacion": "tibia2",
+  "servo_base": 76,
+  "recorrido": 20,
+  "sensor": "ENC_T2",
+  "unidades_por_grado": -6.625,
+  "segundo": "ENC_F4",
+  "segundo_por_grado": -0.15,
+  "esperado": "ENC_T2"
+ },
+ {
+  "articulacion": "tibia3",
+  "servo_base": 82,
+  "recorrido": 20,
+  "sensor": "C5",
+  "unidades_por_grado": 0.075,
+  "segundo": "C2",
+  "segundo_por_grado": -0.075,
+  "esperado": "C11"
+ },
+ {
+  "articulacion": "tibia4",
+  "servo_base": 91,
+  "recorrido": 20,
+  "sensor": "C10",
+  "unidades_por_grado": -3.425,
+  "segundo": "ENC_T2",
+  "segundo_por_grado": -0.075,
+  "esperado": "C10"
+ }
+]

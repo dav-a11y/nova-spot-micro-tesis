@@ -1,0 +1,23 @@
+<section id="recompensa" data-transition="fade" style="background:#F6F5F0;color:#2A3442;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4521C">El agente</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#15233B">Función de recompensa por paso</h2>
+<div style="background:#FFFFFF;padding:36px 48px;border-radius:16px;display:flex;flex-direction:column;gap:18px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:38px;color:#15233B">rₜ = 1 + wav·Δx − wact·(φ² + ϑ²) − 25·(h − 0,235)² − 0,25·‖eq‖² − 0,04·‖Δq‖²</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:38px;color:#15233B">      − wlat·y² − wgiro·ψ² − wsuav·Σⱼ( (Δqₜ,ⱼ − Δqₜ₋₁,ⱼ) / 0,02 )² − wcox·ē²coxa</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:38px;color:#15233B">Al cerrar cada ciclo:   − wgc · (Δψciclo)²</p>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:40px">
+<ul style="font-size:26px;line-height:1.5">
+<li>Δx: avance del cuerpo en el paso (m)</li>
+<li>φ, ϑ: alabeo y cabeceo (rad); h: altura (m)</li>
+<li>eq: error respecto a la marcha base</li>
+</ul>
+<ul style="font-size:26px;line-height:1.5">
+<li>y, ψ: desvío lateral y giro acumulados</li>
+<li>ē²coxa: desviación cuadrática media de las coxas (°²)</li>
+<li>Δψciclo: giro de cada ciclo (°)</li>
+</ul>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6A7383">Nova Spot Micro · El agente · Ecuación de la tesis (recompensa con el actuador real)</p>
+<aside>Es la nota que recibe la red en cada paso (30 ms); aprende a que la suma de notas sea lo más alta posible. Es lo que le decimos al robot que queremos. Son premios (+) y castigos (-), cada castigo con un peso w. Casi todos van al cuadrado: un error pequeño casi no se castiga y uno grande mucho (1 de error da 1; 10 de error da 100).<br><br>+1: premio por seguir vivo; si se cae, el intento termina y deja de sumar.<br>+ wav·Δx: premio por avanzar; Δx metros avanzados en el paso; wav 10, 20, 30 o 40 según la marcha. 3 mm con wav 10 da +0,03. Si va hacia atrás, resta.<br>- wact·(φ² + ϑ²): castigo por inclinarse. φ alabeo (de lado), ϑ cabeceo (de frente), en radianes. wact = 30, el más fuerte. Ojo: aquí φ es el alabeo, no la fase.<br>- 25·(h - 0,235)²: castigo por altura; h altura del cuerpo, 0,235 m la de pie.<br>- 0,25·‖eq‖²: castigo por alejarse de la marcha base (eq diferencia entre dónde están las articulaciones y dónde las pide la base; ‖ ‖² suma de cuadrados). Corrige la marcha pero no inventa otra.<br>- 0,04·‖Δq‖²: castigo pequeño por corregir mucho.<br>- wlat·y²: desvío lateral; y metros fuera de la línea recta; wlat 20 (30 galope).<br>- wgiro·ψ²: giro del rumbo desde el inicio; wgiro 10.<br>- wsuav·Σ((Δq nuevo - Δq anterior)/0,02)²: brusquedad; cuánto cambió la corrección, dividido entre el cambio máximo; wsuav 0,3. Agregado el 20-oct: en el robot las correcciones eran tan rápidas que los servos no las seguían y el cuerpo se sacudía.<br>- wcox·ē²coxa: coxas; promedio del cuadrado de cuánto se apartan, en grados; wcox 1. Agregado el 20-oct: con la red las coxas se desviaban el doble.<br>Al cerrar cada ciclo, - wgc·(Δψ ciclo)²: grados que giró el cuerpo en el ciclo; wgc 5; se cobra una vez por ciclo. Agregado el 19-oct: la red no ve el rumbo (sin IMU) y en caminatas largas se curvaba.<br><br>Ejemplo de un paso de trote (wav 10, wact 30, wlat 20, wgiro 10, wsuav 0,3, wcox 1):<br>Seguir vivo +1,000.<br>Avanzó 3 mm: 10 x 0,003 = +0,030.<br>Inclinación 0,03 de lado y 0,04 de frente: 30 x (0,0009 + 0,0016) = -0,075.<br>Altura 5 mm abajo: 25 x 0,005² = -0,001.<br>Lejos de la base 0,05 rad en 8 articulaciones: 0,25 x 8 x 0,05² = -0,005.<br>Corregir mucho 0,03 rad en 8: -0,0003.<br>Desvío 5 cm: 20 x 0,05² = -0,050.<br>Giro 0,05 rad: 10 x 0,05² = -0,025.<br>Brusquedad 0,005 rad en 8: 0,3 x 8 x (0,005/0,02)² = -0,150.<br>Coxas 0,3 grados: -0,090.<br>Nota del paso: unos +0,63.<br>Un intento de trote son unos 430 pasos. Para que la nota suba, la red tiene que avanzar más y a la vez inclinarse menos, ir derecho y corregir suave. Si se cae, pierde todos los +1 que le quedaban.<br>En una frase: avanza y no te caigas, pero sin inclinarte, sin desviarte, sin girar, sin sacudirte y sin alejarte mucho de la marcha base.</aside>
+</section>

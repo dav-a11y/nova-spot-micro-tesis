@@ -1,0 +1,60 @@
+{
+  "started_at": "2026-09-29T10:08:53.371619+00:00",
+  "purpose": "development_only_lateral_stability_with_smoothed_step_reference",
+  "gait": "step",
+  "training_seeds": [
+    11,
+    23,
+    37,
+    53,
+    71
+  ],
+  "timesteps_requested": 200000,
+  "episode_cycles_training": 5,
+  "ramp_duration_s": 1.0,
+  "control_dt_s": 0.02,
+  "gait_samples": 48,
+  "sample_duration_s": 0.12,
+  "steps_per_sample": 6,
+  "cycle_duration_s": 5.76,
+  "nominal_interpolation": "linear_at_control_rate",
+  "reference_max_waypoint_jump_rad": 0.049114793385375166,
+  "training_domain_randomization": true,
+  "environment": {
+    "attitude_weight": 32.0,
+    "stability_observation": true,
+    "lateral_weight": 64.0,
+    "yaw_weight": 32.0
+  },
+  "development_evaluation_seeds": [
+    801,
+    802,
+    803,
+    804,
+    805
+  ],
+  "evaluation_episodes": 5,
+  "evaluation_cycles": 20,
+  "evaluation_domain_randomization": false,
+  "reserved_final_evaluation_seeds": [
+    101,
+    202,
+    303,
+    404,
+    505
+  ],
+  "provisional_targets": {
+    "waypoint_jump_rad_max": 0.05,
+    "roll_pitch_rms_deg_max": 5.0,
+    "roll_pitch_abs_max_deg": 15.0,
+    "body_height_m": [
+      0.16,
+      0.32
+    ],
+    "joint_tracking_error_rms_rad_max": 0.05,
+    "joint_tracking_error_abs_rad_max": 0.15,
+    "source": "Documentacion/FICHA_APROBACION_PROTOCOLO.md",
+    "approval_status": "unsigned_provisional"
+  },
+  "hardware_transfer": false
+}

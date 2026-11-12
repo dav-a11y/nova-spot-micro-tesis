@@ -1,0 +1,27 @@
+{
+  "nota": "21-oct: corrección de la postura base respecto a la simulación (fémur: + = pie adelante; tibia: + = rodilla más doblada), medida con las cintas de colores por calibrar_postura_colores.py. 27-oct (operador, postura de trabajo desde ahora): el apoyo de las tibias 2 y 4 pasa a ser su BASE (166° y 144° de servo, en el firmware y en el ejecutor) y su movimiento va en sentido contrario al de las tibias 1 y 3 (SIGNO_TIBIA +1); ganancia_tibia multiplica el movimiento de cada tibia al dar el paso (1: 2,0; 2: 1,4; 3: 1,6; 4: 1,8); tope mínimo de la tibia 1 en 18°. ganancia_coxa multiplica el movimiento de cada coxa en el galope (27-oct: coxas traseras 3 y 4 a la mitad y delanteras fijas; con la 2 fija y la 1 moviéndose el galope retrocedía en simulación).",
+  "femur_offset_deg": {
+    "1": -20.1,
+    "2": -28.1,
+    "3": -28.4,
+    "4": -22.2
+  },
+  "tibia_offset_deg": {
+    "1": 60.0,
+    "2": 0.0,
+    "3": 17.9,
+    "4": 0.0
+  },
+  "ganancia_tibia": {
+    "1": 2.0,
+    "2": 1.4,
+    "3": 1.6,
+    "4": 1.8
+  },
+  "ganancia_coxa": {
+    "1": 0.0,
+    "2": 0.0,
+    "3": 0.5,
+    "4": 0.5
+  }
+}

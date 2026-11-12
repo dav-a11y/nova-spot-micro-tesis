@@ -1,0 +1,1219 @@
+/*
+  Prueba de movimiento lento del cuadrupedo suspendido.
+
+  Arduino Uno -> PCA9685 (I2C A4=SDA, A5=SCL), direccion 0x40.
+  Son servos POSICIONALES de 180 grados. No son servos de giro continuo.
+
+  Comandos por el monitor serie a 115200:
+    m : postura estatica y tres ciclos cortos de prueba.
+    p : ir solamente a la postura estatica.
+    c : calibracion: mueve un servo a la vez +/-8 grados y transmite ADC.
+    a : identificacion de coxas (CH0--CH3).
+    f : identificacion de femures (CH4--CH7).
+    l : identificacion de tibia 1 (inactiva) y tibia 3 (CH10).
+    t : tibia 2 a 90 y luego 25 grados, con vigilancia MUX C9.
+    e : prueba aislada de tibia 1 (CH12), +/-2 grados desde su centro.
+    z : prueba aislada de tibia 3 (CH10), +/-2 grados desde su centro.
+    y : secuencia parcial tipo paso en el aire, solo coxas 2-4 y femures.
+    g : tibia 4 hacia 150 y luego 15 grados, con vigilancia MUX C10.
+    h : sostener tibia 1 (CH12) en 100 grados, sin barrido.
+    j : sostener pata 1 (CH0/CH4/CH12) en sus centros, sin barrido.
+    n : prueba de tibia 1 por PCA CH12, con CH0/CH4 sosteniendo la pata.
+    o : paso minimo de pata 1 hacia atras: F1=110->112 y mantener, en CH0/CH12.
+    x : apagar inmediatamente las doce salidas PWM.
+
+  CH9 (tibia 2) permanece fuera de rutinas generales; solo se mueve con el
+  ensayo dedicado, gradual y vigilado por su señal local C9.
+*/
+
+#include <Wire.h>
+
+// Controlador minimo del PCA9685: evita depender de una biblioteca externa.
+class PCA9685 {
+ public:
+  explicit PCA9685(byte direccion) : direccion_(direccion) {}
+
+  void begin() {
+    Wire.begin();
+    escribirRegistro(0x00, 0x00); // MODE1: oscilador activo, sin auto-incremento
+    delay(5);
+  }
+
+  void setPWMFreq(float frecuencia) {
+    // Prescaler del PCA9685: 25 MHz / (4096 * frecuencia) - 1.
+    byte prescaler = (byte)(25000000.0 / (4096.0 * frecuencia) - 1.0 + 0.5);
+    byte modoAnterior = leerRegistro(0x00);
+    escribirRegistro(0x00, (modoAnterior & 0x7F) | 0x10); // SLEEP
+    escribirRegistro(0xFE, prescaler);
+    escribirRegistro(0x00, modoAnterior);
+    delay(5);
+    escribirRegistro(0x00, modoAnterior | 0xA1); // RESTART + auto-incremento
+  }
+
+  void setPWM(byte canal, int encendido, int apagado) {
+    if (canal > 15) return;
+    Wire.beginTransmission(direccion_);
+    Wire.write((byte)(0x06 + 4 * canal));
+    Wire.write((byte)(encendido & 0xFF));
+    Wire.write((byte)(encendido >> 8));
+    Wire.write((byte)(apagado & 0xFF));
+    Wire.write((byte)(apagado >> 8));
+    Wire.endTransmission();
+  }
+
+ private:
+  byte direccion_;
+
+  void escribirRegistro(byte registro, byte valor) {
+    Wire.beginTransmission(direccion_);
+    Wire.write(registro);
+    Wire.write(valor);
+    Wire.endTransmission();
+  }
+
+  byte leerRegistro(byte registro) {
+    Wire.beginTransmission(direccion_);
+    Wire.write(registro);
+    Wire.endTransmission();
+    Wire.requestFrom((int)direccion_, 1);
+    return Wire.available() ? Wire.read() : 0;
+  }
+};
+
+PCA9685 pca(0x40);
+
+const int PULSO_MIN = 102;
+const int PULSO_MAX = 512;
+const int FRECUENCIA_SERVO = 50;
+const byte NUM_SERVOS = 12;
+const byte PIN_SIG_MUX = A0;
+const byte PIN_S0_MUX = 8;  // verificado 16-oct con diagnostico_mux_pines: D8-D11 (el diagrama D7-D4 no corresponde)
+const byte PIN_S1_MUX = 9;
+const byte PIN_S2_MUX = 10;
+const byte PIN_S3_MUX = 11;
+const unsigned long PERIODO_TELEMETRIA_MS = 100;
+
+struct ServoPrueba {
+  const char *nombre;
+  byte canal;
+  int base;       // posicion estatica confirmada por el operador
+  int excursion;  // desplazamiento pequeno de la prueba
+  bool activo;
+};
+
+ServoPrueba servo[NUM_SERVOS] = {
+  {"Coxa 1",  0, 150, -5, false}, // BLOQUEADA: C0=93, fuera de la calibracion local; no ordenar a ciegas
+  {"Coxa 2",  1,  45,  5, true},  // 16-oct: operador indica que 40 queda muy abajo -> 45
+  {"Coxa 3",  2,  55,  5, true},
+  {"Coxa 4",  3, 150, -5, true},  // 16-oct: equilibrio indicado por el operador 147->150
+  {"Femur 1", 4, 110, -4, true},
+  {"Femur 2", 5, 100,  4, true},
+  {"Femur 3", 6, 100,  4, true},
+  {"Femur 4", 7, 100, -4, true},
+  {"Tibia 1", 8, 100,  4, false}, // 16-oct: reconectada; operador confirma CH8. Sensor C8 poco fiable.
+  {"Tibia 2",12,  80,  0, false}, // 16-oct: reconectada; operador confirma CH12. Sensor C9.
+  {"Tibia 3", 9, 100,  4, true},  // 16-oct: reconectada; operador confirma CH9. Sensor C11.
+  {"Tibia 4",11,  70, -4, false}, // 16-oct: operador confirma CH11. Sensor C10. CH10 vacio.
+};
+
+int ordenActual[NUM_SERVOS];
+const char *estadoActual = "OFF";
+unsigned long ultimaTelemetriaMs = 0;
+
+int limitarAngulo(int angulo) {
+  return constrain(angulo, 0, 180);
+}
+
+void escribirServo(byte canal, int angulo) {
+  angulo = limitarAngulo(angulo);
+  int pulso = map(angulo, 0, 180, PULSO_MIN, PULSO_MAX);
+  pca.setPWM(canal, 0, pulso);
+}
+
+void apagarTodos() {
+  for (byte canal = 0; canal < 16; ++canal) {
+    pca.setPWM(canal, 0, 4096); // FULL_OFF del PCA9685
+  }
+  estadoActual = "OFF";
+  Serial.println(F("PWM APAGADO: CH0--CH15"));
+}
+
+void seleccionarCanalMux(byte canal) {
+  digitalWrite(PIN_S0_MUX, bitRead(canal, 0));
+  digitalWrite(PIN_S1_MUX, bitRead(canal, 1));
+  digitalWrite(PIN_S2_MUX, bitRead(canal, 2));
+  digitalWrite(PIN_S3_MUX, bitRead(canal, 3));
+}
+
+int leerCanalMux(byte canal) {
+  seleccionarCanalMux(canal);
+  // El condensador de muestreo del ADC debe cargarse tras cambiar el 4067.
+  // Es importante cuando se lee el cursor de un potenciometro a traves del MUX.
+  delayMicroseconds(500);
+  for (byte descarte = 0; descarte < 3; ++descarte) analogRead(PIN_SIG_MUX);
+  long suma = 0;
+  for (byte muestra = 0; muestra < 8; ++muestra) suma += analogRead(PIN_SIG_MUX);
+  return suma / 8;
+}
+
+// Formato estable para la base de datos:
+// DATA,ms,estado,orden_CH0..orden_CH11,ADC_CH0..ADC_CH15
+void enviarTelemetriaSiCorresponde() {
+  unsigned long ahora = millis();
+  if (ahora - ultimaTelemetriaMs < PERIODO_TELEMETRIA_MS) return;
+  ultimaTelemetriaMs = ahora;
+
+  Serial.print(F("DATA,"));
+  Serial.print(ahora);
+  Serial.print(',');
+  Serial.print(estadoActual);
+  for (byte i = 0; i < NUM_SERVOS; ++i) {
+    Serial.print(',');
+    Serial.print(ordenActual[i]);
+  }
+  for (byte canal = 0; canal < 16; ++canal) {
+    Serial.print(',');
+    Serial.print(leerCanalMux(canal));
+  }
+  Serial.println();
+}
+
+bool paradaSolicitada() {
+  while (Serial.available()) {
+    char orden = Serial.read();
+    if (orden == 'x' || orden == 'X') {
+      apagarTodos();
+      return true;
+    }
+  }
+  return false;
+}
+
+bool esperarConParada(unsigned long milisegundos) {
+  unsigned long inicio = millis();
+  while (millis() - inicio < milisegundos) {
+    if (paradaSolicitada()) return true;
+    enviarTelemetriaSiCorresponde();
+    delay(5);
+  }
+  return false;
+}
+
+void posturaBase() {
+  Serial.println(F("Postura estatica: moviendo servos habilitados."));
+  for (byte i = 0; i < NUM_SERVOS; ++i) {
+    ordenActual[i] = servo[i].base;
+    if (servo[i].activo) escribirServo(servo[i].canal, ordenActual[i]);
+  }
+  // CH9 queda sin PWM; no se asume un limite seguro para tibia 2.
+  pca.setPWM(9, 0, 4096);
+  estadoActual = "STAND";
+}
+
+bool moverSuave(const int destino[NUM_SERVOS]) {
+  bool faltaMover = true;
+  while (faltaMover) {
+    faltaMover = false;
+    for (byte i = 0; i < NUM_SERVOS; ++i) {
+      if (!servo[i].activo) continue;
+      if (ordenActual[i] < destino[i]) {
+        ++ordenActual[i];
+        faltaMover = true;
+      } else if (ordenActual[i] > destino[i]) {
+        --ordenActual[i];
+        faltaMover = true;
+      }
+      escribirServo(servo[i].canal, ordenActual[i]);
+    }
+    if (paradaSolicitada()) return false;
+    enviarTelemetriaSiCorresponde();
+    delay(45); // cambio de 1 grado por paso: prueba lenta y visible
+  }
+  return true;
+}
+
+bool moverUnServoSuave(byte indice, int destino) {
+  destino = limitarAngulo(destino);
+  while (ordenActual[indice] != destino) {
+    if (ordenActual[indice] < destino) {
+      ++ordenActual[indice];
+    } else {
+      --ordenActual[indice];
+    }
+    escribirServo(servo[indice].canal, ordenActual[indice]);
+    if (paradaSolicitada()) return false;
+    enviarTelemetriaSiCorresponde();
+    delay(45);
+  }
+  return true;
+}
+
+// Identifica el canal MUX de cada servo sin alcanzar topes mecanicos.
+bool ejecutarCalibracionRango(byte primerIndice, byte ultimoIndice) {
+  // Ocho grados siguen lejos de los topes declarados de los once servos activos.
+  const int EXCURSION_CALIBRACION = 8;
+  // Centra solo el grupo solicitado. No mueve los otros grupos al iniciar.
+  for (byte i = primerIndice; i <= ultimoIndice; ++i) {
+    if (!servo[i].activo) continue;
+    ordenActual[i] = servo[i].base;
+    escribirServo(servo[i].canal, servo[i].base);
+  }
+  estadoActual = "CAL";
+  if (esperarConParada(2000)) return false;
+
+  for (byte i = primerIndice; i <= ultimoIndice; ++i) {
+    if (!servo[i].activo) continue;
+    Serial.print(F("CALIBRANDO "));
+    Serial.println(servo[i].nombre);
+    if (!moverUnServoSuave(i, servo[i].base + EXCURSION_CALIBRACION)) return false;
+    if (esperarConParada(1200)) return false;
+    if (!moverUnServoSuave(i, servo[i].base - EXCURSION_CALIBRACION)) return false;
+    if (esperarConParada(1200)) return false;
+    if (!moverUnServoSuave(i, servo[i].base)) return false;
+    if (esperarConParada(600)) return false;
+  }
+  estadoActual = "STAND";
+  Serial.println(F("CALIBRACION INDIVIDUAL TERMINADA"));
+  return true;
+}
+
+bool ejecutarCalibracionIndividual() {
+  return ejecutarCalibracionRango(0, NUM_SERVOS - 1);
+}
+
+bool probarTibia2HastaLimitesProximos();
+
+// Prueba aislada: CH9 (tibia 2), con vigilancia de C9.
+bool ejecutarPruebaTibias() {
+  return probarTibia2HastaLimitesProximos();
+}
+
+// Prueba local conservadora tras confirmacion visual de que la articulacion
+// fue colocada en su centro. No cambia el PWM ni la orden de las otras patas.
+bool ejecutarPruebaTibiaCorta(byte indice, int centro, const char *nombre,
+                              const char *estadoSostener) {
+  ordenActual[indice] = centro;
+  escribirServo(servo[indice].canal, centro);
+  estadoActual = "TIBIA_CENTER";
+  Serial.print(F("Prueba aislada +/-2 grados: "));
+  Serial.println(nombre);
+  if (esperarConParada(1500)) return false;
+
+  estadoActual = "TIBIA_TEST";
+  if (!moverUnServoSuave(indice, centro + 2) || esperarConParada(1200)) return false;
+  if (!moverUnServoSuave(indice, centro) || esperarConParada(800)) return false;
+  if (!moverUnServoSuave(indice, centro - 2) || esperarConParada(1200)) return false;
+  if (!moverUnServoSuave(indice, centro) || esperarConParada(800)) return false;
+
+  estadoActual = estadoSostener;
+  Serial.print(F("Prueba terminada; centro sostenido: "));
+  Serial.println(nombre);
+  return true;
+}
+
+// Avanza una tibia en tramos de hasta 2 grados. Su señal MUX debe cambiar en
+// el sentido medido localmente; si no responde, se corta ese canal PCA.
+bool moverTibiaVigilada(byte indice, byte canalMux, int objetivo,
+                        int minimoCambio, const char *estadoParada,
+                        const char *etiqueta) {
+  while (ordenActual[indice] != objetivo) {
+    int anterior = ordenActual[indice];
+    int diferencia = objetivo - anterior;
+    int paso = (abs(diferencia) >= 2) ? 2 : 1;
+    int siguiente = anterior + ((diferencia > 0) ? paso : -paso);
+    int adcAntes = leerCanalMux(canalMux);
+
+    if (!moverUnServoSuave(indice, siguiente) || esperarConParada(120)) {
+      return false;
+    }
+
+    int adcDespues = leerCanalMux(canalMux);
+    int avanceSensor = (siguiente > anterior)
+                         ? adcAntes - adcDespues
+                         : adcDespues - adcAntes;
+    int umbral = (abs(siguiente - anterior) == 1)
+                   ? max(1, minimoCambio / 2) : minimoCambio;
+
+    Serial.print(etiqueta);
+    Serial.print(',');
+    Serial.print(siguiente);
+    Serial.print(',');
+    Serial.print(adcDespues);
+    Serial.print(',');
+    Serial.println(avanceSensor);
+
+    if (avanceSensor < umbral) {
+      pca.setPWM(servo[indice].canal, 0, 4096);
+      estadoActual = estadoParada;
+      Serial.println(F("PARADA SEGURA: senal MUX no confirma movimiento; canal apagado."));
+      return false;
+    }
+  }
+  return true;
+}
+
+bool probarTibia2HastaLimitesProximos() {
+  const byte indice = 9;
+  const int centro = 80;
+
+  apagarTodos();
+  ordenActual[indice] = centro;
+  escribirServo(servo[indice].canal, centro);
+  estadoActual = "TIBIA2_CENTER";
+  Serial.println(F("Tibia 2: C9 vigilado, objetivo 90 y despues 25 grados."));
+  if (esperarConParada(1000)) return false;
+
+  estadoActual = "TIBIA2_TO_90";
+  if (!moverTibiaVigilada(indice, 9, 90, 3,
+                          "TIBIA2_FEEDBACK_STOP", "T2_GUARD")) return false;
+  estadoActual = "TIBIA2_AT_90";
+  if (esperarConParada(600)) return false;
+
+  estadoActual = "TIBIA2_TO_25";
+  if (!moverTibiaVigilada(indice, 9, 25, 3,
+                          "TIBIA2_FEEDBACK_STOP", "T2_GUARD")) return false;
+  estadoActual = "TIBIA2_AT_25";
+  if (esperarConParada(600)) return false;
+
+  apagarTodos();
+  Serial.println(F("Tibia 2 alcanzo ambos objetivos; todas las salidas OFF."));
+  return true;
+}
+
+bool probarTibia4HastaExtremosProximos() {
+  const byte indice = 11;
+  const int centro = 70;
+
+  apagarTodos();
+  ordenActual[indice] = centro;
+  escribirServo(servo[indice].canal, centro);
+  estadoActual = "TIBIA4_CENTER";
+  Serial.println(F("Tibia 4: C10 vigilado, objetivo 150 y despues 15 grados."));
+  if (esperarConParada(1000)) return false;
+
+  estadoActual = "TIBIA4_TO_150";
+  if (!moverTibiaVigilada(indice, 10, 150, 3,
+                          "TIBIA4_FEEDBACK_STOP", "T4_GUARD")) return false;
+  estadoActual = "TIBIA4_AT_150";
+  if (esperarConParada(600)) return false;
+
+  estadoActual = "TIBIA4_TO_15";
+  if (!moverTibiaVigilada(indice, 10, 15, 3,
+                          "TIBIA4_FEEDBACK_STOP", "T4_GUARD")) return false;
+  estadoActual = "TIBIA4_AT_15";
+  if (esperarConParada(600)) return false;
+
+  apagarTodos();
+  Serial.println(F("Tibia 4 alcanzo ambos objetivos; todas las salidas OFF."));
+  return true;
+}
+
+void sostenerTibia1EnCentro() {
+  ordenActual[8] = 100;
+  escribirServo(servo[8].canal, 100);
+  estadoActual = "HOLD_TIBIA1";
+  Serial.println(F("Tibia 1 CH12 sostenida en 100 grados; sin barrido."));
+}
+
+bool sostenerPata1EnCentros() {
+  // La coxa y el femur estabilizan la cadena para distinguir balanceo pasivo
+  // de la pata de una oscilacion propia de la tibia 1.
+  apagarTodos();
+  ordenActual[0] = 150;
+  escribirServo(0, 150);
+  estadoActual = "PATA1_COXA";
+  if (esperarConParada(1200)) return false;
+
+  ordenActual[4] = 110;
+  escribirServo(4, 110);
+  estadoActual = "PATA1_FEMUR";
+  if (esperarConParada(1200)) return false;
+
+  ordenActual[8] = 100;
+  escribirServo(servo[8].canal, 100);
+  estadoActual = "HOLD_PATA1";
+  Serial.println(F("Pata 1 sostenida: CH0=150, CH4=110, tibia1 CH12=100; sin barrido."));
+  return true;
+}
+
+bool moverIndicePorCanal(byte indice, byte canalPca, int destino) {
+  destino = limitarAngulo(destino);
+  while (ordenActual[indice] != destino) {
+    if (ordenActual[indice] < destino) ++ordenActual[indice];
+    else --ordenActual[indice];
+    escribirServo(canalPca, ordenActual[indice]);
+    if (paradaSolicitada()) return false;
+    enviarTelemetriaSiCorresponde();
+    delay(45);
+  }
+  return true;
+}
+
+bool probarTibia1EnCanal12() {
+  const byte CANAL_TIBIA1 = servo[8].canal;
+  apagarTodos();
+
+  ordenActual[0] = 150;
+  escribirServo(0, 150);
+  estadoActual = "PATA1_COXA";
+  if (esperarConParada(1200)) return false;
+
+  ordenActual[4] = 110;
+  escribirServo(4, 110);
+  estadoActual = "PATA1_FEMUR";
+  if (esperarConParada(1200)) return false;
+
+  ordenActual[8] = 100;
+  escribirServo(CANAL_TIBIA1, 100);
+  estadoActual = "TIBIA1_CH12_CENTER";
+  if (esperarConParada(1500)) return false;
+
+  estadoActual = "TIBIA1_CH12_TEST";
+  if (!moverIndicePorCanal(8, CANAL_TIBIA1, 102) ||
+      esperarConParada(1200)) return false;
+  if (!moverIndicePorCanal(8, CANAL_TIBIA1, 100) ||
+      esperarConParada(800)) return false;
+  if (!moverIndicePorCanal(8, CANAL_TIBIA1, 98) ||
+      esperarConParada(1200)) return false;
+  if (!moverIndicePorCanal(8, CANAL_TIBIA1, 100) ||
+      esperarConParada(800)) return false;
+
+  estadoActual = "HOLD_PATA1_CH12";
+  Serial.println(F("Fin CH12: CH0=150, CH4=110, tibia1 CH12=100."));
+  return true;
+}
+
+bool llevarPata1AtrasYVolver() {
+  const byte CANAL_TIBIA1 = servo[8].canal;
+  apagarTodos();
+
+  ordenActual[0] = 150;
+  escribirServo(0, 150);
+  estadoActual = "PATA1_COXA";
+  if (esperarConParada(1200)) return false;
+
+  ordenActual[4] = 110;
+  escribirServo(4, 110);
+  estadoActual = "PATA1_FEMUR_CENTER";
+  if (esperarConParada(1200)) return false;
+
+  ordenActual[8] = 100;
+  escribirServo(CANAL_TIBIA1, 100);
+  estadoActual = "PATA1_TIBIA_CENTER";
+  if (esperarConParada(1200)) return false;
+
+  estadoActual = "PATA1_BACKWARD_SMALL_STEP";
+  if (!moverIndicePorCanal(4, 4, 112) || esperarConParada(300)) return false;
+
+  estadoActual = "HOLD_PATA1_BACKWARD_112";
+  Serial.println(F("Paso minimo: CH4=112; mantener, sin retorno automatico."));
+  return true;
+}
+
+bool ejecutarPrueba() {
+  posturaBase();
+  estadoActual = "TEST";
+  if (esperarConParada(2500)) return false;
+
+  for (byte ciclo = 0; ciclo < 3; ++ciclo) {
+    int objetivo[NUM_SERVOS];
+    for (byte i = 0; i < NUM_SERVOS; ++i) {
+      objetivo[i] = servo[i].base + servo[i].excursion;
+    }
+    Serial.print(F("Ciclo "));
+    Serial.print(ciclo + 1);
+    Serial.println(F("/3: desplazamiento pequeno."));
+    if (!moverSuave(objetivo) || esperarConParada(700)) return false;
+
+    for (byte i = 0; i < NUM_SERVOS; ++i) {
+      objetivo[i] = servo[i].base - servo[i].excursion;
+    }
+    if (!moverSuave(objetivo) || esperarConParada(700)) return false;
+
+    for (byte i = 0; i < NUM_SERVOS; ++i) objetivo[i] = servo[i].base;
+    if (!moverSuave(objetivo) || esperarConParada(700)) return false;
+  }
+
+  Serial.println(F("Prueba terminada. Plataforma en postura estatica."));
+  return true;
+}
+
+// Prueba mas controlada: servo por servo y agrupada por pata, +/-2 grados.
+// Tibia 2 y tibia 4 permanecen excluidas mientras no se habiliten expresamente.
+bool ejecutarPruebaSecuencialControlada() {
+  const byte ordenPorPata[] = {0, 4, 8, 1, 5, 9, 2, 6, 10, 3, 7, 11};
+  const int excursion = 2;
+
+  posturaBase();
+  estadoActual = "SEQ";
+  if (esperarConParada(1500)) return false;
+
+  for (byte posicion = 0; posicion < NUM_SERVOS; ++posicion) {
+    byte indice = ordenPorPata[posicion];
+    if (!servo[indice].activo) continue;
+
+    Serial.print(F("Movimiento controlado: "));
+    Serial.println(servo[indice].nombre);
+    if (!moverUnServoSuave(indice, servo[indice].base + excursion)) return false;
+    if (esperarConParada(600)) return false;
+    if (!moverUnServoSuave(indice, servo[indice].base - excursion)) return false;
+    if (esperarConParada(600)) return false;
+    if (!moverUnServoSuave(indice, servo[indice].base)) return false;
+    if (esperarConParada(500)) return false;
+  }
+
+  estadoActual = "STAND";
+  Serial.println(F("Prueba secuencial terminada; articulaciones en centro."));
+  return true;
+}
+
+// Prueba exclusiva de coxas 2 y 3: coxa 1 se omite porque su ADC C0 no
+// concuerda con la calibracion local. No se llama posturaBase(), que moveria
+// otras articulaciones. Coxa 4 queda fuera mientras se verifica su caida por
+// gravedad. Rampa por escalones de 2 grados hasta +/-16 grados.
+bool ejecutarPruebaCoxasPequena() {
+  const byte indices[] = {1, 2};
+  const int excursionMaxima = 16;
+  apagarTodos();
+  estadoActual = "COXA";
+
+  for (byte k = 0; k < 2; ++k) {
+    byte i = indices[k];
+    ordenActual[i] = servo[i].base;
+    escribirServo(servo[i].canal, servo[i].base);
+    Serial.print(F("COXA centrada: "));
+    Serial.println(servo[i].nombre);
+    if (esperarConParada(1000)) return false;
+  }
+
+  for (byte k = 0; k < 2; ++k) {
+    byte i = indices[k];
+    Serial.print(F("Rampa coxa en pasos de 2 grados hasta +/-16: "));
+    Serial.println(servo[i].nombre);
+    for (int excursion = 2; excursion <= excursionMaxima; excursion += 2) {
+      if (!moverUnServoSuave(i, servo[i].base + excursion)) return false;
+      if (esperarConParada(1200)) return false;
+    }
+    if (!moverUnServoSuave(i, servo[i].base)) return false;
+    if (esperarConParada(800)) return false;
+    for (int excursion = 2; excursion <= excursionMaxima; excursion += 2) {
+      if (!moverUnServoSuave(i, servo[i].base - excursion)) return false;
+      if (esperarConParada(1200)) return false;
+    }
+    if (!moverUnServoSuave(i, servo[i].base)) return false;
+    if (esperarConParada(800)) return false;
+  }
+
+  // Conserva el PWM de CH1/CH2 para sostener la carga contra la gravedad.
+  // Coxas 1 y 4, y las demas articulaciones, permanecen sin PWM.
+  estadoActual = "HOLD_COXA";
+  Serial.println(F("Prueba terminada; coxas 2 y 3 en centro y con PWM de sostén. Coxas 1 y 4 sin mover."));
+  return true;
+}
+
+// Recuperacion prudente de coxa 4 (PCA CH3, MUX C2) tras desplazarse por
+// gravedad al cortar PWM. ADC~198 corresponde localmente a 147 grados; una
+// lectura menor estima una posicion mayor. La estimacion solo sirve para
+// acercarse: se valida la respuesta del potenciometro en pasos de 1 grado.
+bool recuperarCoxa4HaciaCentro() {
+  const byte indice = 3;
+  const byte muxCoxa4 = 2;
+  const int adcCentroLocal = 198;
+  const float cuentasPorGrado = 2.35f;
+  const int adcInicial = leerCanalMux(muxCoxa4);
+
+  Serial.print(F("COXA4 ADC inicial C2="));
+  Serial.println(adcInicial);
+  if (adcInicial < 30 || adcInicial > 900 || adcInicial >= adcCentroLocal) {
+    Serial.println(F("COXA4 sin movimiento: la lectura no coincide con la caida esperada."));
+    return false;
+  }
+
+  int anguloEstimado = servo[indice].base + (int)((adcCentroLocal - adcInicial) / cuentasPorGrado + 0.5f);
+  anguloEstimado = constrain(anguloEstimado, servo[indice].base, 176);
+  ordenActual[indice] = anguloEstimado;
+  escribirServo(servo[indice].canal, anguloEstimado);
+  estadoActual = "COXA4_INICIO";
+  Serial.print(F("COXA4 punto inicial aproximado="));
+  Serial.println(anguloEstimado);
+  if (esperarConParada(1000)) return false;
+
+  int adcPrevio = leerCanalMux(muxCoxa4);
+  if (abs(adcPrevio - adcInicial) > 18) {
+    estadoActual = "COXA4_HOLD_CHECK";
+    Serial.print(F("COXA4 detenida para revisar: cambio inicial ADC="));
+    Serial.println(adcPrevio - adcInicial);
+    return false; // deja CH3 energizado, no libera la articulacion
+  }
+
+  byte pasosSinRespuesta = 0;
+  while (ordenActual[indice] > servo[indice].base) {
+    int siguiente = max(servo[indice].base, ordenActual[indice] - 1);
+    if (!moverUnServoSuave(indice, siguiente)) return false;
+    if (esperarConParada(350)) return false;
+    int adcActual = leerCanalMux(muxCoxa4);
+    int delta = adcActual - adcPrevio; // al bajar el angulo, C2 debe subir
+    Serial.print(F("COXA4 paso="));
+    Serial.print(ordenActual[indice]);
+    Serial.print(F(" ADC="));
+    Serial.print(adcActual);
+    Serial.print(F(" delta="));
+    Serial.println(delta);
+    if (delta < -1 || delta > 10) {
+      estadoActual = "COXA4_HOLD_CHECK";
+      Serial.println(F("COXA4 detenida: respuesta ADC inesperada; CH3 queda sosteniendo."));
+      return false;
+    }
+    if (delta <= 0) {
+      ++pasosSinRespuesta;
+      if (pasosSinRespuesta >= 3) {
+        estadoActual = "COXA4_HOLD_CHECK";
+        Serial.println(F("COXA4 detenida: ADC sin respuesta durante 3 pasos; CH3 queda sosteniendo."));
+        return false;
+      }
+    } else {
+      pasosSinRespuesta = 0;
+    }
+    adcPrevio = adcActual;
+  }
+
+  if (abs(adcPrevio - adcCentroLocal) > 20) {
+    estadoActual = "COXA4_HOLD_CHECK";
+    Serial.println(F("COXA4 en pausa cerca del centro, pero ADC fuera de tolerancia; CH3 sostiene."));
+    return false;
+  }
+  estadoActual = "HOLD_COXA4";
+  Serial.println(F("COXA4 centrada y sostenida por PWM; otras salidas apagadas."));
+  return true;
+}
+
+// Caracteriza coxa 4 en un intervalo local creciente. Si la señal
+// deja de responder o cambia al sentido incorrecto, detiene el barrido y
+// mantiene CH3 energizado en la posición alcanzada.
+bool ejecutarBarridoCoxa4() {
+  if (!recuperarCoxa4HaciaCentro()) return false;
+  const byte indice = 3;
+  const byte muxCoxa4 = 2;
+  const int excursionMaxima = 20;
+  int adcPrevio = leerCanalMux(muxCoxa4);
+  byte pasosSinRespuesta = 0;
+  estadoActual = "COXA4_TEST";
+
+  for (int direccion = 1; direccion >= -1; direccion -= 2) {
+    for (int excursion = 2; excursion <= excursionMaxima; excursion += 2) {
+      int objetivo = servo[indice].base + direccion * excursion;
+      if (!moverUnServoSuave(indice, objetivo)) return false;
+      if (esperarConParada(1200)) return false;
+      int adcActual = leerCanalMux(muxCoxa4);
+      int delta = direccion > 0 ? adcPrevio - adcActual : adcActual - adcPrevio;
+      Serial.print(F("COXA4 barrido angulo="));
+      Serial.print(objetivo);
+      Serial.print(F(" ADC="));
+      Serial.print(adcActual);
+      Serial.print(F(" respuesta="));
+      Serial.println(delta);
+      if (delta < -1 || delta > 18) {
+        estadoActual = "COXA4_HOLD_CHECK";
+        Serial.println(F("Barrido coxa4 detenido por respuesta inesperada; CH3 sostiene."));
+        return false;
+      }
+      if (delta <= 0) {
+        if (++pasosSinRespuesta >= 2) {
+          estadoActual = "COXA4_HOLD_CHECK";
+          Serial.println(F("Barrido coxa4 detenido por falta de respuesta; CH3 sostiene."));
+          return false;
+        }
+      } else {
+        pasosSinRespuesta = 0;
+      }
+      adcPrevio = adcActual;
+    }
+    if (!moverUnServoSuave(indice, servo[indice].base)) return false;
+    if (esperarConParada(800)) return false;
+    adcPrevio = leerCanalMux(muxCoxa4);
+    pasosSinRespuesta = 0;
+    if (abs(adcPrevio - 198) > 20) {
+      estadoActual = "COXA4_HOLD_CHECK";
+      Serial.println(F("Barrido coxa4 detenido: retorno fuera de tolerancia; CH3 sostiene."));
+      return false;
+    }
+  }
+  estadoActual = "HOLD_COXA4";
+  Serial.println(F("Barrido coxa4 +/-8 terminado; CH3 sostiene el centro."));
+  return true;
+}
+
+// Primera identificacion segura de los cuatro femures: pulsos de ±2°,
+// individuales y con pausas para asociar la respuesta ADC de cada MUX.
+bool ejecutarPruebaFemuresPequena() {
+  const byte indices[] = {4, 5, 6, 7};
+  apagarTodos();
+  estadoActual = "FEMUR_CENTER";
+  for (byte k = 0; k < 4; ++k) {
+    byte i = indices[k];
+    ordenActual[i] = servo[i].base;
+    escribirServo(servo[i].canal, servo[i].base);
+    Serial.print(F("FEMUR centro: "));
+    Serial.println(servo[i].nombre);
+    if (esperarConParada(900)) return false;
+  }
+
+  estadoActual = "FEMUR_TEST";
+  for (byte k = 0; k < 4; ++k) {
+    byte i = indices[k];
+    Serial.print(F("FEMUR pulso +/-2: "));
+    Serial.println(servo[i].nombre);
+    if (!moverUnServoSuave(i, servo[i].base + 2)) return false;
+    if (esperarConParada(1000)) return false;
+    if (!moverUnServoSuave(i, servo[i].base - 2)) return false;
+    if (esperarConParada(1000)) return false;
+    if (!moverUnServoSuave(i, servo[i].base)) return false;
+    if (esperarConParada(1000)) return false;
+  }
+
+  estadoActual = "HOLD_FEMURES";
+  Serial.println(F("Prueba inicial de femures terminada; CH4-CH7 sostienen el centro."));
+  return true;
+}
+
+// Ampliacion gradual de la identificacion femoral: ±2, ±4, ±6, ±8°,
+// articulacion por articulacion, retornando al centro entre sentidos.
+bool ejecutarBarridoFemures() {
+  const byte indices[] = {4, 5, 6, 7};
+  const int excursionMaxima = 8;
+  apagarTodos();
+  estadoActual = "FEMUR_CENTER";
+  for (byte k = 0; k < 4; ++k) {
+    byte i = indices[k];
+    ordenActual[i] = servo[i].base;
+    escribirServo(servo[i].canal, servo[i].base);
+    Serial.print(F("FEMUR centro: "));
+    Serial.println(servo[i].nombre);
+    if (esperarConParada(900)) return false;
+  }
+
+  for (byte k = 0; k < 4; ++k) {
+    byte i = indices[k];
+    Serial.print(F("FEMUR barrido +/-8: "));
+    Serial.println(servo[i].nombre);
+    estadoActual = "FEMUR_TEST";
+    for (int direccion = 1; direccion >= -1; direccion -= 2) {
+      for (int excursion = 2; excursion <= excursionMaxima; excursion += 2) {
+        int objetivo = servo[i].base + direccion * excursion;
+        if (!moverUnServoSuave(i, objetivo)) return false;
+        if (esperarConParada(800)) return false;
+      }
+      if (!moverUnServoSuave(i, servo[i].base)) return false;
+      if (esperarConParada(700)) return false;
+    }
+  }
+
+  estadoActual = "HOLD_FEMURES";
+  Serial.println(F("Barrido de femures terminado; CH4-CH7 sostienen el centro."));
+  return true;
+}
+
+// Solo los femures 1 y 3 carecen de canal MUX identificado. Se amplian hasta
+// ±16° en pasos de 2°, manteniendo los cuatro femures centrados al terminar.
+bool ejecutarPruebaFemuresSinMapa() {
+  const byte todos[] = {4, 5, 6, 7};
+  const byte sinMapa[] = {4, 6};
+  const int excursionMaxima = 16;
+  apagarTodos();
+  estadoActual = "FEMUR_CENTER";
+  for (byte k = 0; k < 4; ++k) {
+    byte i = todos[k];
+    ordenActual[i] = servo[i].base;
+    escribirServo(servo[i].canal, servo[i].base);
+    Serial.print(F("FEMUR centro: "));
+    Serial.println(servo[i].nombre);
+    if (esperarConParada(900)) return false;
+  }
+
+  for (byte k = 0; k < 2; ++k) {
+    byte i = sinMapa[k];
+    Serial.print(F("FEMUR sin mapa, barrido hasta +/-16: "));
+    Serial.println(servo[i].nombre);
+    estadoActual = "FEMUR_TEST";
+    for (int direccion = 1; direccion >= -1; direccion -= 2) {
+      for (int excursion = 2; excursion <= excursionMaxima; excursion += 2) {
+        int objetivo = servo[i].base + direccion * excursion;
+        if (!moverUnServoSuave(i, objetivo)) return false;
+        if (esperarConParada(800)) return false;
+      }
+      if (!moverUnServoSuave(i, servo[i].base)) return false;
+      if (esperarConParada(800)) return false;
+    }
+  }
+
+  estadoActual = "HOLD_FEMURES";
+  Serial.println(F("Barrido F1/F3 terminado; CH4-CH7 sostienen el centro."));
+  return true;
+}
+
+// Ensayo visual de coordinacion tipo paso con el robot suspendido. Las tibias
+// quedan siempre sin PWM y coxa 1 se omite por su lectura C0 no validada.
+// No es una marcha apoyada ni reproduce una politica PPO.
+bool ejecutarPasoParcialEnAire() {
+  const byte participantes[] = {1, 2, 3, 4, 5, 6, 7}; // C2-C4 y F1-F4
+  apagarTodos();
+  for (byte k = 0; k < sizeof(participantes); ++k) {
+    byte i = participantes[k];
+    ordenActual[i] = servo[i].base;
+    escribirServo(servo[i].canal, servo[i].base);
+  }
+  // Refuerza explicitamente que ninguna tibia ni coxa 1 reciba PWM.
+  for (byte canal = 8; canal <= 11; ++canal) pca.setPWM(canal, 0, 4096);
+  pca.setPWM(12, 0, 4096);
+  estadoActual = "PASO_PARCIAL_CENTRO";
+  Serial.println(F("Paso parcial en aire: solo C2-C4 y F1-F4; tibias y C1 apagadas."));
+  if (esperarConParada(1000)) return false;
+
+  for (byte ciclo = 0; ciclo < 2; ++ciclo) {
+    for (int signo = 1; signo >= -1; signo -= 2) {
+      int destino[NUM_SERVOS];
+      for (byte i = 0; i < NUM_SERVOS; ++i) destino[i] = servo[i].base;
+      // Alternancia diagonal de amplitud minima alrededor de las referencias.
+      destino[3] = servo[3].base + signo * 2; // coxa 4
+      destino[1] = servo[1].base - signo * 2; // coxa 2
+      destino[2] = servo[2].base - signo * 2; // coxa 3
+      destino[4] = servo[4].base + signo * 2; // femur 1
+      destino[7] = servo[7].base + signo * 2; // femur 4
+      destino[5] = servo[5].base - signo * 2; // femur 2
+      destino[6] = servo[6].base - signo * 2; // femur 3
+      estadoActual = (signo > 0) ? "PASO_PARCIAL_DIAGONAL_A" : "PASO_PARCIAL_DIAGONAL_B";
+      for (byte k = 0; k < sizeof(participantes); ++k) {
+        byte i = participantes[k];
+        if (!moverUnServoSuave(i, destino[i])) return false;
+      }
+      if (esperarConParada(500)) return false;
+    }
+  }
+
+  for (byte k = 0; k < sizeof(participantes); ++k) {
+    byte i = participantes[k];
+    if (!moverUnServoSuave(i, servo[i].base)) return false;
+  }
+  apagarTodos();
+  Serial.println(F("Secuencia parcial terminada; PWM apagado."));
+  return true;
+}
+
+// Gateo demostrativo EN EL AIRE (robot suspendido), lazo abierto.
+// Orden FL(2) -> RR(3) -> FR(1) -> RL(4). Femures +/-6 grados; tibias +/-2..3
+// dentro de lo ya probado. Las cuatro coxas sostienen su punto de equilibrio.
+// No es una marcha apoyada ni esta validada para el suelo.
+
+// 16-oct: sosten realimentado de coxas 2-4 durante la caminata. Si el
+// potenciometro se aleja de su lectura de equilibrio, corrige la orden 1 grado
+// (ADC sube cuando el angulo baja, ~-2.4 cuentas/grado), con limite +/-6.
+const byte COXA_IDX[3] = {1, 2, 3};
+const byte COXA_MUX[3] = {1, 3, 2};
+int coxaRefAdc[3];
+float coxaFiltro[3];
+unsigned long ultimaCorreccionCoxasMs = 0;
+void capturarReferenciaCoxas() {
+  for (byte k = 0; k < 3; ++k) {
+    long sum = 0;
+    for (byte n = 0; n < 4; ++n) sum += leerCanalMux(COXA_MUX[k]);
+    coxaRefAdc[k] = sum / 4;
+    coxaFiltro[k] = coxaRefAdc[k];
+  }
+}
+// Corrige solo la deriva lenta (caida por peso). Las caidas breves del paso se
+// atenuan con un promedio movil; las lecturas que saltan > 40 cuentas se ignoran.
+void corregirCoxas() {
+  for (byte k = 0; k < 3; ++k) {
+    int adc = leerCanalMux(COXA_MUX[k]);
+    if (adc < 30 || adc > 950) continue;
+    if (abs(adc - coxaFiltro[k]) > 40) continue;
+    coxaFiltro[k] = 0.85f * coxaFiltro[k] + 0.15f * adc;
+  }
+  if (millis() - ultimaCorreccionCoxasMs < 200) return;
+  ultimaCorreccionCoxasMs = millis();
+  for (byte k = 0; k < 3; ++k) {
+    byte i = COXA_IDX[k];
+    if (coxaRefAdc[k] < 30 || coxaRefAdc[k] > 950) continue;
+    float err = coxaFiltro[k] - coxaRefAdc[k];
+    int nuevo = ordenActual[i];
+    if (err > 4) nuevo += 1;
+    else if (err < -4) nuevo -= 1;
+    nuevo = constrain(nuevo, servo[i].base - 6, servo[i].base + 6);
+    if (nuevo != ordenActual[i]) {
+      ordenActual[i] = nuevo;
+      escribirServo(servo[i].canal, nuevo);
+    }
+  }
+}
+// 16-oct: 40 ms (0,8 s/fase) -> 25 ms (0,5 s/fase) tras medir seguimiento de F2/F4.
+const int PAUSA_PASO_CAMINATA_MS = 25;
+bool ejecutarCaminataEnAire() {
+  const int A = 15;                                  // amplitud femur (16-oct: 6->10->15)
+  const int signoFemur[5] = {0, -1, 1, -1, 1};       // sentido "adelante" por pata
+  const int signoTibia[5] = {0, -1, -1, -1, -1};  // 16-oct: T4 invertida (70->56), tramo donde si respondio
+  const int ampTibia[5]   = {0, 14, 14, 14, 14};
+  const byte ordenPatas[4] = {2, 3, 1, 4};
+  // 16-oct: las cuatro coxas se sostienen fijas en sus puntos de equilibrio
+  // (C1=150, C2=45, C3=55, C4=150), incluida la coxa 1 (CH0).
+  const byte arranque[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}; // indices servo
+  float offset[5];
+  int base[NUM_SERVOS];
+  for (byte i = 0; i < NUM_SERVOS; ++i) base[i] = servo[i].base;
+
+  apagarTodos();
+  estadoActual = "CAMINATA_ARRANQUE";
+  Serial.println(F("Caminata en aire: energizando articulaciones una por una."));
+  for (byte k = 0; k < sizeof(arranque); ++k) {
+    byte i = arranque[k];
+    ordenActual[i] = base[i];
+    escribirServo(servo[i].canal, base[i]);
+    if (esperarConParada(300)) return false;
+  }
+
+  if (esperarConParada(500)) return false;
+  capturarReferenciaCoxas();
+  // Desfase inicial de cada pata dentro del ciclo de cuatro fases.
+  for (byte k = 0; k < 4; ++k) offset[ordenPatas[k]] = -A + k * (2.0f * A / 3.0f);
+
+  // Rampa desde el centro hasta el desfase inicial.
+  const byte PASOS = 20;
+  for (byte s = 1; s <= PASOS; ++s) {
+    for (byte pata = 1; pata <= 4; ++pata) {
+      byte f = 3 + pata;
+      ordenActual[f] = base[f] + (int)round(signoFemur[pata] * offset[pata] * s / PASOS);
+      escribirServo(servo[f].canal, ordenActual[f]);
+    }
+    if (esperarConParada(40)) return false;
+  }
+
+  for (byte ciclo = 0; ciclo < 10; ++ciclo) {  // 16-oct: 4 -> 10 ciclos
+    Serial.print(F("Caminata ciclo ")); Serial.println(ciclo + 1);
+    for (byte fase = 0; fase < 4; ++fase) {
+      byte vuela = ordenPatas[fase];
+      estadoActual = "CAMINATA_FASE";
+      float inicio[5];
+      for (byte pata = 1; pata <= 4; ++pata) inicio[pata] = offset[pata];
+      for (byte s = 1; s <= PASOS; ++s) {
+        float t = (float)s / PASOS;
+        for (byte pata = 1; pata <= 4; ++pata) {
+          float o;
+          int tib = 0;
+          if (pata == vuela) {
+            o = inicio[pata] + (2.0f * A) * t;                 // -A -> +A
+            tib = (int)round(signoTibia[pata] * ampTibia[pata] * sin(PI * t));
+          } else {
+            o = inicio[pata] - (2.0f * A / 3.0f) * t;          // empuje hacia atras
+          }
+          offset[pata] = o;
+          byte f = 3 + pata, ti = 7 + pata;
+          ordenActual[f] = base[f] + (int)round(signoFemur[pata] * o);
+          escribirServo(servo[f].canal, ordenActual[f]);
+          ordenActual[ti] = base[ti] + tib;
+          escribirServo(servo[ti].canal, ordenActual[ti]);
+        }
+        corregirCoxas();
+        if (esperarConParada(PAUSA_PASO_CAMINATA_MS)) return false;
+      }
+      if (esperarConParada(150)) return false;
+    }
+  }
+
+  // Regreso al centro y apagado.
+  for (byte s = 1; s <= PASOS; ++s) {
+    for (byte pata = 1; pata <= 4; ++pata) {
+      byte f = 3 + pata;
+      ordenActual[f] = base[f] + (int)round(signoFemur[pata] * offset[pata] * (PASOS - s) / PASOS);
+      escribirServo(servo[f].canal, ordenActual[f]);
+    }
+    if (esperarConParada(40)) return false;
+  }
+  if (esperarConParada(800)) return false;
+  // 16-oct: no soltar las coxas (la coxa 2 cae por su peso). Se apagan solo
+  // femures y tibias; las cuatro coxas quedan sostenidas en equilibrio.
+  for (byte i = 4; i < NUM_SERVOS; ++i) pca.setPWM(servo[i].canal, 0, 4096);
+  estadoActual = "HOLD_EQUILIBRIO";
+  Serial.println(F("Caminata terminada; coxas sostenidas en equilibrio, femures y tibias sin PWM."));
+  return true;
+}
+
+// Identificacion de tibias: recorre PCA CH9..CH15 uno por uno. Cada canal va a
+// 90 grados y oscila +/-8 grados (CH9 1 vez, CH10 2 veces, ... CH15 7 veces) para
+// que el operador lo reconozca. Apaga cada canal antes de pasar al siguiente.
+int ordenIdent = 0;
+bool moverCanalSuave(byte canal, int desde, int hasta) {
+  int paso = (hasta > desde) ? 1 : -1;
+  for (int a = desde; a != hasta; a += paso) {
+    ordenIdent = a + paso;
+    escribirServo(canal, ordenIdent);
+    if (esperarConParada(45)) return false;
+  }
+  return true;
+}
+bool identificarCanalesTibias() {
+  apagarTodos();
+  static char estado[12];
+  for (byte canal = 9; canal <= 15; ++canal) {
+    byte veces = canal - 8;
+    snprintf(estado, sizeof(estado), "IDENT_CH%d", canal);
+    estadoActual = estado;
+    Serial.print(F("IDENTIFICANDO CH")); Serial.print(canal);
+    Serial.print(F(" oscilaciones=")); Serial.println(veces);
+    ordenIdent = 90;
+    escribirServo(canal, 90);
+    if (esperarConParada(1000)) return false;
+    for (byte v = 0; v < veces; ++v) {
+      if (!moverCanalSuave(canal, 90, 98)) return false;
+      if (!moverCanalSuave(canal, 98, 82)) return false;
+      if (!moverCanalSuave(canal, 82, 90)) return false;
+      if (esperarConParada(250)) return false;
+    }
+    pca.setPWM(canal, 0, 4096);
+    estadoActual = "IDENT_PAUSA";
+    if (esperarConParada(2000)) return false;
+  }
+  apagarTodos();
+  Serial.println(F("Identificacion CH9-CH15 terminada; PWM apagado."));
+  return true;
+}
+
+// Prueba de un solo canal PCA para identificacion visual por el operador.
+bool probarUnCanal(byte canal) {
+  apagarTodos();
+  static char estado[14];
+  snprintf(estado, sizeof(estado), "UNO_CH%d", canal);
+  estadoActual = estado;
+  Serial.print(F("PROBANDO SOLO CH")); Serial.println(canal);
+  // 16-oct: amplitud ampliada a +/-20 grados alrededor de 70 (50-90), dentro de
+  // los limites declarados de las cuatro tibias.
+  ordenIdent = 70;
+  escribirServo(canal, 70);
+  if (esperarConParada(1000)) return false;
+  for (byte v = 0; v < 3; ++v) {
+    if (!moverCanalSuave(canal, 70, 90)) return false;
+    if (!moverCanalSuave(canal, 90, 50)) return false;
+    if (!moverCanalSuave(canal, 50, 70)) return false;
+    if (esperarConParada(300)) return false;
+  }
+  apagarTodos();
+  return true;
+}
+
+// Prueba amplia de un canal (16-oct): centro y amplitud configurables.
+bool probarCanalAmplio(byte canal, int centro, int amp) {
+  apagarTodos();
+  static char estado[16];
+  snprintf(estado, sizeof(estado), "AMPLIO_CH%d", canal);
+  estadoActual = estado;
+  Serial.print(F("PRUEBA AMPLIA CH")); Serial.println(canal);
+  ordenIdent = centro;
+  escribirServo(canal, centro);
+  if (esperarConParada(1000)) return false;
+  for (byte v = 0; v < 3; ++v) {
+    if (!moverCanalSuave(canal, centro, centro + amp)) return false;
+    if (!moverCanalSuave(canal, centro + amp, centro - amp)) return false;
+    if (!moverCanalSuave(canal, centro - amp, centro)) return false;
+    if (esperarConParada(300)) return false;
+  }
+  apagarTodos();
+  return true;
+}
+
+// Sostiene solo las cuatro coxas en sus puntos de equilibrio, sin caminar.
+void sostenerCoxasEquilibrio() {
+  apagarTodos();
+  for (byte i = 0; i < 4; ++i) {
+    ordenActual[i] = servo[i].base;
+    escribirServo(servo[i].canal, servo[i].base);
+    if (esperarConParada(300)) return;
+  }
+  estadoActual = "HOLD_EQUILIBRIO";
+  Serial.println(F("Coxas sostenidas en equilibrio."));
+}
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(PIN_S0_MUX, OUTPUT);
+  pinMode(PIN_S1_MUX, OUTPUT);
+  pinMode(PIN_S2_MUX, OUTPUT);
+  pinMode(PIN_S3_MUX, OUTPUT);
+  seleccionarCanalMux(0);
+  for (byte i = 0; i < NUM_SERVOS; ++i) ordenActual[i] = servo[i].base;
+  pca.begin();
+  pca.setPWMFreq(FRECUENCIA_SERVO);
+  delay(10);
+  apagarTodos();
+  Serial.println(F("LISTO. k=F1/F3 hasta +/-16, v=femures hasta +/-8, u=femures +/-2, w=coxa4 hasta +/-12, r=recuperar coxa4, q=coxas2-3, m=movimiento, s=secuencial, p=postura, c=todo, a=coxas, f=femures +/-8, l=tibias, t=tibia2 a 90 y 25 con C9 vigilado, e=tibia1 CH12 +/-2, z=tibia3 CH10 +/-2, y=paso parcial en aire C2-C4/F1-F4 con tibias/C1 apagadas, g=tibia4 a 150 y luego 15 con C10 vigilado, h=tibia1 CH12 sostener 100, j=pata1 sostener centros CH12, n=tibia1 CH12 +/-2, o=pata1 atras paso de 2 grados, x=apagar."));
+}
+
+void loop() {
+  enviarTelemetriaSiCorresponde();
+  if (!Serial.available()) return;
+
+  char orden = Serial.read();
+  if (orden == 'k' || orden == 'K') {
+    ejecutarPruebaFemuresSinMapa();
+  } else if (orden == 'v' || orden == 'V') {
+    ejecutarBarridoFemures();
+  } else if (orden == 'u' || orden == 'U') {
+    ejecutarPruebaFemuresPequena();
+  } else if (orden == 'w' || orden == 'W') {
+    ejecutarBarridoCoxa4();
+  } else if (orden == 'r' || orden == 'R') {
+    recuperarCoxa4HaciaCentro();
+  } else if (orden == 'q' || orden == 'Q') {
+    ejecutarPruebaCoxasPequena();
+  } else if (orden == 'm' || orden == 'M') {
+    ejecutarPrueba();
+  } else if (orden == 's' || orden == 'S') {
+    ejecutarPruebaSecuencialControlada();
+  } else if (orden == 'p' || orden == 'P') {
+    posturaBase();
+    Serial.println(F("Postura estatica aplicada."));
+  } else if (orden == 'c' || orden == 'C') {
+    ejecutarCalibracionIndividual();
+  } else if (orden == 'a' || orden == 'A') {
+    ejecutarCalibracionRango(0, 3);
+  } else if (orden == 'f' || orden == 'F') {
+    ejecutarCalibracionRango(4, 7);
+  } else if (orden == 'l' || orden == 'L') {
+    ejecutarCalibracionRango(8, 10);
+  } else if (orden == 't' || orden == 'T') {
+    ejecutarPruebaTibias();
+  } else if (orden == 'e' || orden == 'E') {
+    ejecutarPruebaTibiaCorta(8, 100, "Tibia 1 CH12", "HOLD_TIBIA1");
+  } else if (orden == 'z' || orden == 'Z') {
+    ejecutarPruebaTibiaCorta(10, 100, "Tibia 3 CH10", "HOLD_TIBIA3");
+  } else if (orden == 'y' || orden == 'Y') {
+    ejecutarPasoParcialEnAire();
+  } else if (orden == 'g' || orden == 'G') {
+    probarTibia4HastaExtremosProximos();
+  } else if (orden == 'h' || orden == 'H') {
+    sostenerTibia1EnCentro();
+  } else if (orden == 'j' || orden == 'J') {
+    sostenerPata1EnCentros();
+  } else if (orden == 'n' || orden == 'N') {
+    probarTibia1EnCanal12();
+  } else if (orden == 'o' || orden == 'O') {
+    llevarPata1AtrasYVolver();
+  } else if (orden >= '0' && orden <= '5') {
+    probarUnCanal(10 + (orden - '0'));
+  } else if (orden == '#') {
+    sostenerCoxasEquilibrio();
+  } else if (orden == 'd' || orden == 'D') {
+    probarCanalAmplio(0, 150, 20);  // CH0 coxa 1, 130-170 grados
+  } else if (orden == '6') {
+    probarCanalAmplio(1, 40, 20);  // CH1 coxa 2, 20-60 grados
+  } else if (orden == '7') {
+    probarCanalAmplio(8, 80, 40);
+  } else if (orden == '8') {
+    probarUnCanal(8);
+  } else if (orden == '9') {
+    probarUnCanal(9);
+  } else if (orden == 'i' || orden == 'I') {
+    identificarCanalesTibias();
+  } else if (orden == 'b' || orden == 'B') {
+    ejecutarCaminataEnAire();
+  } else if (orden == 'x' || orden == 'X') {
+    apagarTodos();
+  }
+}

@@ -15,6 +15,8 @@ from trajectory_msgs.msg import JointTrajectory
 import yaml
 
 from pca9685_seguro import PCA9685Seguro
+from filtro_control_realimentado import FeedbackControlFilter, FeedbackRejected
+from leer_as5600_tca import AS5600Reader, SENSORS
 
 
 CONFIG = Path(__file__).parents[1] / "configuracion" / "servos.yaml"
@@ -30,12 +32,21 @@ class InterfazPWM(Node):
             self.config["pwm_frequency_hz"], self.config["oe_bcm_gpio"])
         self.last_reference = monotonic()
         self.enabled = False
+        self.feedback_filter = None
+        self.sensor_reader = None
+        try:
+            self.feedback_filter = FeedbackControlFilter.from_config(self.config)
+            self.sensor_reader = AS5600Reader(self.config["i2c_bus"])
+        except (RuntimeError, ValueError) as error:
+            self.get_logger().warning(
+                f"Realimentación no preparada; PWM seguirá bloqueado: {error}")
         self.create_subscription(
             JointTrajectory, "/joint_trajectory_controller/joint_trajectory",
             self.trajectory_callback, 10)
         self.create_subscription(
             Bool, "/nova/hardware/enable", self.enable_callback, 10)
         self.create_timer(0.05, self.watchdog)
+        self.create_timer(0.02, self.feedback_timer)
         self.get_logger().warning("PWM iniciado DESHABILITADO; OE permanece alto")
 
     def calibration_complete(self):
@@ -51,6 +62,9 @@ class InterfazPWM(Node):
                 and len(self.servos) == 12
                 and all(item.get("calibrated", False)
                         for item in self.servos.values())
+                and self.feedback_filter is not None
+                and FeedbackControlFilter.config_complete(
+                    self.config, set(self.servos))
                 and (measured_limits or not self.config.get(
                     "require_measured_motion_limits", True)))
 
@@ -74,14 +88,27 @@ class InterfazPWM(Node):
             self.disable("trayectoria inválida")
             return
         try:
-            for joint, angle in zip(message.joint_names, positions):
+            references = dict(zip(message.joint_names, positions))
+            limited = self.feedback_filter.limit_references(references)
+            for joint, angle in limited.items():
                 calibration = self.servos[joint]
                 pulse = self.driver.angle_to_pulse(angle, calibration)
                 self.driver.set_pulse_us(calibration["channel"], pulse)
-        except (KeyError, ValueError, RuntimeError) as error:
+        except (KeyError, ValueError, RuntimeError, FeedbackRejected) as error:
             self.disable(f"referencia rechazada: {error}")
             return
         self.last_reference = monotonic()
+
+    def feedback_timer(self):
+        """Actualiza la última ventana AS5600; un defecto detiene PWM activo."""
+        if self.feedback_filter is None or self.sensor_reader is None:
+            return
+        try:
+            readings = [self.sensor_reader.read_sensor(sensor) for sensor in SENSORS]
+            self.feedback_filter.update_measurements(readings)
+        except FeedbackRejected as error:
+            if self.enabled:
+                self.disable(f"realimentación rechazada: {error}")
 
     def watchdog(self):
         if (self.enabled and monotonic() - self.last_reference
@@ -95,6 +122,8 @@ class InterfazPWM(Node):
 
     def destroy_node(self):
         self.driver.close()
+        if self.sensor_reader is not None:
+            self.sensor_reader.close()
         super().destroy_node()
 
 

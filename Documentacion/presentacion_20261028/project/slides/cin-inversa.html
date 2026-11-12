@@ -1,0 +1,22 @@
+<section id="cin-inversa" data-transition="fade" style="background:#EAEEF2;color:#2A3442;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4521C">Modelo matemático</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#15233B">Cinemática inversa: del punto del pie a los ángulos</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:40px">
+<div style="background:#FFFFFF;padding:36px 44px;border-radius:16px;display:flex;flex-direction:column;gap:16px">
+<h3 style="font-size:30px;font-weight:600;color:#2F5D8C">1. Coxa</h3>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:38px;color:#15233B">zp = −√( y² + z² − lc² )</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:38px;color:#15233B">a = atan2(z, y) − atan2(zp, sᵢ·lc)</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:38px;color:#15233B">qc = sᵢ·a</p>
+</div>
+<div style="background:#FFFFFF;padding:36px 44px;border-radius:16px;display:flex;flex-direction:column;gap:16px">
+<h3 style="font-size:30px;font-weight:600;color:#2F5D8C">2. Triángulo fémur–tibia</h3>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:34px;color:#4A5568">d = −zp ,  b = −x ,  r² = b² + d²</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:38px;color:#15233B">D = (r² − lf² − lt²) / (2·lf·lt)</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:38px;color:#15233B">qt = −arccos D</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:34px;color:#15233B">qf = atan2(b, d) − atan2(lt·sin qt, lf + lt·cos qt)</p>
+</div>
+</div>
+<p style="font-size:27px;line-height:1.4">La rama negativa de qt mantiene la rodilla flexionada. Referencias sin solución (|D| &gt; 1), fuera de límites o discontinuas se rechazan, no se saturan. Ida y vuelta FK→IK: error &lt; 10⁻¹² rad.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6A7383">Nova Spot Micro · Modelo matemático</p>
+<aside>La cinemática inversa es el camino de vuelta: sabemos dónde queremos el pie y calculamos qué ángulos poner. Es lo que necesita la marcha. Se resuelve al revés de la directa: primero se deshace el giro de la coxa y luego se resuelve la pata de lado.<br><br>Paso 1, la coxa: mira la pata de frente. Desde la cadera sale la coxa al lado (largo lc) y desde su punta baja el resto de la pata (largo |zp|), formando un ángulo recto; la línea cadera-pie es la hipotenusa, √(y²+z²). Por Pitágoras: zp = -√(y² + z² - lc²) (menos porque el pie está abajo). El ángulo de la coxa sale de comparar dos direcciones: atan2(z, y), hacia dónde apunta realmente el pie, y atan2(zp, si·lc), hacia dónde apuntaría sin girar la coxa. La diferencia es a, y qc = si·a. atan2 es el arcotangente que da el ángulo correcto en cualquier dirección.<br><br>Paso 2, el triángulo fémur-tibia: ya sin coxa, se mira de lado. d = -zp (qué tan abajo está el pie), b = -x (cuánto se corre), r² = b² + d² (distancia cadera-pie al cuadrado). Fémur, tibia y esa línea forman un triángulo del que conocemos los tres lados; los ángulos salen con la ley del coseno: r² = lf² + lt² + 2·lf·lt·cos qt. Despejando: D = (r² - lf² - lt²)/(2·lf·lt) y qt = -arccos D. El signo menos elige la rodilla doblada hacia atrás (hay dos soluciones). D debe estar entre -1 y 1 porque un coseno nunca pasa de 1: si sale mayor, el pie está más lejos de lo que alcanza la pata y el programa rechaza el punto. El fémur: qf = atan2(b, d) - atan2(lt·sin qt, lf + lt·cos qt), es decir, la dirección de la línea cadera-pie menos cuánto se aparta el fémur por estar doblada la rodilla.<br><br>Comprobación con el ejemplo de la diapositiva 11 (pie en 0,0110; 0,1112; -0,2063 m):<br>Coxa: zp = -√(0,1112² + 0,2063² - 0,09²) = -0,2164; a = atan2(-0,2063; 0,1112) - atan2(-0,2164; 0,09) = -1,0763 + 1,1763 = 0,10.<br>Triángulo: d = 0,2164, b = -0,0110, r² = 0,04695; D = (0,04695 - 0,01103 - 0,01742)/0,02772 = 0,667; qt = -arccos 0,667 = -0,84.<br>Fémur: qf = atan2(-0,011; 0,2164) - atan2(-0,0981; 0,1934) = -0,051 + 0,469 = 0,42.<br>Salen exactamente los ángulos de partida. Eso significa «ida y vuelta FK-IK con error menor a 10^-12 rad»: ir de ángulos a pie y volver da lo mismo.</aside>
+</section>

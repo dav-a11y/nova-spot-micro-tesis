@@ -1,0 +1,19 @@
+<section id="e07-servo" data-transition="fade" style="background:#EAEEF2;color:#2A3442;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:row;align-items:center;gap:32px"><p style="font-family:'Source Serif 4', Georgia, serif;font-size:96px;font-weight:600;line-height:1;color:#B4521C">07</p><div style="display:flex;flex-direction:column;gap:4px"><p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4521C">16 – 21 de octubre de 2026</p><h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#15233B">El servo real, medido y simulado</h2></div></div>
+<div style="display:grid;grid-template-columns:1fr 1.25fr;gap:32px">
+<ul style="font-size:28px;line-height:1.55">
+<li>Caminatas nominales: retardo ≈ 100 ms</li>
+<li>Escalones y senoides: zona muerta 0,5–1°; a 2 Hz llega al 74–92 %</li>
+<li>Barrido de ±40°: lineal, fija los topes</li>
+<li>Ciclo de mejora: retardo 99 ms</li>
+</ul>
+<div style="background:#FFFFFF;padding:32px 40px;border-radius:16px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:32px;color:#15233B">qordₜ = clip( qnomₜ + Δqₜ , qordₜ₋₁ ± 3° )</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:32px;color:#15233B">qefⱼ = q*ⱼ + gⱼ·( qordⱼ − q*ⱼ )</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:32px;color:#15233B">|qefₜ − qefₜ₋₁| &lt; 0,42°  ⇒  qefₜ = qefₜ₋₁</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:32px;color:#15233B">uₜ = qefₜ₋d ,  d ∈ {1, …, 4}</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:32px;color:#15233B">gⱼ ~ U(0,95; 1,05)·gⱼ ,  sesgo ~ U(−1°; 1°)</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6A7383">Nova Spot Micro · Paso 7 de 13 · MuJoCo a 2 ms, 15 subpasos por decisión</p>
+</section>

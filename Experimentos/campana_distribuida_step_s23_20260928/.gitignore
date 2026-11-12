@@ -1,0 +1,4 @@
+# Conservar los registros de esta campaña como evidencia experimental.
+!*.log
+# Bloqueo de ejecución local, sin datos experimentales.
+expansion.lock

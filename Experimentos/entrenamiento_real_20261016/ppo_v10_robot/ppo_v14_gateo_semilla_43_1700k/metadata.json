@@ -1,0 +1,80 @@
+{
+  "seed": "semilla_43",
+  "timesteps": 1700000,
+  "continuado_desde": "ppo_v13_gateo_abierto/semilla_13/intermedias/policy_900000_steps.zip",
+  "ciclos_episodio": 6,
+  "ppo": {
+    "lr": 0.0001,
+    "target_kl": 0.03,
+    "n_steps": 2048
+  },
+  "eval_seeds": [
+    801,
+    802,
+    803,
+    804,
+    805
+  ],
+  "control_dt": 0.03,
+  "marcha": {
+    "tipo": "gateo",
+    "femur_deg": 15.0,
+    "tibia_deg": 10.0,
+    "fase_s": 0.5,
+    "ciclo_paso_s": 2.4,
+    "ciclo_trote_s": 1.4,
+    "apertura_deg": 8.0
+  },
+  "pesos": {
+    "avance": 10.0,
+    "actitud": 30.0,
+    "lateral": 20.0,
+    "giro": 10.0,
+    "giro_ciclo": 5.0,
+    "suavidad": 0.3,
+    "coxas": 1.0
+  },
+  "hardware_transfer": false,
+  "observacion": [
+    "front_left_femur_joint",
+    "front_left_tibia_joint",
+    "front_right_femur_joint",
+    "front_right_tibia_joint",
+    "rear_left_femur_joint",
+    "rear_left_tibia_joint",
+    "rear_right_femur_joint",
+    "rear_right_tibia_joint",
+    "sin_fase",
+    "cos_fase",
+    "residual_previo x12"
+  ],
+  "sin_residual": [
+    "front_left_coxa_joint",
+    "front_right_coxa_joint",
+    "rear_left_coxa_joint",
+    "rear_right_coxa_joint"
+  ],
+  "aleatorizar_actuador": true,
+  "limite_cambio_grados": 3.0000000000000004,
+  "nota": "Simulación ajustada al robot real del 16-oct; no transferida al robot.",
+  "origen": "ppo_v14_gateo/semilla_43/intermedias/policy_1700000_steps.zip",
+  "evaluacion_3min": {
+    "avance_m": 7.7954,
+    "deriva_m": 0.1392,
+    "roll_rms_deg": 1.2637,
+    "pitch_rms_deg": 1.4753,
+    "inclinacion_max_deg": 3.801,
+    "coxas_rms_deg": 0.8324,
+    "suavidad": 1.0563
+  },
+  "evaluacion_marcha_dañada_27oct": {
+    "avance_m": 6.272353130499823,
+    "deriva_m": 1.5673302964511606,
+    "roll_rms_deg": 1.3807594424765068,
+    "pitch_rms_deg": 0.9857214221037264,
+    "inclinacion_max_deg": 3.459792835165083,
+    "coxas_rms_deg": 0.8241466134342748,
+    "suavidad": 1.4197566503883425,
+    "caidas": 0
+  }
+}

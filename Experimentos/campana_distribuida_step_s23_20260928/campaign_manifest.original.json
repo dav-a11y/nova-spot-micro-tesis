@@ -1,0 +1,27 @@
+{
+  "date": "2026-09-24",
+  "simulators": [
+    "mujoco"
+  ],
+  "gaits": [
+    "step"
+  ],
+  "seeds": [
+    23
+  ],
+  "mujoco_timesteps": 200000,
+  "gazebo_timesteps": 4096,
+  "episode_cycles": 5,
+  "evaluation_episodes": 5,
+  "hardware_transfer": false,
+  "dimensions_m": {
+    "coxa": 0.0381,
+    "femur": 0.10795,
+    "tibia": 0.13589,
+    "hip_spacing_x": 0.18,
+    "hip_spacing_y": 0.12,
+    "body_length": 0.23,
+    "body_width": 0.12,
+    "body_height": 0.075
+  }
+}

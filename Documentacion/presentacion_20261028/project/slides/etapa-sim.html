@@ -1,0 +1,21 @@
+<section id="etapa-sim" data-transition="fade" style="display:flex; flex-direction:column; gap:36px; padding:112px 128px 160px; background:#f6f5f0">
+  <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#b4521c">Primera etapa</p>
+  <h2 style="font-family:'Source Serif 4', Georgia, serif; font-size:64px; font-weight:600; line-height:1.1; color:#15233b">Simulación con ROS 2, Gazebo y MuJoCo</h2>
+  <div style="display:grid; gap:28px; grid-template-columns:1fr 1fr 1fr">
+    <div style="display:flex; flex-direction:column; gap:12px; padding:36px; background:#ffffff; border:1px solid #dcd8ce; border-radius:16px">
+      <h3 style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:32px; font-weight:600; color:#2f5d8c">Software</h3>
+      <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:26px; line-height:1.4; color:#2a3442">ROS 2 Humble: descripción del robot (URDF/SDF y MJCF), controlador de marcha, nodo de métricas y supervisor de seguridad. 79 pruebas automáticas e integración continua.</p>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:12px; padding:36px; background:#ffffff; border:1px solid #dcd8ce; border-radius:16px">
+      <h3 style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:32px; font-weight:600; color:#2f5d8c">Gateo y paso en Gazebo</h3>
+      <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:26px; line-height:1.4; color:#2a3442">Gateo cartesiano: 5 ensayos, 191 ciclos, 0,0240 m/ciclo (0,0055 m/s). Paso: ≈ 0,0217 m/ciclo con 5,76 s/ciclo.</p>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:12px; padding:36px; background:#ffffff; border:1px solid #dcd8ce; border-radius:16px">
+      <h3 style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:32px; font-weight:600; color:#b4521c">Resultado negativo útil</h3>
+      <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:26px; line-height:1.4; color:#2a3442">PPO con modelo nominal del servo: −25,8 % de avance y +23,7 % de pitch frente a la marcha base. Bloqueó la transferencia y motivó identificar el actuador.</p>
+    </div>
+  </div>
+  <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:28px; line-height:1.4; color:#4a5568">Conclusión de la etapa: sin un modelo del servo medido en el robot, lo aprendido en simulación no mejora la marcha. Por eso se construyó el entorno con el actuador real.</p>
+  <p style="position:absolute; bottom:64px; left:128px; width:1664px; font-family:'IBM Plex Sans', Arial, sans-serif; font-size:24px; color:#6a7383">Nova Spot Micro · Plataforma y simulación</p>
+  <aside>Software: en la primera etapa todo se hizo con un robot virtual en el computador. Se usó ROS 2, una plataforma que deja comunicarse a los programas del robot. Unos archivos describen cómo es el robot: medidas, pesos y uniones. Un programa genera los movimientos de las patas, otro mide cuánto avanza y cuánto se inclina, y un supervisor lo detiene si algo sale mal. Ese supervisor se probó con 9 situaciones peligrosas y frenó todas. Además, 79 pruebas automáticas revisan que todo funcione cada vez que se sube un cambio.<br><br>Gateo y paso en Gazebo: Gazebo es un simulador con física real. En gateo el robot mueve una pata a la vez y avanzó 2,4 cm por ciclo, en 5 ensayos casi iguales. En paso, que es lo mismo pero continuo, avanzó unos 2,2 cm por ciclo, con ciclos de 5,76 s. Esto mostró que las marchas funcionaban antes de pasarlas al robot real.<br><br>Resultado negativo útil: se probó por primera vez la red PPO y empeoró la marcha. El robot avanzó 25,8 % menos y se balanceó 23,7 % más. Pasó porque la red se entrenó con un servo ideal, que obedece al instante, y los servos reales tienen retraso y no llegan justo al ángulo pedido. Fue útil por dos razones: evitó llevar al robot una red que no servía y mostró que había que medir el servo real y entrenar con ese modelo. Eso se hizo después, y con eso la red sí funcionó.<br><br>La frase de abajo lo resume: sin un modelo del servo medido en el robot, lo aprendido en simulación no mejora la marcha.</aside>
+</section>
